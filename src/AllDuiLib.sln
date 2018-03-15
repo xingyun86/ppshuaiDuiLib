@@ -1,0 +1,40 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2013
+VisualStudioVersion = 12.0.40629.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "AllDuiLib", "DuiLib\AllDuiLib.vcxproj", "{E106ACD7-4E53-4AEE-942B-D0DD426DB34E}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		DADebug|Win32 = DADebug|Win32
+		DARelease|Win32 = DARelease|Win32
+		DUDebug|Win32 = DUDebug|Win32
+		DURelease|Win32 = DURelease|Win32
+		SADebug|Win32 = SADebug|Win32
+		SARelease|Win32 = SARelease|Win32
+		SUDebug|Win32 = SUDebug|Win32
+		SURelease|Win32 = SURelease|Win32
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{E106ACD7-4E53-4AEE-942B-D0DD426DB34E}.DADebug|Win32.ActiveCfg = DADebug|Win32
+		{E106ACD7-4E53-4AEE-942B-D0DD426DB34E}.DADebug|Win32.Build.0 = DADebug|Win32
+		{E106ACD7-4E53-4AEE-942B-D0DD426DB34E}.DARelease|Win32.ActiveCfg = DARelease|Win32
+		{E106ACD7-4E53-4AEE-942B-D0DD426DB34E}.DARelease|Win32.Build.0 = DARelease|Win32
+		{E106ACD7-4E53-4AEE-942B-D0DD426DB34E}.DUDebug|Win32.ActiveCfg = DUDebug|Win32
+		{E106ACD7-4E53-4AEE-942B-D0DD426DB34E}.DUDebug|Win32.Build.0 = DUDebug|Win32
+		{E106ACD7-4E53-4AEE-942B-D0DD426DB34E}.DURelease|Win32.ActiveCfg = DURelease|Win32
+		{E106ACD7-4E53-4AEE-942B-D0DD426DB34E}.DURelease|Win32.Build.0 = DURelease|Win32
+		{E106ACD7-4E53-4AEE-942B-D0DD426DB34E}.SADebug|Win32.ActiveCfg = SADebug|Win32
+		{E106ACD7-4E53-4AEE-942B-D0DD426DB34E}.SADebug|Win32.Build.0 = SADebug|Win32
+		{E106ACD7-4E53-4AEE-942B-D0DD426DB34E}.SARelease|Win32.ActiveCfg = SARelease|Win32
+		{E106ACD7-4E53-4AEE-942B-D0DD426DB34E}.SARelease|Win32.Build.0 = SARelease|Win32
+		{E106ACD7-4E53-4AEE-942B-D0DD426DB34E}.SUDebug|Win32.ActiveCfg = SUDebug|Win32
+		{E106ACD7-4E53-4AEE-942B-D0DD426DB34E}.SUDebug|Win32.Build.0 = SUDebug|Win32
+		{E106ACD7-4E53-4AEE-942B-D0DD426DB34E}.SURelease|Win32.ActiveCfg = SURelease|Win32
+		{E106ACD7-4E53-4AEE-942B-D0DD426DB34E}.SURelease|Win32.Build.0 = SURelease|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
