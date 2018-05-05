@@ -31,8 +31,8 @@ namespace DuiLib
 
 		void SetTextStyle(UINT uStyle);
 		UINT GetTextStyle() const;
-		bool IsMultiLine();
-		void SetMultiLine(bool bMultiLine = true);
+		BOOL IsMultiLine();
+		void SetMultiLine(BOOL bMultiLine = TRUE);
 		void SetTextColor(DWORD dwTextColor);
 		DWORD GetTextColor() const;
 		void SetDisabledTextColor(DWORD dwTextColor);
@@ -41,24 +41,24 @@ namespace DuiLib
 		int GetFont() const;
 		RECT GetTextPadding() const;
 		void SetTextPadding(RECT rc);
-		bool IsShowHtml();
-		void SetShowHtml(bool bShowHtml = true);
+		BOOL IsShowHtml();
+		void SetShowHtml(BOOL bShowHtml = true);
 
 		SIZE EstimateSize(SIZE szAvailable);
-		void DoEvent(TEventUI& event);
+		LRESULT DoEvent(TEventUI& event);
 		void SetAttribute(LPCTSTR pstrName, LPCTSTR pstrValue);
 
-		void PaintText(HDC hDC);
+		LRESULT PaintText(HDC hDC);
 
 #ifdef _USE_GDIPLUS
-		void		SetEnabledEffect(bool _EnabledEffect);
-		bool		GetEnabledEffect();
-		void		SetEnabledLuminous(bool bEnableLuminous);
-		bool		GetEnabledLuminous();
+		void		SetEnabledEffect(BOOL _EnabledEffect);
+		BOOL		GetEnabledEffect();
+		void		SetEnabledLuminous(BOOL bEnableLuminous);
+		BOOL		GetEnabledLuminous();
 		void		SetLuminousFuzzy(float fFuzzy);
 		float		GetLuminousFuzzy();
-		void		SetGradientLength(int _GradientLength);
-		int			GetGradientLength();
+		void		SetGradientLength(LONG _GradientLength);
+		LONG		GetGradientLength();
 		void		SetShadowOffset(int _offset,int _angle);
 		RectF		GetShadowOffset();
 		void		SetTextColor1(DWORD _TextColor1);
@@ -69,33 +69,33 @@ namespace DuiLib
 		DWORD		GetTextShadowColorB();
 		void		SetStrokeColor(DWORD _StrokeColor);
 		DWORD		GetStrokeColor();
-		void		SetGradientAngle(int _SetGradientAngle);
-		int			GetGradientAngle();
-		void		SetEnabledStroke(bool _EnabledStroke);
-		bool		GetEnabledStroke();
-		void		SetEnabledShadow(bool _EnabledShadowe);
-		bool		GetEnabledShadow();
+		void		SetGradientAngle(LONG _SetGradientAngle);
+		LONG		GetGradientAngle();
+		void		SetEnabledStroke(BOOL _EnabledStroke);
+		BOOL		GetEnabledStroke();
+		void		SetEnabledShadow(BOOL _EnabledShadowe);
+		BOOL		GetEnabledShadow();
 #endif
 	
 	protected:
 		LPWSTR  m_pWideText;
 		DWORD	m_dwTextColor;
 		DWORD	m_dwDisabledTextColor;
-		int		m_iFont;
+		LONG	m_iFont;
 		UINT	m_uTextStyle;
 		RECT	m_rcTextPadding;
-		bool	m_bShowHtml;
+		BOOL	m_bShowHtml;
         SIZE    m_szAvailableLast;
         SIZE    m_cxyFixedLast;
-        bool    m_bNeedEstimateSize;
+        BOOL    m_bNeedEstimateSize;
 
 		float					m_fLuminousFuzzy;
-		int						m_GradientLength;
-		int						m_GradientAngle;
-		bool					m_EnableEffect;
-		bool					m_bEnableLuminous;
-		bool					m_EnabledStroke;
-		bool					m_EnabledShadow;
+		LONG					m_GradientLength;
+		LONG					m_GradientAngle;
+		BOOL					m_EnableEffect;
+		BOOL					m_bEnableLuminous;
+		BOOL					m_EnabledStroke;
+		BOOL					m_EnabledShadow;
 		DWORD					m_dwTextColor1;
 		DWORD					m_dwTextShadowColorA;
 		DWORD					m_dwTextShadowColorB;

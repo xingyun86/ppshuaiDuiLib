@@ -9,8 +9,8 @@
  */
 /* Compiler settings for downloadmgr.idl:
     Oicf (OptLev=i2), W1, Zp8, env=Win32 (32b run), ms_ext, c_ext
-    error checks: allocation ref bounds_check enum stub_data
-    VC __declspec() decoration level:
+    error checks: allocation ref bounds_check enum stub_data 
+    VC __declspec() decoration level: 
          __declspec(uuid()), __declspec(selectany), __declspec(novtable)
          DECLSPEC_UUID(), MIDL_INTERFACE()
 */
@@ -37,7 +37,7 @@
 #ifndef __downloadmgr_h__
 #define __downloadmgr_h__
 
-/* Forward Declarations */
+/* Forward Declarations */ 
 
 #ifndef __IDownloadManager_FWD_DEFINED__
 #define __IDownloadManager_FWD_DEFINED__
@@ -51,13 +51,13 @@ typedef interface IDownloadManager IDownloadManager;
 
 #ifdef __cplusplus
 extern "C"{
-#endif
+#endif 
 
-//void __RPC_FAR * __RPC_USER MIDL_user_allocate(size_t);
-//void __RPC_USER MIDL_user_free( void __RPC_FAR * );
+void __RPC_FAR * __RPC_USER MIDL_user_allocate(size_t);
+void __RPC_USER MIDL_user_free( void __RPC_FAR * ); 
 
 /* interface __MIDL_itf_downloadmgr_0000 */
-/* [local] */
+/* [local] */ 
 
 //=--------------------------------------------------------------------------=
 // downloadmgr.h
@@ -91,18 +91,18 @@ extern RPC_IF_HANDLE __MIDL_itf_downloadmgr_0000_v0_0_s_ifspec;
 #define __IDownloadManager_INTERFACE_DEFINED__
 
 /* interface IDownloadManager */
-/* [local][unique][uuid][object][helpstring] */
+/* [local][unique][uuid][object][helpstring] */ 
 
 
 EXTERN_C const IID IID_IDownloadManager;
 
 #if defined(__cplusplus) && !defined(CINTERFACE)
-
+    
     MIDL_INTERFACE("988934A4-064B-11D3-BB80-00104B35E7F9")
     IDownloadManager : public IUnknown
     {
     public:
-        virtual HRESULT STDMETHODCALLTYPE Download(
+        virtual HRESULT STDMETHODCALLTYPE Download( 
             /* [in] */ IMoniker __RPC_FAR *pmk,
             /* [in] */ IBindCtx __RPC_FAR *pbc,
             /* [in] */ DWORD dwBindVerb,
@@ -111,27 +111,27 @@ EXTERN_C const IID IID_IDownloadManager;
             /* [in] */ LPCOLESTR pszHeaders,
             /* [in] */ LPCOLESTR pszRedir,
             /* [in] */ UINT uiCP) = 0;
-
+        
     };
-
+    
 #else 	/* C style interface */
 
     typedef struct IDownloadManagerVtbl
     {
         BEGIN_INTERFACE
-
-        HRESULT ( STDMETHODCALLTYPE __RPC_FAR *QueryInterface )(
+        
+        HRESULT ( STDMETHODCALLTYPE __RPC_FAR *QueryInterface )( 
             IDownloadManager __RPC_FAR * This,
             /* [in] */ REFIID riid,
             /* [iid_is][out] */ void __RPC_FAR *__RPC_FAR *ppvObject);
-
-        ULONG ( STDMETHODCALLTYPE __RPC_FAR *AddRef )(
+        
+        ULONG ( STDMETHODCALLTYPE __RPC_FAR *AddRef )( 
             IDownloadManager __RPC_FAR * This);
-
-        ULONG ( STDMETHODCALLTYPE __RPC_FAR *Release )(
+        
+        ULONG ( STDMETHODCALLTYPE __RPC_FAR *Release )( 
             IDownloadManager __RPC_FAR * This);
-
-        HRESULT ( STDMETHODCALLTYPE __RPC_FAR *Download )(
+        
+        HRESULT ( STDMETHODCALLTYPE __RPC_FAR *Download )( 
             IDownloadManager __RPC_FAR * This,
             /* [in] */ IMoniker __RPC_FAR *pmk,
             /* [in] */ IBindCtx __RPC_FAR *pbc,
@@ -141,7 +141,7 @@ EXTERN_C const IID IID_IDownloadManager;
             /* [in] */ LPCOLESTR pszHeaders,
             /* [in] */ LPCOLESTR pszRedir,
             /* [in] */ UINT uiCP);
-
+        
         END_INTERFACE
     } IDownloadManagerVtbl;
 
@@ -150,7 +150,7 @@ EXTERN_C const IID IID_IDownloadManager;
         CONST_VTBL struct IDownloadManagerVtbl __RPC_FAR *lpVtbl;
     };
 
-
+    
 
 #ifdef COBJMACROS
 
@@ -175,7 +175,7 @@ EXTERN_C const IID IID_IDownloadManager;
 
 
 
-HRESULT STDMETHODCALLTYPE IDownloadManager_Download_Proxy(
+HRESULT STDMETHODCALLTYPE IDownloadManager_Download_Proxy( 
     IDownloadManager __RPC_FAR * This,
     /* [in] */ IMoniker __RPC_FAR *pmk,
     /* [in] */ IBindCtx __RPC_FAR *pbc,

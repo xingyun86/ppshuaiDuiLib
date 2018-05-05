@@ -16,23 +16,23 @@ namespace DuiLib
 		CContainerUI* GetOwner() const;
 		void SetOwner(CContainerUI* pOwner);
 
-		void SetVisible(bool bVisible = true);
-		void SetEnabled(bool bEnable = true);
+		void SetVisible(BOOL bVisible = TRUE);
+		void SetEnabled(BOOL bEnable = TRUE);
 		void SetFocus();
 
-		bool IsHorizontal();
-		void SetHorizontal(bool bHorizontal = true);
-		int GetScrollRange() const;
+		BOOL IsHorizontal();
+		void SetHorizontal(BOOL bHorizontal = TRUE);
+		LONG GetScrollRange() const;
 		void SetScrollRange(int nRange);
-		int GetScrollPos() const;
-		void SetScrollPos(int nPos, bool bTriggerEvent=true);
-		int GetLineSize() const;
-		void SetLineSize(int nSize);
-        int GetScrollUnit() const;
-        void SetScrollUnit(int iUnit);
+		LONG GetScrollPos() const;
+		void SetScrollPos(int nPos, BOOL bTriggerEvent = TRUE);
+		LONG GetLineSize() const;
+		void SetLineSize(LONG nSize);
+        LONG GetScrollUnit() const;
+        void SetScrollUnit(LONG iUnit);
 
-		bool GetShowButton1();
-		void SetShowButton1(bool bShow);
+		BOOL GetShowButton1();
+		void SetShowButton1(BOOL bShow);
 		DWORD GetButton1Color() const;
 		void SetButton1Color(DWORD dwColor);
 		LPCTSTR GetButton1NormalImage();
@@ -44,8 +44,8 @@ namespace DuiLib
 		LPCTSTR GetButton1DisabledImage();
 		void SetButton1DisabledImage(LPCTSTR pStrImage);
 
-		bool GetShowButton2();
-		void SetShowButton2(bool bShow);
+		BOOL GetShowButton2();
+		void SetShowButton2(BOOL bShow);
 		DWORD GetButton2Color() const;
 		void SetButton2Color(DWORD dwColor);
 		LPCTSTR GetButton2NormalImage();
@@ -86,17 +86,17 @@ namespace DuiLib
 		LPCTSTR GetBkDisabledImage();
 		void SetBkDisabledImage(LPCTSTR pStrImage);
 
-		void SetPos(RECT rc, bool bNeedInvalidate = true);
-		void DoEvent(TEventUI& event);
+		LRESULT SetPos(RECT rc, BOOL bNeedInvalidate = TRUE);
+		LRESULT DoEvent(TEventUI& event);
 		void SetAttribute(LPCTSTR pstrName, LPCTSTR pstrValue);
 
-		bool DoPaint(HDC hDC, const RECT& rcPaint, CControlUI* pStopControl);
+		LRESULT DoPaint(HDC hDC, const RECT& rcPaint, CControlUI* pStopControl);
 
-		void PaintBk(HDC hDC);
-		void PaintButton1(HDC hDC);
-		void PaintButton2(HDC hDC);
-		void PaintThumb(HDC hDC);
-		void PaintRail(HDC hDC);
+		LRESULT PaintBk(HDC hDC);
+		LRESULT PaintButton1(HDC hDC);
+		LRESULT PaintButton2(HDC hDC);
+		LRESULT PaintThumb(HDC hDC);
+		LRESULT PaintRail(HDC hDC);
 
 	protected:
 
@@ -106,23 +106,23 @@ namespace DuiLib
 			DEFAULT_TIMERID = 10,
 		};
 
-		bool m_bHorizontal;
-		int m_nRange;
-		int m_nScrollPos;
-		int m_nLineSize;
-        int m_nScrollUnit;
+		BOOL m_bHorizontal;
+		LONG m_nRange;
+		LONG m_nScrollPos;
+		LONG m_nLineSize;
+        LONG m_nScrollUnit;
 		CContainerUI* m_pOwner;
 		POINT ptLastMouse;
-		int m_nLastScrollPos;
-		int m_nLastScrollOffset;
-		int m_nScrollRepeatDelay;
+		LONG m_nLastScrollPos;
+		LONG m_nLastScrollOffset;
+		LONG m_nScrollRepeatDelay;
 
 		TDrawInfo m_diBkNormal;
 		TDrawInfo m_diBkHot;
 		TDrawInfo m_diBkPushed;
 		TDrawInfo m_diBkDisabled;
 
-		bool m_bShowButton1;
+		BOOL m_bShowButton1;
 		RECT m_rcButton1;
 		UINT m_uButton1State;
 		DWORD m_dwButton1Color;
@@ -131,7 +131,7 @@ namespace DuiLib
 		TDrawInfo m_diButton1Pushed;
 		TDrawInfo m_diButton1Disabled;
 
-		bool m_bShowButton2;
+		BOOL m_bShowButton2;
 		RECT m_rcButton2;
 		UINT m_uButton2State;
 		DWORD m_dwButton2Color;

@@ -21,20 +21,20 @@ namespace DuiLib
 		SYSTEMTIME& GetTime();
 		void SetTime(SYSTEMTIME* pst);
 
-		void SetReadOnly(bool bReadOnly);
-		bool IsReadOnly() const;
+		void SetReadOnly(BOOL bReadOnly);
+		BOOL IsReadOnly() const;
 
-		void UpdateText();
+		LRESULT UpdateText();
 
-        void SetPos(RECT rc, bool bNeedInvalidate = true);
-        void Move(SIZE szOffset, bool bNeedInvalidate = true);
+		LRESULT SetPos(RECT rc, BOOL bNeedInvalidate = TRUE);
+		LRESULT Move(SIZE szOffset, BOOL bNeedInvalidate = TRUE);
 
-		void DoEvent(TEventUI& event);
+		LRESULT DoEvent(TEventUI& event);
 
 	protected:
 		SYSTEMTIME m_sysTime;
-		int        m_nDTUpdateFlag;
-		bool       m_bReadOnly;
+		LONG       m_nDTUpdateFlag;
+		BOOL       m_bReadOnly;
 
 		CDateTimeWnd* m_pWindow;
 	};

@@ -18,36 +18,36 @@ public:
     LPCTSTR GetClass() const;
     LPVOID GetInterface(LPCTSTR pstrName);
 
-    void DoInit();
+	LRESULT DoInit();
     UINT GetControlFlags() const;
 
     CDuiString GetText() const;
-    void SetEnabled(bool bEnable = true);
+    void SetEnabled(BOOL bEnable = TRUE);
 
     CDuiString GetDropBoxAttributeList();
     void SetDropBoxAttributeList(LPCTSTR pstrList);
     SIZE GetDropBoxSize() const;
     void SetDropBoxSize(SIZE szDropBox);
 
-    int GetCurSel() const;
-	bool GetSelectCloseFlag();
-	void SetSelectCloseFlag(bool flag);
-    bool SelectItem(int iIndex, bool bTakeFocus = false, bool bTriggerEvent=true);
-    bool ExpandItem(int iIndex, bool bExpand = true);
-    int GetExpandedItem() const;
+    LONG GetCurSel() const;
+	BOOL GetSelectCloseFlag();
+	void SetSelectCloseFlag(BOOL flag);
+	LRESULT SelectItem(LONG iIndex, BOOL bTakeFocus = FALSE, BOOL bTriggerEvent = TRUE);
+	LRESULT ExpandItem(LONG iIndex, BOOL bExpand = TRUE);
+	LONG GetExpandedItem() const;
 
-    bool SetItemIndex(CControlUI* pControl, int iNewIndex);
-    bool SetMultiItemIndex(CControlUI* pStartControl, int iCount, int iNewStartIndex);
-    bool Add(CControlUI* pControl);
-    bool AddAt(CControlUI* pControl, int iIndex);
-    bool Remove(CControlUI* pControl, bool bDoNotDestroy=false);
-    bool RemoveAt(int iIndex, bool bDoNotDestroy=false);
-    void RemoveAll();
+	LRESULT SetItemIndex(CControlUI* pControl, int iNewIndex);
+	LRESULT SetMultiItemIndex(CControlUI* pStartControl, int iCount, int iNewStartIndex);
+	LRESULT Add(CControlUI* pControl);
+	LRESULT AddAt(CControlUI* pControl, int iIndex);
+	LRESULT Remove(CControlUI* pControl, BOOL bDoNotDestroy = FALSE);
+	LRESULT RemoveAt(LONG iIndex, BOOL bDoNotDestroy = FALSE);
+	LRESULT RemoveAll();
 
-    bool Activate();
+    BOOL Activate();
 
-	bool GetShowText() const;
-	void SetShowText(bool flag);
+	BOOL GetShowTextStatus() const;
+	void SetShowTextStatus(BOOL flag);
     RECT GetTextPadding() const;
     void SetTextPadding(RECT rc);
     LPCTSTR GetNormalImage() const;
@@ -64,7 +64,7 @@ public:
     TListInfoUI* GetListInfo();
     UINT GetItemFixedHeight();
     void SetItemFixedHeight(UINT nHeight);
-    int GetItemFont(int index);
+    long GetItemFont(int index);
     void SetItemFont(int index);
     UINT GetItemTextStyle();
     void SetItemTextStyle(UINT uStyle);
@@ -76,8 +76,8 @@ public:
     void SetItemBkColor(DWORD dwBkColor);
 	LPCTSTR GetItemBkImage() const;
     void SetItemBkImage(LPCTSTR pStrImage);
-    bool IsAlternateBk() const;
-    void SetAlternateBk(bool bAlternateBk);
+    BOOL IsAlternateBk() const;
+	void SetAlternateBk(BOOL bAlternateBk);
 	DWORD GetSelectedItemTextColor() const;
     void SetSelectedItemTextColor(DWORD dwTextColor);
 	DWORD GetSelectedItemBkColor() const;
@@ -100,29 +100,29 @@ public:
     void SetItemHLineSize(int iSize);
     DWORD GetItemHLineColor() const;
     void SetItemHLineColor(DWORD dwLineColor);
-    int GetItemVLineSize() const;
+    long GetItemVLineSize() const;
     void SetItemVLineSize(int iSize);
 	DWORD GetItemVLineColor() const;
     void SetItemVLineColor(DWORD dwLineColor);
-    bool IsItemShowHtml();
-    void SetItemShowHtml(bool bShowHtml = true);
+    BOOL IsItemShowHtml();
+    void SetItemShowHtml(BOOL bShowHtml = TRUE);
 
     SIZE EstimateSize(SIZE szAvailable);
-	void SetPos(RECT rc, bool bNeedInvalidate = true);
-	void Move(SIZE szOffset, bool bNeedInvalidate = true);
-    void DoEvent(TEventUI& event);
+	LRESULT SetPos(RECT rc, BOOL bNeedInvalidate = TRUE);
+	LRESULT Move(SIZE szOffset, BOOL bNeedInvalidate = TRUE);
+	LRESULT DoEvent(TEventUI& event);
     void SetAttribute(LPCTSTR pstrName, LPCTSTR pstrValue);
     
-    bool DoPaint(HDC hDC, const RECT& rcPaint, CControlUI* pStopControl);
-    void PaintText(HDC hDC);
-    void PaintStatusImage(HDC hDC);
+	LRESULT DoPaint(HDC hDC, const RECT& rcPaint, CControlUI* pStopControl);
+	LRESULT PaintText(HDC hDC);
+	LRESULT PaintStatusImage(HDC hDC);
 
 protected:
     CComboWnd* m_pWindow;
 
-    int m_iCurSel;
-	bool m_bShowText;
-	bool m_bSelectCloseFlag;
+    LONG m_iCurSel;
+	BOOL m_bShowText;
+	BOOL m_bSelectCloseFlag;
     RECT m_rcTextPadding;
     CDuiString m_sDropBoxAttributes;
     SIZE m_szDropBox;

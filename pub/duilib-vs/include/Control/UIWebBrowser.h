@@ -4,20 +4,7 @@
 #pragma once
 
 #include "Utils/WebBrowserEventHandler.h"
-
-#include <mshtmhst.h>
-#include <mshtml.h>
-#include <Exdisp.h>
-#include <exdispid.h>
-#include <MsHtmdid.h>
-#include <initguid.h>
-DEFINE_GUID(IID_ICustomDoc, 0x3050f3f0, 0x98b5, 0x11cf, 0xbb,0x82, 0x00,0xaa,0x00,0xbd,0xce,0x0b);
-//DEFINE_GUID(IID_IDownloadManager, 0x988934a4, 0x064b, 0x11d3, 0xbb,0x80, 0x00,0x10,0x4b,0x35,0xe7,0xf9);
-DEFINE_GUID(CGID_DocHostCommandHandler,0xf38bc242,0xb950,0x11d1,0x89,0x18,0x00,0xc0,0x4f,0xc2,0xc8,0x36);
-
-//#define SID_SDownloadManager IID_IDownloadManager
-
-#include "Utils/downloadmgr.h"
+#include <ExDisp.h>
 
 namespace DuiLib
 {
@@ -37,8 +24,8 @@ namespace DuiLib
 		void SetHomePage(LPCTSTR lpszUrl);
 		LPCTSTR GetHomePage();
 
-		void SetAutoNavigation(bool bAuto = TRUE);
-		bool IsAutoNavigation();
+		void SetAutoNavigation(BOOL bAuto = TRUE);
+		BOOL IsAutoNavigation();
 
 		void SetWebBrowserEventHandler(CWebBrowserEventHandler* pEventHandler);
 		void Navigate2(LPCTSTR lpszUrl);
@@ -48,9 +35,9 @@ namespace DuiLib
 		void GoForward();
 		void NavigateHomePage();
 		void NavigateUrl(LPCTSTR lpszUrl);
-		virtual bool DoCreateControl();
+		virtual LRESULT DoCreateControl();
 		IWebBrowser2* GetWebBrowser2(void);
-		IDispatch*		   GetHtmlWindow();
+		IDispatch*	GetHtmlWindow();
 		static DISPID FindId(IDispatch *pObj, LPOLESTR pName);
 		static HRESULT InvokeMethod(IDispatch *pObj, LPOLESTR pMehtod, VARIANT *pVarResult, VARIANT *ps, int cArgs);
 		static HRESULT GetProperty(IDispatch *pObj, LPOLESTR pName, VARIANT *pValue);
@@ -61,11 +48,11 @@ namespace DuiLib
 		IHTMLWindow2*		_pHtmlWnd2;
 		LONG m_dwRef;
 		DWORD m_dwCookie;
-		virtual void ReleaseControl();
+		virtual HRESULT ReleaseControl();
 		HRESULT RegisterEventHandler(BOOL inAdvise);
 		virtual void SetAttribute(LPCTSTR pstrName, LPCTSTR pstrValue);
 		CDuiString m_sHomePage;	// 默认页面
-		bool m_bAutoNavi;	// 是否启动时打开默认页面
+		BOOL m_bAutoNavi;	// 是否启动时打开默认页面
 		CWebBrowserEventHandler* m_pWebBrowserEventHandler;	//浏览器事件处理
 
 		// DWebBrowserEvents2
@@ -75,7 +62,7 @@ namespace DuiLib
 		void DocumentComplete(IDispatch *pDisp,VARIANT *&url);
 		void ProgressChange(LONG nProgress, LONG nProgressMax);
 		void NewWindow3(IDispatch **pDisp, VARIANT_BOOL *&Cancel, DWORD dwFlags, BSTR bstrUrlContext, BSTR bstrUrl);
-		void CommandStateChange(long Command,VARIANT_BOOL Enable);
+		void CommandStateChange(LONG Command,VARIANT_BOOL Enable);
 
 	public:
 		virtual LPCTSTR GetClass() const;

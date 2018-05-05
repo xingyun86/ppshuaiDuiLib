@@ -156,11 +156,11 @@ namespace DuiLib
 		void Empty();
 		void Resize(int iSize);
 		bool IsEmpty() const;
-		int Find(LPVOID iIndex) const;
-		bool Add(LPVOID pData);
-		bool SetAt(int iIndex, LPVOID pData);
-		bool InsertAt(int iIndex, LPVOID pData);
-		bool Remove(int iIndex, int iCount = 1);
+		long Find(LPVOID iIndex) const;
+		long Add(LPVOID pData);
+		long SetAt(int iIndex, LPVOID pData);
+		long InsertAt(int iIndex, LPVOID pData);
+		long Remove(int iIndex, int iCount = 1);
 		int GetSize() const;
 		LPVOID* GetData();
 
@@ -185,8 +185,8 @@ namespace DuiLib
 
 		void Empty();
 		bool IsEmpty() const;
-		bool Add(LPCVOID pData);
-		bool Remove(int iIndex,  int iCount = 1);
+		long Add(LPCVOID pData);
+		long Remove(int iIndex, int iCount = 1);
 		int GetSize() const;
 		LPVOID GetData();
 

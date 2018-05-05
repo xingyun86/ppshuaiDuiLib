@@ -14,10 +14,10 @@ namespace DuiLib
 		LPCTSTR GetClass() const;
 		LPVOID GetInterface(LPCTSTR pstrName);
 
-		void SetManager(CPaintManagerUI* pManager, CControlUI* pParent, bool bInit = true);
+		void SetManager(CPaintManagerUI* pManager, CControlUI* pParent, BOOL bInit = TRUE);
 
-		bool Activate();
-		void SetEnabled(bool bEnable = true);
+		BOOL Activate();
+		void SetEnabled(BOOL bEnable = TRUE);
 
 		LPCTSTR GetSelectedImage();
 		void SetSelectedImage(LPCTSTR pStrImage);
@@ -36,17 +36,17 @@ namespace DuiLib
 
 		LPCTSTR GetGroup() const;
 		void SetGroup(LPCTSTR pStrGroupName = NULL);
-		bool IsSelected() const;
-		virtual void Selected(bool bSelected, bool bTriggerEvent=true);
+		BOOL IsSelected() const;
+		virtual void Selected(BOOL bSelected, BOOL bTriggerEvent=true);
 
 		SIZE EstimateSize(SIZE szAvailable);
 		void SetAttribute(LPCTSTR pstrName, LPCTSTR pstrValue);
 
-		void PaintStatusImage(HDC hDC);
-		void PaintText(HDC hDC);
+		LRESULT PaintStatusImage(HDC hDC);
+		LRESULT PaintText(HDC hDC);
 
 	protected:
-		bool			m_bSelected;
+		BOOL			m_bSelected;
 		CDuiString		m_sGroupName;
 
 		DWORD			m_dwSelectedBkColor;

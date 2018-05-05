@@ -9,7 +9,7 @@ namespace DuiLib {
 /////////////////////////////////////////////////////////////////////////////////////
 //
 
-typedef int (CALLBACK *PULVCompareFunc)(UINT_PTR, UINT_PTR, UINT_PTR);
+typedef LONG (CALLBACK *PULVCompareFunc)(UINT_PTR, UINT_PTR, UINT_PTR);
 
 class CListHeaderUI;
 
@@ -17,16 +17,16 @@ class CListHeaderUI;
 
 typedef struct tagTListInfoUI
 {
-    int nColumns;
+    LONG nColumns;
     RECT rcColumn[UILIST_MAX_COLUMNS];
     UINT uFixedHeight; 
-    int nFont;
+    LONG nFont;
     UINT uTextStyle;
     RECT rcTextPadding;
     DWORD dwTextColor;
     DWORD dwBkColor;
     TDrawInfo diBk;
-    bool bAlternateBk;
+    BOOL bAlternateBk;
     DWORD dwSelectedTextColor;
     DWORD dwSelectedBkColor;
     TDrawInfo diSelected;
@@ -36,12 +36,12 @@ typedef struct tagTListInfoUI
     DWORD dwDisabledTextColor;
     DWORD dwDisabledBkColor;
     TDrawInfo diDisabled;
-    int iHLineSize;
+    LONG iHLineSize;
     DWORD dwHLineColor;
-    int iVLineSize;
+    LONG iVLineSize;
     DWORD dwVLineColor;
-    bool bShowHtml;
-    bool bMultiExpandable;
+    BOOL bShowHtml;
+    BOOL bMultiExpandable;
 } TListInfoUI;
 
 
@@ -58,11 +58,11 @@ class IListOwnerUI
 {
 public:
     virtual TListInfoUI* GetListInfo() = 0;
-    virtual int GetCurSel() const = 0;
-    virtual bool SelectItem(int iIndex, bool bTakeFocus = false, bool bTriggerEvent=true) = 0;
-    virtual void DoEvent(TEventUI& event) = 0;
-    virtual bool ExpandItem(int iIndex, bool bExpand = true) = 0;
-    virtual int GetExpandedItem() const = 0;
+    virtual LONG GetCurSel() const = 0;
+	virtual LRESULT SelectItem(LONG iIndex, BOOL bTakeFocus = FALSE, BOOL bTriggerEvent = TRUE) = 0;
+	virtual LRESULT DoEvent(TEventUI& event) = 0;
+	virtual LRESULT ExpandItem(LONG iIndex, BOOL bExpand = TRUE) = 0;
+    virtual LONG GetExpandedItem() const = 0;
 };
 
 class IListUI : public IListOwnerUI
@@ -77,17 +77,17 @@ public:
 class IListItemUI
 {
 public:
-    virtual int GetIndex() const = 0;
+    virtual LONG GetIndex() const = 0;
     virtual void SetIndex(int iIndex) = 0;
-    virtual int GetDrawIndex() const = 0;
+    virtual LONG GetDrawIndex() const = 0;
     virtual void SetDrawIndex(int iIndex) = 0;
     virtual IListOwnerUI* GetOwner() = 0;
     virtual void SetOwner(CControlUI* pOwner) = 0;
-    virtual bool IsSelected() const = 0;
-    virtual bool Select(bool bSelect = true, bool bTriggerEvent=true) = 0;
-    virtual bool IsExpanded() const = 0;
-    virtual bool Expand(bool bExpand = true) = 0;
-    virtual void DrawItemText(HDC hDC, const RECT& rcItem) = 0;
+    virtual BOOL IsSelected() const = 0;
+    virtual BOOL Select(BOOL bSelect = TRUE, BOOL bTriggerEvent=TRUE) = 0;
+    virtual BOOL IsExpanded() const = 0;
+    virtual BOOL Expand(BOOL bExpand = TRUE) = 0;
+	virtual LRESULT DrawItemText(HDC hDC, const RECT& rcItem) = 0;
 };
 
 
@@ -106,27 +106,27 @@ public:
     UINT GetControlFlags() const;
     LPVOID GetInterface(LPCTSTR pstrName);
 
-    bool GetScrollSelect();
-    void SetScrollSelect(bool bScrollSelect);
-    int GetCurSel() const;
-    bool SelectItem(int iIndex, bool bTakeFocus = false, bool bTriggerEvent=true);
+    BOOL GetScrollSelect();
+    void SetScrollSelect(BOOL bScrollSelect);
+    LONG GetCurSel() const;
+	LRESULT SelectItem(LONG iIndex, BOOL bTakeFocus = FALSE, BOOL bTriggerEvent = TRUE);
 
     CControlUI* GetItemAt(int iIndex) const;
-    int GetItemIndex(CControlUI* pControl) const;
-    bool SetItemIndex(CControlUI* pControl, int iIndex);
-    bool SetMultiItemIndex(CControlUI* pStartControl, int iCount, int iNewStartIndex);
-    int GetCount() const;
-    bool Add(CControlUI* pControl);
-    bool AddAt(CControlUI* pControl, int iIndex);
-    bool Remove(CControlUI* pControl, bool bDoNotDestroy=false);
-    bool RemoveAt(int iIndex, bool bDoNotDestroy=false);
-    void RemoveAll();
+    LONG GetItemIndex(CControlUI* pControl) const;
+    BOOL SetItemIndex(CControlUI* pControl, int iIndex);
+    BOOL SetMultiItemIndex(CControlUI* pStartControl, int iCount, int iNewStartIndex);
+    LONG GetCount() const;
+	LRESULT Add(CControlUI* pControl);
+	LRESULT AddAt(CControlUI* pControl, LONG iIndex);
+	LRESULT Remove(CControlUI* pControl, BOOL bDoNotDestroy = FALSE);
+	LRESULT RemoveAt(LONG iIndex, BOOL bDoNotDestroy = FALSE);
+	LRESULT RemoveAll();
 
     void EnsureVisible(int iIndex);
     void Scroll(int dx, int dy);
 
-    int GetChildPadding() const;
-    void SetChildPadding(int iPadding);
+    LONG GetChildPadding() const;
+	void SetChildPadding(LONG iPadding);
 
     CListHeaderUI* GetHeader() const;  
     CContainerUI* GetList() const;
@@ -146,8 +146,8 @@ public:
     void SetItemBkColor(DWORD dwBkColor);
     LPCTSTR GetItemBkImage() const;
     void SetItemBkImage(LPCTSTR pStrImage);
-    bool IsAlternateBk() const;
-    void SetAlternateBk(bool bAlternateBk);
+    BOOL IsAlternateBk() const;
+    void SetAlternateBk(BOOL bAlternateBk);
     DWORD GetSelectedItemTextColor() const;
     void SetSelectedItemTextColor(DWORD dwTextColor);
     DWORD GetSelectedItemBkColor() const;
@@ -174,16 +174,16 @@ public:
     void SetItemVLineSize(int iSize);
     DWORD GetItemVLineColor() const;
     void SetItemVLineColor(DWORD dwLineColor);
-    bool IsItemShowHtml();
-    void SetItemShowHtml(bool bShowHtml = true);
+    BOOL IsItemShowHtml();
+    void SetItemShowHtml(BOOL bShowHtml = TRUE);
 
-    void SetMultiExpanding(bool bMultiExpandable); 
-    int GetExpandedItem() const;
-    bool ExpandItem(int iIndex, bool bExpand = true);
+    void SetMultiExpanding(BOOL bMultiExpandable); 
+    LONG GetExpandedItem() const;
+	LRESULT ExpandItem(LONG iIndex, BOOL bExpand = TRUE);
 
-	void SetPos(RECT rc, bool bNeedInvalidate = true);
-	void Move(SIZE szOffset, bool bNeedInvalidate = true);
-    void DoEvent(TEventUI& event);
+	LRESULT SetPos(RECT rc, BOOL bNeedInvalidate = true);
+	LRESULT Move(SIZE szOffset, BOOL bNeedInvalidate = true);
+	LRESULT DoEvent(TEventUI& event);
     void SetAttribute(LPCTSTR pstrName, LPCTSTR pstrValue);
 
     IListCallbackUI* GetTextCallback() const;
@@ -204,15 +204,15 @@ public:
     void PageRight();
     void HomeLeft();
     void EndRight();
-    void EnableScrollBar(bool bEnableVertical = true, bool bEnableHorizontal = false);
+    void EnableScrollBar(BOOL bEnableVertical = TRUE, BOOL bEnableHorizontal = FALSE);
     virtual CScrollBarUI* GetVerticalScrollBar() const;
     virtual CScrollBarUI* GetHorizontalScrollBar() const;
-    bool SortItems(PULVCompareFunc pfnCompare, UINT_PTR dwData);
+    BOOL SortItems(PULVCompareFunc pfnCompare, UINT_PTR dwData);
 
 protected:
-    bool m_bScrollSelect;
-    int m_iCurSel;
-    int m_iExpandedItem;
+    BOOL m_bScrollSelect;
+    LONG m_iCurSel;
+    LONG m_iExpandedItem;
     IListCallbackUI* m_pCallback;
     CListBodyUI* m_pList;
     CListHeaderUI* m_pHeader;
@@ -246,10 +246,10 @@ public:
     LPVOID GetInterface(LPCTSTR pstrName);
     UINT GetControlFlags() const;
 
-    void SetEnabled(bool bEnable = true);
+    void SetEnabled(BOOL bEnable = true);
 
-	bool IsDragable() const;
-    void SetDragable(bool bDragable);
+	BOOL IsDragable() const;
+    void SetDragable(BOOL bDragable);
 	DWORD GetSepWidth() const;
     void SetSepWidth(int iWidth);
 	DWORD GetTextStyle() const;
@@ -260,9 +260,9 @@ public:
     void SetSepColor(DWORD dwSepColor);
 	void SetTextPadding(RECT rc);
 	RECT GetTextPadding() const;
-    void SetFont(int index);
-    bool IsShowHtml();
-    void SetShowHtml(bool bShowHtml = true);
+    void SetFont(LONG index);
+    BOOL IsShowHtml();
+    void SetShowHtml(BOOL bShowHtml = true);
     LPCTSTR GetNormalImage() const;
     void SetNormalImage(LPCTSTR pStrImage);
     LPCTSTR GetHotImage() const;
@@ -274,24 +274,24 @@ public:
     LPCTSTR GetSepImage() const;
     void SetSepImage(LPCTSTR pStrImage);
 
-    void DoEvent(TEventUI& event);
+	LRESULT DoEvent(TEventUI& event);
     SIZE EstimateSize(SIZE szAvailable);
     void SetAttribute(LPCTSTR pstrName, LPCTSTR pstrValue);
     RECT GetThumbRect() const;
 
-    void PaintText(HDC hDC);
-    void PaintStatusImage(HDC hDC);
+	LRESULT PaintText(HDC hDC);
+	LRESULT PaintStatusImage(HDC hDC);
 
 protected:
     POINT ptLastMouse;
-    bool m_bDragable;
+    BOOL m_bDragable;
     UINT m_uButtonState;
-    int m_iSepWidth;
+    LONG m_iSepWidth;
     DWORD m_dwTextColor;
     DWORD m_dwSepColor;
-    int m_iFont;
+    LONG m_iFont;
     UINT m_uTextStyle;
-    bool m_bShowHtml;
+    BOOL m_bShowHtml;
 	RECT m_rcTextPadding;
     TDrawInfo m_diNormal;
     TDrawInfo m_diHot;
@@ -313,34 +313,34 @@ public:
     UINT GetControlFlags() const;
     LPVOID GetInterface(LPCTSTR pstrName);
 
-    void SetEnabled(bool bEnable = true);
+    void SetEnabled(BOOL bEnable = TRUE);
 
-    int GetIndex() const;
+    LONG GetIndex() const;
     void SetIndex(int iIndex);
-    int GetDrawIndex() const;
+    LONG GetDrawIndex() const;
     void SetDrawIndex(int iIndex);
 
     IListOwnerUI* GetOwner();
     void SetOwner(CControlUI* pOwner);
-    void SetVisible(bool bVisible = true);
+    void SetVisible(BOOL bVisible = TRUE);
 
-    bool IsSelected() const;
-    bool Select(bool bSelect = true, bool bTriggerEvent=true);
-    bool IsExpanded() const;
-    bool Expand(bool bExpand = true);
+    BOOL IsSelected() const;
+    BOOL Select(BOOL bSelect = TRUE, BOOL bTriggerEvent=TRUE);
+    BOOL IsExpanded() const;
+    BOOL Expand(BOOL bExpand = TRUE);
 
-    void Invalidate(); // 直接CControl::Invalidate会导致滚动条刷新，重写减少刷新区域
-    bool Activate();
+	LRESULT Invalidate(); // 直接CControl::Invalidate会导致滚动条刷新，重写减少刷新区域
+    BOOL Activate();
 
-    void DoEvent(TEventUI& event);
+	LRESULT DoEvent(TEventUI& event);
     void SetAttribute(LPCTSTR pstrName, LPCTSTR pstrValue);
 
-    void DrawItemBk(HDC hDC, const RECT& rcItem);
+	LRESULT DrawItemBk(HDC hDC, const RECT& rcItem);
 
 protected:
-    int m_iIndex;
-    int m_iDrawIndex;
-    bool m_bSelected;
+    LONG m_iIndex;
+    LONG m_iDrawIndex;
+    BOOL m_bSelected;
     UINT m_uButtonState;
     IListOwnerUI* m_pOwner;
 };
@@ -363,19 +363,19 @@ public:
     void SetFixedHeight(int cy);
     void SetText(LPCTSTR pstrText);
 
-    void DoEvent(TEventUI& event);
+	LRESULT DoEvent(TEventUI& event);
     SIZE EstimateSize(SIZE szAvailable);
-    bool DoPaint(HDC hDC, const RECT& rcPaint, CControlUI* pStopControl);
+	LRESULT DoPaint(HDC hDC, const RECT& rcPaint, CControlUI* pStopControl);
 
-    void DrawItemText(HDC hDC, const RECT& rcItem);
+	LRESULT DrawItemText(HDC hDC, const RECT& rcItem);
 
 protected:
     SIZE    m_cxyFixedLast;
-    bool    m_bNeedEstimateSize;
+    BOOL    m_bNeedEstimateSize;
 
     SIZE    m_szAvailableLast;
     UINT    m_uFixedHeightLast; 
-    int     m_nFontLast;
+    LONG     m_nFontLast;
     UINT    m_uTextStyleLast;
     RECT    m_rcTextPaddingLast;
 };
@@ -394,16 +394,19 @@ public:
     LPVOID GetInterface(LPCTSTR pstrName);
     UINT GetControlFlags() const;
 
-    LPCTSTR GetText(int iIndex) const;
-    void SetText(int iIndex, LPCTSTR pstrText);
+	LPCTSTR GetText(int iIndex) const;
+	void SetText(int iIndex, LPCTSTR pstrText);
+
+	HICON GetIcon(int iIndex) const;
+	void SetIcon(int iIndex, HICON hIcon);
 
     void SetOwner(CControlUI* pOwner);
     CDuiString* GetLinkContent(int iIndex);
 
-    void DoEvent(TEventUI& event);
+	LRESULT DoEvent(TEventUI& event);
     SIZE EstimateSize(SIZE szAvailable);
 
-    void DrawItemText(HDC hDC, const RECT& rcItem);
+	LRESULT DrawItemText(HDC hDC, const RECT& rcItem);
 
 protected:
     enum { MAX_LINK = 8 };
@@ -413,7 +416,7 @@ protected:
     int m_nHoverLink;
     IListUI* m_pOwner;
     CDuiPtrArray m_aTexts;
-
+	CDuiPtrArray m_aIcons;
     CDuiString m_sTextLast;
 };
 
@@ -429,41 +432,41 @@ public:
     UINT GetControlFlags() const;
     LPVOID GetInterface(LPCTSTR pstrName);
 
-    int GetIndex() const;
+    LONG GetIndex() const;
     void SetIndex(int iIndex);
-    int GetDrawIndex() const;
+    LONG GetDrawIndex() const;
     void SetDrawIndex(int iIndex);
 
     IListOwnerUI* GetOwner();
     void SetOwner(CControlUI* pOwner);
-    void SetVisible(bool bVisible = true);
-    void SetEnabled(bool bEnable = true);
+    void SetVisible(BOOL bVisible = TRUE);
+    void SetEnabled(BOOL bEnable = TRUE);
 
-    bool IsSelected() const;
-    bool Select(bool bSelect = true, bool bTriggerEvent=true);
-    bool IsExpandable() const;
-    void SetExpandable(bool bExpandable);
-    bool IsExpanded() const;
-    bool Expand(bool bExpand = true);
+    BOOL IsSelected() const;
+    BOOL Select(BOOL bSelect = TRUE, BOOL bTriggerEvent=TRUE);
+    BOOL IsExpandable() const;
+    void SetExpandable(BOOL bExpandable);
+    BOOL IsExpanded() const;
+    BOOL Expand(BOOL bExpand = TRUE);
 
     void Invalidate(); // 直接CControl::Invalidate会导致滚动条刷新，重写减少刷新区域
-    bool Activate();
+    BOOL Activate();
 
-    void DoEvent(TEventUI& event);
+	LRESULT DoEvent(TEventUI& event);
     void SetAttribute(LPCTSTR pstrName, LPCTSTR pstrValue);
-    bool DoPaint(HDC hDC, const RECT& rcPaint, CControlUI* pStopControl);
+	LRESULT DoPaint(HDC hDC, const RECT& rcPaint, CControlUI* pStopControl);
 
-    void DrawItemText(HDC hDC, const RECT& rcItem);    
-    void DrawItemBk(HDC hDC, const RECT& rcItem);
+	LRESULT DrawItemText(HDC hDC, const RECT& rcItem);
+	LRESULT DrawItemBk(HDC hDC, const RECT& rcItem);
 
     SIZE EstimateSize(SIZE szAvailable);
 
 protected:
     int m_iIndex;
     int m_iDrawIndex;
-    bool m_bSelected;
-    bool m_bExpandable;
-    bool m_bExpand;
+    BOOL m_bSelected;
+    BOOL m_bExpandable;
+    BOOL m_bExpand;
     UINT m_uButtonState;
     IListOwnerUI* m_pOwner;
 };
@@ -479,8 +482,8 @@ public:
     LPCTSTR GetClass() const;
     LPVOID GetInterface(LPCTSTR pstrName);
 
-    void SetPos(RECT rc, bool bNeedInvalidate = true);
-    bool DoPaint(HDC hDC, const RECT& rcPaint, CControlUI* pStopControl);
+	LRESULT SetPos(RECT rc, BOOL bNeedInvalidate = TRUE);
+	LRESULT DoPaint(HDC hDC, const RECT& rcPaint, CControlUI* pStopControl);
 };
 
 } // namespace DuiLib

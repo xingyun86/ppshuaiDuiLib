@@ -17,16 +17,16 @@ namespace DuiLib
 
 		CDuiString* GetLinkContent(int iIndex);
 
-		void DoEvent(TEventUI& event);
+		LRESULT DoEvent(TEventUI& event);
 
-		void PaintText(HDC hDC);
+		LRESULT PaintText(HDC hDC);
 
 	protected:
 		enum { MAX_LINK = 8 };
-		int m_nLinks;
+		LONG m_nLinks;
 		RECT m_rcLinks[MAX_LINK];
 		CDuiString m_sLinks[MAX_LINK];
-		int m_nHoverLink;
+		LONG m_nHoverLink;
 	};
 
 } // namespace DuiLib

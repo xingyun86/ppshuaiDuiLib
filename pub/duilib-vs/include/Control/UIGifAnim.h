@@ -17,27 +17,27 @@ namespace DuiLib
 
 		LPCTSTR	GetClass() const;
 		LPVOID	GetInterface(LPCTSTR pstrName);
-		void	DoInit() override;
-		bool	DoPaint(HDC hDC, const RECT& rcPaint, CControlUI* pStopControl);
-		void	DoEvent(TEventUI& event);
-		void	SetVisible(bool bVisible = true );
+		LRESULT	DoInit() override;
+		LRESULT	DoPaint(HDC hDC, const RECT& rcPaint, CControlUI* pStopControl);
+		LRESULT	DoEvent(TEventUI& event);
+		void	SetVisible(BOOL bVisible = TRUE );
 		void	SetAttribute(LPCTSTR pstrName, LPCTSTR pstrValue);
 		void	SetBkImage(LPCTSTR pStrImage);
 		LPCTSTR GetBkImage();
 
-		void	SetAutoPlay(bool bIsAuto = true );
-		bool	IsAutoPlay() const;
-		void	SetAutoSize(bool bIsAuto = true );
-		bool	IsAutoSize() const;
-		void	PlayGif();
-		void	PauseGif();
-		void	StopGif();
+		void	SetAutoPlay(BOOL bIsAuto = TRUE );
+		BOOL	IsAutoPlay() const;
+		void	SetAutoSize(BOOL bIsAuto = TRUE );
+		BOOL	IsAutoSize() const;
+		LRESULT	PlayGif ();
+		LRESULT	PauseGif ();
+		LRESULT	StopGif ();
 
 	private:
-		void	InitGifImage();
-		void	DeleteGif();
-		void    OnTimer( UINT_PTR idEvent );
-		void	DrawFrame( HDC hDC );		// 绘制GIF每帧
+		LRESULT	InitGifImage();
+		LRESULT	DeleteGif();
+		LRESULT OnTimer(UINT_PTR idEvent);
+		LRESULT	DrawFrame(HDC hDC);		// 绘制GIF每帧
 		Gdiplus::Image*	LoadGifFromFile(LPCTSTR pstrGifPath);
 		Gdiplus::Image* LoadGifFromMemory( LPVOID pBuf,size_t dwSize );
 	private:
@@ -47,9 +47,9 @@ namespace DuiLib
 		Gdiplus::PropertyItem*	m_pPropertyItem;	// 帧与帧之间间隔时间
 
 		CDuiString		m_sBkImage;
-		bool			m_bIsAutoPlay;				// 是否自动播放gif
-		bool			m_bIsAutoSize;				// 是否自动根据图片设置大小
-		bool			m_bIsPlaying;
+		BOOL			m_bIsAutoPlay;				// 是否自动播放gif
+		BOOL			m_bIsAutoSize;				// 是否自动根据图片设置大小
+		BOOL			m_bIsPlaying;
 
 	};
 }
