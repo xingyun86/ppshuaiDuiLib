@@ -13,25 +13,25 @@ namespace DuiLib
 		LPCTSTR GetClass() const;
 		LPVOID GetInterface(LPCTSTR pstrName);
 
-		bool IsHorizontal();
-		void SetHorizontal(bool bHorizontal = true);
-		int GetMinValue() const;
-		void SetMinValue(int nMin);
-		int GetMaxValue() const;
-		void SetMaxValue(int nMax);
-		int GetValue() const;
-		void SetValue(int nValue);
+		BOOL IsHorizontal();
+		void SetHorizontal(BOOL bHorizontal = TRUE);
+		LONG GetMinValue() const;
+		void SetMinValue(LONG nMin);
+		LONG GetMaxValue() const;
+		void SetMaxValue(LONG nMax);
+		LONG GetValue() const;
+		void SetValue(LONG nValue);
 		LPCTSTR GetForeImage() const;
 		void SetForeImage(LPCTSTR pStrImage);
 
 		void SetAttribute(LPCTSTR pstrName, LPCTSTR pstrValue);
-		void PaintStatusImage(HDC hDC);
+		LRESULT PaintStatusImage(HDC hDC);
 
 	protected:
-		bool m_bHorizontal;
-		int m_nMax;
-		int m_nMin;
-		int m_nValue;
+		BOOL m_bHorizontal;
+		LONG m_nMax;
+		LONG m_nMin;
+		LONG m_nValue;
 
 		TDrawInfo m_diFore;
 	};

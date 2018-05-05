@@ -59,7 +59,7 @@ namespace DuiLib
 
 	CGifAnimUI::~CGifAnimUI(void)
 	{
-		DeleteGif();
+		DeleteGif ();
 		m_pManager->KillTimer( this, EVENT_TIEM_ID );
 
 	}
@@ -71,47 +71,48 @@ namespace DuiLib
 
 	LPVOID CGifAnimUI::GetInterface( LPCTSTR pstrName )
 	{
-		if( _tcscmp(pstrName, DUI_CTR_GIFANIM) == 0 ) return static_cast<CGifAnimUI*>(this);
+		if ( _tcscmp(pstrName, DUI_CTR_GIFANIM) == 0 ) return static_cast<CGifAnimUI*>(this);
 		return CControlUI::GetInterface(pstrName);
 	}
 
-	void CGifAnimUI::DoInit()
+	LRESULT CGifAnimUI::DoInit()
 	{
-		InitGifImage();
+		return InitGifImage();
 	}
 
-	bool CGifAnimUI::DoPaint(HDC hDC, const RECT& rcPaint, CControlUI* pStopControl)
+	LRESULT CGifAnimUI::DoPaint(HDC hDC, const RECT& rcPaint, CControlUI* pStopControl)
 	{
 		if ( NULL == m_pGifImage )
 		{
 			InitGifImage();
 		}
 		DrawFrame( hDC );
-        return true;
+        return (0L);
 	}
 
-	void CGifAnimUI::DoEvent( TEventUI& event )
+	LRESULT CGifAnimUI::DoEvent(TEventUI& event)
 	{
-		if( event.Type == UIEVENT_TIMER )
+		if ( event.Type == UIEVENT_TIMER )
 			OnTimer( (UINT_PTR)event.wParam );
+		return (0L);
 	}
 
-	void CGifAnimUI::SetVisible(bool bVisible /* = true */)
+	void CGifAnimUI::SetVisible(BOOL bVisible /* = true */)
 	{
 		CControlUI::SetVisible(bVisible);
 		if (bVisible)
-			PlayGif();
+			PlayGif ();
 		else
-			StopGif();
+			StopGif ();
 	}
 
 	void CGifAnimUI::SetAttribute(LPCTSTR pstrName, LPCTSTR pstrValue)
 	{
-		if( _tcscmp(pstrName, _T("bkimage")) == 0 ) SetBkImage(pstrValue);
-		else if( _tcscmp(pstrName, _T("autoplay")) == 0 ) {
+		if ( _tcscmp(pstrName, _T("bkimage")) == 0 ) SetBkImage(pstrValue);
+		else if ( _tcscmp(pstrName, _T("autoplay")) == 0 ) {
 			SetAutoPlay(_tcscmp(pstrValue, _T("true")) == 0);
 		}
-		else if( _tcscmp(pstrName, _T("autosize")) == 0 ) {
+		else if ( _tcscmp(pstrName, _T("autosize")) == 0 ) {
 			SetAutoSize(_tcscmp(pstrValue, _T("true")) == 0);
 		}
 		else
@@ -120,12 +121,12 @@ namespace DuiLib
 
 	void CGifAnimUI::SetBkImage(LPCTSTR pStrImage)
 	{
-		if( m_sBkImage == pStrImage || NULL == pStrImage) return;
+		if ( m_sBkImage == pStrImage || NULL == pStrImage) return;
 
 		m_sBkImage = pStrImage;
 
-		StopGif();
-		DeleteGif();
+		StopGif ();
+		DeleteGif ();
 
 		Invalidate();
 
@@ -136,31 +137,31 @@ namespace DuiLib
 		return m_sBkImage.GetData();
 	}
 
-	void CGifAnimUI::SetAutoPlay(bool bIsAuto)
+	void CGifAnimUI::SetAutoPlay(BOOL bIsAuto)
 	{
 		m_bIsAutoPlay = bIsAuto;
 	}
 
-	bool CGifAnimUI::IsAutoPlay() const
+	BOOL CGifAnimUI::IsAutoPlay() const
 	{
 		return m_bIsAutoPlay;
 	}
 
-	void CGifAnimUI::SetAutoSize(bool bIsAuto)
+	void CGifAnimUI::SetAutoSize(BOOL bIsAuto)
 	{
 		m_bIsAutoSize = bIsAuto;
 	}
 
-	bool CGifAnimUI::IsAutoSize() const
+	BOOL CGifAnimUI::IsAutoSize() const
 	{
 		return m_bIsAutoSize;
 	}
 
-	void CGifAnimUI::PlayGif()
+	LRESULT CGifAnimUI::PlayGif ()
 	{
 		if (m_bIsPlaying || m_pGifImage == NULL)
 		{
-			return;
+			return (-1L);
 		}
 
 		long lPause = ((long*) m_pPropertyItem->value)[m_nFramePosition] * 10;
@@ -168,37 +169,41 @@ namespace DuiLib
 		m_pManager->SetTimer( this, EVENT_TIEM_ID, lPause );
 
 		m_bIsPlaying = true;
+
+		return (0L);
 	}
 
-	void CGifAnimUI::PauseGif()
+	LRESULT CGifAnimUI::PauseGif ()
 	{
 		if (!m_bIsPlaying || m_pGifImage == NULL)
 		{
-			return;
+			return (-1L);
 		}
 
 		m_pManager->KillTimer(this, EVENT_TIEM_ID);
 		this->Invalidate();
 		m_bIsPlaying = false;
+		return (0L);
 	}
 
-	void CGifAnimUI::StopGif()
+	LRESULT CGifAnimUI::StopGif ()
 	{
 		if (!m_bIsPlaying)
 		{
-			return;
+			return (-1L);
 		}
 
 		m_pManager->KillTimer(this, EVENT_TIEM_ID);
 		m_nFramePosition = 0;
 		this->Invalidate();
 		m_bIsPlaying = false;
+		return (0L);
 	}
 
-	void CGifAnimUI::InitGifImage()
+	LRESULT CGifAnimUI::InitGifImage()
 	{
 		m_pGifImage = LoadGifFromFile(GetBkImage());
-		if ( NULL == m_pGifImage ) return;
+		if ( NULL == m_pGifImage ) return (-1L);
 		UINT nCount	= 0;
 		nCount	=	m_pGifImage->GetFrameDimensionsCount();
 		GUID* pDimensionIDs	=	new GUID[ nCount ];
@@ -217,11 +222,12 @@ namespace DuiLib
 		}
 		if (m_bIsAutoPlay && nSize > 0)
 		{
-			PlayGif();
+			PlayGif ();
 		}
+		return (0L);
 	}
 
-	void CGifAnimUI::DeleteGif()
+	LRESULT CGifAnimUI::DeleteGif ()
 	{
 		if ( m_pGifImage != NULL )
 		{
@@ -236,12 +242,13 @@ namespace DuiLib
 		}
 		m_nFrameCount		=	0;
 		m_nFramePosition	=	0;
+		return (0L);
 	}
 
-	void CGifAnimUI::OnTimer( UINT_PTR idEvent )
+	LRESULT CGifAnimUI::OnTimer(UINT_PTR idEvent)
 	{
 		if ( idEvent != EVENT_TIEM_ID )
-			return;
+			return (0L);
 		m_pManager->KillTimer( this, EVENT_TIEM_ID );
 		this->Invalidate();
 
@@ -250,15 +257,17 @@ namespace DuiLib
 		long lPause = ((long*) m_pPropertyItem->value)[m_nFramePosition] * 10;
 		if ( lPause == 0 ) lPause = 100;
 		m_pManager->SetTimer( this, EVENT_TIEM_ID, lPause );
+		return (0L);
 	}
 
-	void CGifAnimUI::DrawFrame( HDC hDC )
+	LRESULT CGifAnimUI::DrawFrame(HDC hDC)
 	{
-		if ( NULL == hDC || NULL == m_pGifImage ) return;
+		if ( NULL == hDC || NULL == m_pGifImage ) return (-1L);
 		GUID pageGuid = Gdiplus::FrameDimensionTime;
 		Gdiplus::Graphics graphics( hDC );
 		graphics.DrawImage( m_pGifImage, (INT)m_rcItem.left, (INT)m_rcItem.top, (INT)(m_rcItem.right-m_rcItem.left), (INT)(m_rcItem.bottom-m_rcItem.top) );
 		m_pGifImage->SelectActiveFrame( &pageGuid, m_nFramePosition );
+		return (0L);
 	}
 
 	Gdiplus::Image* CGifAnimUI::LoadGifFromFile(LPCTSTR pstrGifPath)
@@ -269,20 +278,20 @@ namespace DuiLib
 		do
 		{
 			CDuiString sFile = CPaintManagerUI::GetResourcePath();
-			if( CPaintManagerUI::GetResourceZip().IsEmpty() ) {
+			if ( CPaintManagerUI::GetResourceZip().IsEmpty() ) {
 				sFile += pstrGifPath;
 				HANDLE hFile = ::CreateFile(sFile.GetData(), GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, \
 					FILE_ATTRIBUTE_NORMAL, NULL);
-				if( hFile == INVALID_HANDLE_VALUE ) break;
+				if ( hFile == INVALID_HANDLE_VALUE ) break;
 				dwSize = ::GetFileSize(hFile, NULL);
-				if( dwSize == 0 ) break;
+				if ( dwSize == 0 ) break;
 
 				DWORD dwRead = 0;
 				pData = new BYTE[ dwSize ];
 				::ReadFile( hFile, pData, dwSize, &dwRead, NULL );
 				::CloseHandle( hFile );
 
-				if( dwRead != dwSize ) {
+				if ( dwRead != dwSize ) {
 					delete[] pData;
 					pData = NULL;
 					break;
@@ -291,23 +300,23 @@ namespace DuiLib
 			else {
 				sFile += CPaintManagerUI::GetResourceZip();
 				HZIP hz = NULL;
-				if( CPaintManagerUI::IsCachedResourceZip() ) hz = (HZIP)CPaintManagerUI::GetResourceZipHandle();
+				if ( CPaintManagerUI::IsCachedResourceZip() ) hz = (HZIP)CPaintManagerUI::GetResourceZipHandle();
 				else hz = OpenZip((void*)sFile.GetData(), 0, 2);
-				if( hz == NULL ) break;
+				if ( hz == NULL ) break;
 				ZIPENTRY ze;
 				int i;
-				if( FindZipItem(hz, pstrGifPath, true, &i, &ze) != 0 ) break;
+				if ( FindZipItem(hz, pstrGifPath, true, &i, &ze) != 0 ) break;
 				dwSize = ze.unc_size;
-				if( dwSize == 0 ) break;
+				if ( dwSize == 0 ) break;
 				pData = new BYTE[ dwSize ];
 				int res = UnzipItem(hz, i, pData, dwSize, 3);
-				if( res != 0x00000000 && res != 0x00000600) {
+				if ( res != 0x00000000 && res != 0x00000600) {
 					delete[] pData;
 					pData = NULL;
-					if( !CPaintManagerUI::IsCachedResourceZip() ) CloseZip(hz);
+					if ( !CPaintManagerUI::IsCachedResourceZip() ) CloseZip(hz);
 					break;
 				}
-				if( !CPaintManagerUI::IsCachedResourceZip() ) CloseZip(hz);
+				if ( !CPaintManagerUI::IsCachedResourceZip() ) CloseZip(hz);
 			}
 
 		} while (0);
@@ -317,16 +326,16 @@ namespace DuiLib
 			//读不到图片, 则直接去读取bitmap.m_lpstr指向的路径
 			HANDLE hFile = ::CreateFile(pstrGifPath, GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, \
 				FILE_ATTRIBUTE_NORMAL, NULL);
-			if( hFile == INVALID_HANDLE_VALUE ) break;
+			if ( hFile == INVALID_HANDLE_VALUE ) break;
 			dwSize = ::GetFileSize(hFile, NULL);
-			if( dwSize == 0 ) break;
+			if ( dwSize == 0 ) break;
 
 			DWORD dwRead = 0;
 			pData = new BYTE[ dwSize ];
 			::ReadFile( hFile, pData, dwSize, &dwRead, NULL );
 			::CloseHandle( hFile );
 
-			if( dwRead != dwSize ) {
+			if ( dwRead != dwSize ) {
 				delete[] pData;
 				pData = NULL;
 			}
@@ -352,7 +361,7 @@ namespace DuiLib
 		IStream* pStm = NULL;
 		::CreateStreamOnHGlobal(hMem, TRUE, &pStm);
 		Gdiplus::Image *pImg = Gdiplus::Image::FromStream(pStm);
-		if(!pImg || pImg->GetLastStatus() != Gdiplus::Ok)
+		if (!pImg || pImg->GetLastStatus() != Gdiplus::Ok)
 		{
 			pStm->Release();
 			::GlobalUnlock(hMem);

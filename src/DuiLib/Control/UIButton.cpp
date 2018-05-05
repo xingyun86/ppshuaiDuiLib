@@ -22,7 +22,7 @@ namespace DuiLib
 
 	LPVOID CButtonUI::GetInterface(LPCTSTR pstrName)
 	{
-		if( _tcscmp(pstrName, DUI_CTR_BUTTON) == 0 ) return static_cast<CButtonUI*>(this);
+		if ( _tcscmp(pstrName, DUI_CTR_BUTTON) == 0 ) return static_cast<CButtonUI*>(this);
 		return CLabelUI::GetInterface(pstrName);
 	}
 
@@ -31,69 +31,69 @@ namespace DuiLib
 		return (IsKeyboardEnabled() ? UIFLAG_TABSTOP : 0) | (IsEnabled() ? UIFLAG_SETCURSOR : 0);
 	}
 
-	void CButtonUI::DoEvent(TEventUI& event)
+	LRESULT CButtonUI::DoEvent(TEventUI& event)
 	{
-		if( !IsMouseEnabled() && event.Type > UIEVENT__MOUSEBEGIN && event.Type < UIEVENT__MOUSEEND ) {
-			if( m_pParent != NULL ) m_pParent->DoEvent(event);
+		if ( !IsMouseEnabled() && event.Type > UIEVENT__MOUSEBEGIN && event.Type < UIEVENT__MOUSEEND ) {
+			if ( m_pParent != NULL ) m_pParent->DoEvent(event);
 			else CLabelUI::DoEvent(event);
-			return;
+			return (0L);
 		}
 
-		if( event.Type == UIEVENT_SETFOCUS )
+		if ( event.Type == UIEVENT_SETFOCUS )
 		{
 			Invalidate();
 		}
-		if( event.Type == UIEVENT_KILLFOCUS )
+		else if ( event.Type == UIEVENT_KILLFOCUS )
 		{
 			Invalidate();
 		}
-		if( event.Type == UIEVENT_KEYDOWN )
+		else if ( event.Type == UIEVENT_KEYDOWN )
 		{
 			if (IsKeyboardEnabled() && IsEnabled()) {
-				if( event.chKey == VK_SPACE || event.chKey == VK_RETURN ) {
+				if ( event.chKey == VK_SPACE || event.chKey == VK_RETURN ) {
 					Activate();
-					return;
+					return (0L);
 				}
 			}
 		}
-		if( event.Type == UIEVENT_BUTTONDOWN || event.Type == UIEVENT_DBLCLICK )
+		else if ( event.Type == UIEVENT_BUTTONDOWN || event.Type == UIEVENT_DBLCLICK )
 		{
-			if( ::PtInRect(&m_rcItem, event.ptMouse) && IsEnabled() ) {
+			if ( ::PtInRect(&m_rcItem, event.ptMouse) && IsEnabled() ) {
 				m_uButtonState |= UISTATE_PUSHED | UISTATE_CAPTURED;
 				Invalidate();
 			}
-			return;
+			return (0L);
 		}
-		if( event.Type == UIEVENT_MOUSEMOVE )
+		else if ( event.Type == UIEVENT_MOUSEMOVE )
 		{
-			if( (m_uButtonState & UISTATE_CAPTURED) != 0 ) {
-				if( ::PtInRect(&m_rcItem, event.ptMouse) ) m_uButtonState |= UISTATE_PUSHED;
+			if ( (m_uButtonState & UISTATE_CAPTURED) != 0 ) {
+				if ( ::PtInRect(&m_rcItem, event.ptMouse) ) m_uButtonState |= UISTATE_PUSHED;
 				else m_uButtonState &= ~UISTATE_PUSHED;
 				Invalidate();
 			}
-			return;
+			return (0L);
 		}
-		if( event.Type == UIEVENT_BUTTONUP )
+		else if ( event.Type == UIEVENT_BUTTONUP )
 		{
-			if( (m_uButtonState & UISTATE_CAPTURED) != 0 ) {
-				if( ::PtInRect(&m_rcItem, event.ptMouse) && IsEnabled()) Activate();
+			if ( (m_uButtonState & UISTATE_CAPTURED) != 0 ) {
+				if ( ::PtInRect(&m_rcItem, event.ptMouse) && IsEnabled()) Activate();
 				m_uButtonState &= ~(UISTATE_PUSHED | UISTATE_CAPTURED);
 				Invalidate();
 			}
-			return;
+			return (0L);
 		}
-		if( event.Type == UIEVENT_CONTEXTMENU )
+		else if ( event.Type == UIEVENT_CONTEXTMENU )
 		{
-			if( IsContextMenuUsed() && IsEnabled()) {
+			if ( IsContextMenuUsed() && IsEnabled()) {
 				m_pManager->SendNotify(this, DUI_MSGTYPE_MENU, event.wParam, event.lParam);
 			}
-			return;
+			return (0L);
 		}
-		if( event.Type == UIEVENT_MOUSEENTER )
+		else if ( event.Type == UIEVENT_MOUSEENTER )
 		{
-            if( ::PtInRect(&m_rcItem, event.ptMouse ) ) {
-                if( IsEnabled() ) {
-                    if( (m_uButtonState & UISTATE_HOT) == 0  ) {
+            if ( ::PtInRect(&m_rcItem, event.ptMouse ) ) {
+                if ( IsEnabled() ) {
+                    if ( (m_uButtonState & UISTATE_HOT) == 0  ) {
                         m_uButtonState |= UISTATE_HOT;
                         Invalidate();
                     }
@@ -103,11 +103,11 @@ namespace DuiLib
 				m_pManager->SetTimer(this, FADE_TIMERID, FADE_ELLAPSE);
 			}
 		}
-		if( event.Type == UIEVENT_MOUSELEAVE )
+		else if ( event.Type == UIEVENT_MOUSELEAVE )
 		{
-            if( !::PtInRect(&m_rcItem, event.ptMouse ) ) {
-                if( IsEnabled() ) {
-                    if( (m_uButtonState & UISTATE_HOT) != 0  ) {
+            if ( !::PtInRect(&m_rcItem, event.ptMouse ) ) {
+                if ( IsEnabled() ) {
+                    if ( (m_uButtonState & UISTATE_HOT) != 0  ) {
                         m_uButtonState &= ~UISTATE_HOT;
                         Invalidate();
                     }
@@ -119,47 +119,47 @@ namespace DuiLib
             }
             else {
                 if (m_pManager) m_pManager->AddMouseLeaveNeeded(this);
-                return;
+                return (0L);
             }
 		}
-		if( event.Type == UIEVENT_SETCURSOR )
+		else if ( event.Type == UIEVENT_SETCURSOR )
 		{
-			::SetCursor(::LoadCursor(NULL, /*MAKEINTRESOURCE*/(IDC_HAND)));
-			return;
+			::SetCursor(::LoadCursor(NULL, MAKEINTRESOURCE(IDC_HAND)));
+			return (0L);
 		}
-		if( event.Type == UIEVENT_TIMER  && event.wParam == FADE_TIMERID )
+		else if ( event.Type == UIEVENT_TIMER  && event.wParam == FADE_TIMERID )
 		{
-			if( (m_uButtonState & UISTATE_HOT) != 0 ) {
-				if( m_uFadeAlpha > m_uFadeAlphaDelta ) m_uFadeAlpha -= m_uFadeAlphaDelta;
+			if ( (m_uButtonState & UISTATE_HOT) != 0 ) {
+				if ( m_uFadeAlpha > m_uFadeAlphaDelta ) m_uFadeAlpha -= m_uFadeAlphaDelta;
 				else {
 					m_uFadeAlpha = 0;
 					m_pManager->KillTimer(this, FADE_TIMERID);
 				}
 			}
 			else {
-				if( m_uFadeAlpha < 255-m_uFadeAlphaDelta ) m_uFadeAlpha += m_uFadeAlphaDelta;
+				if ( m_uFadeAlpha < 255-m_uFadeAlphaDelta ) m_uFadeAlpha += m_uFadeAlphaDelta;
 				else {
 					m_uFadeAlpha = 255;
 					m_pManager->KillTimer(this, FADE_TIMERID);
 				}
 			}
 			Invalidate();
-			return;
+			return (0L);
 		}
-		CLabelUI::DoEvent(event);
+		return CLabelUI::DoEvent(event);
 	}
 
-	bool CButtonUI::Activate()
+	BOOL CButtonUI::Activate()
 	{
-		if( !CControlUI::Activate() ) return false;
-		if( m_pManager != NULL ) m_pManager->SendNotify(this, DUI_MSGTYPE_CLICK);
+		if ( !CControlUI::Activate() ) return false;
+		if ( m_pManager != NULL ) m_pManager->SendNotify(this, DUI_MSGTYPE_CLICK);
 		return true;
 	}
 
-	void CButtonUI::SetEnabled(bool bEnable)
+	void CButtonUI::SetEnabled(BOOL bEnable)
 	{
 		CControlUI::SetEnabled(bEnable);
-		if( !IsEnabled() ) {
+		if ( !IsEnabled() ) {
 			m_uButtonState = 0;
 		}
 	}
@@ -211,7 +211,7 @@ namespace DuiLib
 
 	void CButtonUI::SetNormalImage(LPCTSTR pStrImage)
 	{
-		if( m_diNormal.sDrawString == pStrImage && m_diNormal.pImageInfo != NULL ) return;
+		if ( m_diNormal.sDrawString == pStrImage && m_diNormal.pImageInfo != NULL ) return;
 		m_diNormal.Clear();
 		m_diNormal.sDrawString = pStrImage;
 		Invalidate();
@@ -224,7 +224,7 @@ namespace DuiLib
 
 	void CButtonUI::SetHotImage(LPCTSTR pStrImage)
 	{
-		if( m_diHot.sDrawString == pStrImage && m_diHot.pImageInfo != NULL ) return;
+		if ( m_diHot.sDrawString == pStrImage && m_diHot.pImageInfo != NULL ) return;
 		m_diHot.Clear();
 		m_diHot.sDrawString = pStrImage;
 		Invalidate();
@@ -237,7 +237,7 @@ namespace DuiLib
 
 	void CButtonUI::SetPushedImage(LPCTSTR pStrImage)
 	{
-		if( m_diPushed.sDrawString == pStrImage && m_diPushed.pImageInfo != NULL ) return;
+		if ( m_diPushed.sDrawString == pStrImage && m_diPushed.pImageInfo != NULL ) return;
 		m_diPushed.Clear();
 		m_diPushed.sDrawString = pStrImage;
 		Invalidate();
@@ -250,7 +250,7 @@ namespace DuiLib
 
 	void CButtonUI::SetFocusedImage(LPCTSTR pStrImage)
 	{
-		if( m_diFocused.sDrawString == pStrImage && m_diFocused.pImageInfo != NULL ) return;
+		if ( m_diFocused.sDrawString == pStrImage && m_diFocused.pImageInfo != NULL ) return;
 		m_diFocused.Clear();
 		m_diFocused.sDrawString = pStrImage;
 		Invalidate();
@@ -263,7 +263,7 @@ namespace DuiLib
 
 	void CButtonUI::SetDisabledImage(LPCTSTR pStrImage)
 	{
-		if( m_diDisabled.sDrawString == pStrImage && m_diDisabled.pImageInfo != NULL ) return;
+		if ( m_diDisabled.sDrawString == pStrImage && m_diDisabled.pImageInfo != NULL ) return;
 		m_diDisabled.Clear();
 		m_diDisabled.sDrawString = pStrImage;
 		Invalidate();
@@ -276,7 +276,7 @@ namespace DuiLib
 
 	void CButtonUI::SetForeImage( LPCTSTR pStrImage )
 	{
-		if( m_diFore.sDrawString == pStrImage && m_diFore.pImageInfo != NULL ) return;
+		if ( m_diFore.sDrawString == pStrImage && m_diFore.pImageInfo != NULL ) return;
 		m_diFore.Clear();
 		m_diFore.sDrawString = pStrImage;
 		Invalidate();
@@ -289,7 +289,7 @@ namespace DuiLib
 
 	void CButtonUI::SetHotForeImage( LPCTSTR pStrImage )
 	{
-		if( m_diHotFore.sDrawString == pStrImage && m_diHotFore.pImageInfo != NULL ) return;
+		if ( m_diHotFore.sDrawString == pStrImage && m_diHotFore.pImageInfo != NULL ) return;
 		m_diHotFore.Clear();
 		m_diHotFore.sDrawString = pStrImage;
 		Invalidate();
@@ -304,7 +304,7 @@ namespace DuiLib
 			LONG width = m_diNormal.pImageInfo->nX / 5;
 			LONG height = m_diNormal.pImageInfo->nY;
 			m_diNormal.rcBmpPart = CDuiRect(0, 0, width, height);
-			if( m_bFloat && m_cxyFixed.cx == 0 && m_cxyFixed.cy == 0 ) {
+			if ( m_bFloat && m_cxyFixed.cx == 0 && m_cxyFixed.cy == 0 ) {
 				m_cxyFixed.cx = width;
 				m_cxyFixed.cy = height;
 			}
@@ -361,45 +361,45 @@ namespace DuiLib
 
 	SIZE CButtonUI::EstimateSize(SIZE szAvailable)
 	{
-		if( m_cxyFixed.cy == 0 ) return CDuiSize(m_cxyFixed.cx, m_pManager->GetFontInfo(GetFont())->tm.tmHeight + 8);
+		if ( m_cxyFixed.cy == 0 ) return CDuiSize(m_cxyFixed.cx, m_pManager->GetFontInfo(GetFont())->tm.tmHeight + 8);
 		return CControlUI::EstimateSize(szAvailable);
 	}
 
 	void CButtonUI::SetAttribute(LPCTSTR pstrName, LPCTSTR pstrValue)
 	{
-		if( _tcscmp(pstrName, _T("normalimage")) == 0 ) SetNormalImage(pstrValue);
-		else if( _tcscmp(pstrName, _T("hotimage")) == 0 ) SetHotImage(pstrValue);
-		else if( _tcscmp(pstrName, _T("pushedimage")) == 0 ) SetPushedImage(pstrValue);
-		else if( _tcscmp(pstrName, _T("focusedimage")) == 0 ) SetFocusedImage(pstrValue);
-		else if( _tcscmp(pstrName, _T("disabledimage")) == 0 ) SetDisabledImage(pstrValue);
-		else if( _tcscmp(pstrName, _T("foreimage")) == 0 ) SetForeImage(pstrValue);
-		else if( _tcscmp(pstrName, _T("hotforeimage")) == 0 ) SetHotForeImage(pstrValue);
-		else if( _tcscmp(pstrName, _T("fivestatusimage")) == 0 ) SetFiveStatusImage(pstrValue);
-		else if( _tcscmp(pstrName, _T("fadedelta")) == 0 ) SetFadeAlphaDelta((BYTE)_ttoi(pstrValue));
-		else if( _tcscmp(pstrName, _T("hotbkcolor")) == 0 )
+		if ( _tcscmp(pstrName, _T("normalimage")) == 0 ) SetNormalImage(pstrValue);
+		else if ( _tcscmp(pstrName, _T("hotimage")) == 0 ) SetHotImage(pstrValue);
+		else if ( _tcscmp(pstrName, _T("pushedimage")) == 0 ) SetPushedImage(pstrValue);
+		else if ( _tcscmp(pstrName, _T("focusedimage")) == 0 ) SetFocusedImage(pstrValue);
+		else if ( _tcscmp(pstrName, _T("disabledimage")) == 0 ) SetDisabledImage(pstrValue);
+		else if ( _tcscmp(pstrName, _T("foreimage")) == 0 ) SetForeImage(pstrValue);
+		else if ( _tcscmp(pstrName, _T("hotforeimage")) == 0 ) SetHotForeImage(pstrValue);
+		else if ( _tcscmp(pstrName, _T("fivestatusimage")) == 0 ) SetFiveStatusImage(pstrValue);
+		else if ( _tcscmp(pstrName, _T("fadedelta")) == 0 ) SetFadeAlphaDelta((BYTE)_ttoi(pstrValue));
+		else if ( _tcscmp(pstrName, _T("hotbkcolor")) == 0 )
 		{
-			if( *pstrValue == _T('#')) pstrValue = ::CharNext(pstrValue);
+			if ( *pstrValue == _T('#')) pstrValue = ::CharNext(pstrValue);
 			LPTSTR pstr = NULL;
 			DWORD clrColor = _tcstoul(pstrValue, &pstr, 16);
 			SetHotBkColor(clrColor);
 		}
-		else if( _tcscmp(pstrName, _T("hottextcolor")) == 0 )
+		else if ( _tcscmp(pstrName, _T("hottextcolor")) == 0 )
 		{
-			if( *pstrValue == _T('#')) pstrValue = ::CharNext(pstrValue);
+			if ( *pstrValue == _T('#')) pstrValue = ::CharNext(pstrValue);
 			LPTSTR pstr = NULL;
 			DWORD clrColor = _tcstoul(pstrValue, &pstr, 16);
 			SetHotTextColor(clrColor);
 		}
-		else if( _tcscmp(pstrName, _T("pushedtextcolor")) == 0 )
+		else if ( _tcscmp(pstrName, _T("pushedtextcolor")) == 0 )
 		{
-			if( *pstrValue == _T('#')) pstrValue = ::CharNext(pstrValue);
+			if ( *pstrValue == _T('#')) pstrValue = ::CharNext(pstrValue);
 			LPTSTR pstr = NULL;
 			DWORD clrColor = _tcstoul(pstrValue, &pstr, 16);
 			SetPushedTextColor(clrColor);
 		}
-		else if( _tcscmp(pstrName, _T("focusedtextcolor")) == 0 )
+		else if ( _tcscmp(pstrName, _T("focusedtextcolor")) == 0 )
 		{
-			if( *pstrValue == _T('#')) pstrValue = ::CharNext(pstrValue);
+			if ( *pstrValue == _T('#')) pstrValue = ::CharNext(pstrValue);
 			LPTSTR pstr = NULL;
 			DWORD clrColor = _tcstoul(pstrValue, &pstr, 16);
 			SetFocusedTextColor(clrColor);
@@ -407,18 +407,18 @@ namespace DuiLib
 		else CLabelUI::SetAttribute(pstrName, pstrValue);
 	}
 
-	void CButtonUI::PaintText(HDC hDC)
+	LRESULT CButtonUI::PaintText(HDC hDC)
 	{
-		if( IsFocused() ) m_uButtonState |= UISTATE_FOCUSED;
+		if ( IsFocused() ) m_uButtonState |= UISTATE_FOCUSED;
 		else m_uButtonState &= ~ UISTATE_FOCUSED;
-		if( !IsEnabled() ) m_uButtonState |= UISTATE_DISABLED;
+		if ( !IsEnabled() ) m_uButtonState |= UISTATE_DISABLED;
 		else m_uButtonState &= ~ UISTATE_DISABLED;
 
-		if( m_dwTextColor == 0 ) m_dwTextColor = m_pManager->GetDefaultFontColor();
-		if( m_dwDisabledTextColor == 0 ) m_dwDisabledTextColor = m_pManager->GetDefaultDisabledColor();
+		if ( m_dwTextColor == 0 ) m_dwTextColor = m_pManager->GetDefaultFontColor();
+		if ( m_dwDisabledTextColor == 0 ) m_dwDisabledTextColor = m_pManager->GetDefaultDisabledColor();
 
-		if( m_sText.IsEmpty() ) return;
-		int nLinks = 0;
+		if ( m_sText.IsEmpty() ) return (-1L);
+		LONG nLinks = 0;
 		RECT rc = m_rcItem;
 		rc.left += m_rcTextPadding.left;
 		rc.right -= m_rcTextPadding.right;
@@ -427,40 +427,41 @@ namespace DuiLib
 
 		DWORD clrColor = IsEnabled()?m_dwTextColor:m_dwDisabledTextColor;
 
-		if( ((m_uButtonState & UISTATE_PUSHED) != 0) && (GetPushedTextColor() != 0) )
+		if ( ((m_uButtonState & UISTATE_PUSHED) != 0) && (GetPushedTextColor() != 0) )
 			clrColor = GetPushedTextColor();
-		else if( ((m_uButtonState & UISTATE_HOT) != 0) && (GetHotTextColor() != 0) )
+		else if ( ((m_uButtonState & UISTATE_HOT) != 0) && (GetHotTextColor() != 0) )
 			clrColor = GetHotTextColor();
-		else if( ((m_uButtonState & UISTATE_FOCUSED) != 0) && (GetFocusedTextColor() != 0) )
+		else if ( ((m_uButtonState & UISTATE_FOCUSED) != 0) && (GetFocusedTextColor() != 0) )
 			clrColor = GetFocusedTextColor();
 
-		if( m_bShowHtml )
+		if ( m_bShowHtml )
 			CRenderEngine::DrawHtmlText(hDC, m_pManager, rc, m_sText, clrColor, \
 			NULL, NULL, nLinks, m_iFont, m_uTextStyle);
 		else
 			CRenderEngine::DrawText(hDC, m_pManager, rc, m_sText, clrColor, \
 			m_iFont, m_uTextStyle);
+		return (0L);
 	}
 
-	void CButtonUI::PaintStatusImage(HDC hDC)
+	LRESULT CButtonUI::PaintStatusImage(HDC hDC)
 	{
-		if( IsFocused() ) m_uButtonState |= UISTATE_FOCUSED;
+		if ( IsFocused() ) m_uButtonState |= UISTATE_FOCUSED;
 		else m_uButtonState &= ~ UISTATE_FOCUSED;
-		if( !IsEnabled() ) m_uButtonState |= UISTATE_DISABLED;
+		if ( !IsEnabled() ) m_uButtonState |= UISTATE_DISABLED;
 		else m_uButtonState &= ~ UISTATE_DISABLED;
 
-		if( (m_uButtonState & UISTATE_DISABLED) != 0 ) {
-			if (DrawImage(hDC, m_diDisabled)) goto Label_ForeImage;
+		if ( (m_uButtonState & UISTATE_DISABLED) != 0 ) {
+			if (DrawImage(hDC, m_diDisabled) >= (0L)) goto Label_ForeImage;
 		}
-		else if( (m_uButtonState & UISTATE_PUSHED) != 0 ) {
-			if (!DrawImage(hDC, m_diPushed))
+		else if ( (m_uButtonState & UISTATE_PUSHED) != 0 ) {
+			if (DrawImage(hDC, m_diPushed) < (0L))
 				DrawImage(hDC, m_diNormal);
-			if (DrawImage(hDC, m_diPushedFore)) return;
+			if (DrawImage(hDC, m_diPushedFore) >= (0L)) return (0L);
 			else goto Label_ForeImage;
 		}
-		else if( (m_uButtonState & UISTATE_HOT) != 0 ) {
-			if( GetFadeAlphaDelta() > 0 ) {
-				if( m_uFadeAlpha == 0 ) {
+		else if ( (m_uButtonState & UISTATE_HOT) != 0 ) {
+			if ( GetFadeAlphaDelta() > 0 ) {
+				if ( m_uFadeAlpha == 0 ) {
 					m_diHot.uFade = 255;
 					DrawImage(hDC, m_diHot);
 				}
@@ -472,23 +473,23 @@ namespace DuiLib
 				}
 			}
 			else {
-				if (!DrawImage(hDC, m_diHot))
+				if (DrawImage(hDC, m_diHot) < (0L))
 					DrawImage(hDC, m_diNormal);
 			}
 
-			if (DrawImage(hDC, m_diHotFore)) return;
-			else if(m_dwHotBkColor != 0) {
+			if (DrawImage(hDC, m_diHotFore) >= (0L)) return (0L);
+			else if (m_dwHotBkColor != 0) {
 				CRenderEngine::DrawColor(hDC, m_rcPaint, GetAdjustColor(m_dwHotBkColor));
-				return;
+				return (0L);
 			}
 			else goto Label_ForeImage;
 		}
-		else if( (m_uButtonState & UISTATE_FOCUSED) != 0 ) {
-			if (DrawImage(hDC, m_diFocused)) goto Label_ForeImage;;
+		else if ( (m_uButtonState & UISTATE_FOCUSED) != 0 ) {
+			if (DrawImage(hDC, m_diFocused) >= (0L)) goto Label_ForeImage;;
 		}
 
 		if ( GetFadeAlphaDelta() > 0 ) {
-			if( m_uFadeAlpha == 255 ) {
+			if ( m_uFadeAlpha == 255 ) {
 				m_diNormal.uFade = 255;
 				DrawImage(hDC, m_diNormal);
 			}
@@ -505,5 +506,6 @@ namespace DuiLib
 
 Label_ForeImage:
 		DrawImage(hDC, m_diFore);
+		return (0L);
 	}
 }

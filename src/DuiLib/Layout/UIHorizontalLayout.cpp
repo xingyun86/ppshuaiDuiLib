@@ -16,17 +16,17 @@ namespace DuiLib
 
 	LPVOID CHorizontalLayoutUI::GetInterface(LPCTSTR pstrName)
 	{
-		if( _tcscmp(pstrName, DUI_CTR_HORIZONTALLAYOUT) == 0 ) return static_cast<CHorizontalLayoutUI*>(this);
+		if ( _tcscmp(pstrName, DUI_CTR_HORIZONTALLAYOUT) == 0 ) return static_cast<CHorizontalLayoutUI*>(this);
 		return CContainerUI::GetInterface(pstrName);
 	}
 
 	UINT CHorizontalLayoutUI::GetControlFlags() const
 	{
-		if( IsEnabled() && m_iSepWidth != 0 ) return UIFLAG_SETCURSOR;
+		if ( IsEnabled() && m_iSepWidth != 0 ) return UIFLAG_SETCURSOR;
 		else return 0;
 	}
 
-	void CHorizontalLayoutUI::SetPos(RECT rc, bool bNeedInvalidate)
+	LRESULT CHorizontalLayoutUI::SetPos(RECT rc, BOOL bNeedInvalidate)
 	{
 		CControlUI::SetPos(rc, bNeedInvalidate);
 		rc = m_rcItem;
@@ -36,19 +36,19 @@ namespace DuiLib
 		rc.top += m_rcInset.top;
 		rc.right -= m_rcInset.right;
 		rc.bottom -= m_rcInset.bottom;
-		if( m_pVerticalScrollBar && m_pVerticalScrollBar->IsVisible() ) rc.right -= m_pVerticalScrollBar->GetFixedWidth();
-		if( m_pHorizontalScrollBar && m_pHorizontalScrollBar->IsVisible() ) rc.bottom -= m_pHorizontalScrollBar->GetFixedHeight();
+		if ( m_pVerticalScrollBar && m_pVerticalScrollBar->IsVisible() ) rc.right -= m_pVerticalScrollBar->GetFixedWidth();
+		if ( m_pHorizontalScrollBar && m_pHorizontalScrollBar->IsVisible() ) rc.bottom -= m_pHorizontalScrollBar->GetFixedHeight();
 
-		if( m_items.GetSize() == 0) {
+		if ( m_items.GetSize() == 0) {
 			ProcessScrollBar(rc, 0, 0);
-			return;
+			return (0L);
 		}
 
 		// Determine the minimum size
 		SIZE szAvailable = { rc.right - rc.left, rc.bottom - rc.top };
-		if( m_pHorizontalScrollBar && m_pHorizontalScrollBar->IsVisible() )
+		if ( m_pHorizontalScrollBar && m_pHorizontalScrollBar->IsVisible() )
 			szAvailable.cx += m_pHorizontalScrollBar->GetScrollRange();
-		if( m_pVerticalScrollBar && m_pVerticalScrollBar->IsVisible() )
+		if ( m_pVerticalScrollBar && m_pVerticalScrollBar->IsVisible() )
 			szAvailable.cy += m_pVerticalScrollBar->GetScrollRange();
 
 		int cyNeeded = 0;
@@ -60,8 +60,8 @@ namespace DuiLib
 		int iControlMaxHeight = 0;
 		for( int it1 = 0; it1 < m_items.GetSize(); it1++ ) {
 			CControlUI* pControl = static_cast<CControlUI*>(m_items[it1]);
-			if( !pControl->IsVisible() ) continue;
-			if( pControl->IsFloat() ) continue;
+			if ( !pControl->IsVisible() ) continue;
+			if ( pControl->IsFloat() ) continue;
 			szControlAvailable = szAvailable;
 			RECT rcPadding = pControl->GetPadding();
 			szControlAvailable.cy -= rcPadding.top + rcPadding.bottom;
@@ -90,8 +90,8 @@ namespace DuiLib
 			cxFixed += sz.cx + pControl->GetPadding().left + pControl->GetPadding().right;
 
 			sz.cy = MAX(sz.cy, 0);
-			if( sz.cy < pControl->GetMinHeight() ) sz.cy = pControl->GetMinHeight();
-			if( sz.cy > pControl->GetMaxHeight() ) sz.cy = pControl->GetMaxHeight();
+			if ( sz.cy < pControl->GetMinHeight() ) sz.cy = pControl->GetMinHeight();
+			if ( sz.cy > pControl->GetMaxHeight() ) sz.cy = pControl->GetMaxHeight();
 			cyNeeded = MAX(cyNeeded, sz.cy + rcPadding.top + rcPadding.bottom);
 			nEstimateNum++;
 		}
@@ -100,11 +100,11 @@ namespace DuiLib
 		// Place elements
 		int cxNeeded = 0;
 		int cxExpand = 0;
-		if( nAdjustables > 0 ) cxExpand = MAX(0, (szAvailable.cx - cxFixed) / nAdjustables);
+		if ( nAdjustables > 0 ) cxExpand = MAX(0, (szAvailable.cx - cxFixed) / nAdjustables);
 		// Position the elements
 		SIZE szRemaining = szAvailable;
 		int iPosX = rc.left;
-		if( m_pHorizontalScrollBar && m_pHorizontalScrollBar->IsVisible() ) {
+		if ( m_pHorizontalScrollBar && m_pHorizontalScrollBar->IsVisible() ) {
 			iPosX -= m_pHorizontalScrollBar->GetScrollPos();
 		}
 		int iEstimate = 0;
@@ -112,8 +112,8 @@ namespace DuiLib
 		int cxFixedRemaining = cxFixed;
 		for( int it2 = 0; it2 < m_items.GetSize(); it2++ ) {
 			CControlUI* pControl = static_cast<CControlUI*>(m_items[it2]);
-			if( !pControl->IsVisible() ) continue;
-			if( pControl->IsFloat() ) {
+			if ( !pControl->IsVisible() ) continue;
+			if ( pControl->IsFloat() ) {
 				SetFloatPos(it2);
 				continue;
 			}
@@ -137,28 +137,28 @@ namespace DuiLib
 				iAdjustable++;
 				sz.cx = cxExpand;
 				// Distribute remaining to last element (usually round-off left-overs)
-				if( iAdjustable == nAdjustables ) {
+				if ( iAdjustable == nAdjustables ) {
 					sz.cx = MAX(0, szRemaining.cx - rcPadding.right - cxFixedRemaining);
 				}
-				if( sz.cx < pControl->GetMinWidth() ) sz.cx = pControl->GetMinWidth();
-				if( sz.cx > pControl->GetMaxWidth() ) sz.cx = pControl->GetMaxWidth();
+				if ( sz.cx < pControl->GetMinWidth() ) sz.cx = pControl->GetMinWidth();
+				if ( sz.cx > pControl->GetMaxWidth() ) sz.cx = pControl->GetMaxWidth();
 			}
 			else {
-				if( sz.cx < pControl->GetMinWidth() ) sz.cx = pControl->GetMinWidth();
-				if( sz.cx > pControl->GetMaxWidth() ) sz.cx = pControl->GetMaxWidth();
+				if ( sz.cx < pControl->GetMinWidth() ) sz.cx = pControl->GetMinWidth();
+				if ( sz.cx > pControl->GetMaxWidth() ) sz.cx = pControl->GetMaxWidth();
 				cxFixedRemaining -= sz.cx;
 			}
 
 			sz.cy = pControl->GetMaxHeight();
-			if( sz.cy == 0 ) sz.cy = szAvailable.cy - rcPadding.top - rcPadding.bottom;
-			if( sz.cy < 0 ) sz.cy = 0;
-			if( sz.cy > szControlAvailable.cy ) sz.cy = szControlAvailable.cy;
-			if( sz.cy < pControl->GetMinHeight() ) sz.cy = pControl->GetMinHeight();
+			if ( sz.cy == 0 ) sz.cy = szAvailable.cy - rcPadding.top - rcPadding.bottom;
+			if ( sz.cy < 0 ) sz.cy = 0;
+			if ( sz.cy > szControlAvailable.cy ) sz.cy = szControlAvailable.cy;
+			if ( sz.cy < pControl->GetMinHeight() ) sz.cy = pControl->GetMinHeight();
 
 			UINT iChildAlign = GetChildVAlign();
 			if (iChildAlign == DT_VCENTER) {
 				int iPosY = (rc.bottom + rc.top) / 2;
-				if( m_pVerticalScrollBar && m_pVerticalScrollBar->IsVisible() ) {
+				if ( m_pVerticalScrollBar && m_pVerticalScrollBar->IsVisible() ) {
 					iPosY += m_pVerticalScrollBar->GetScrollRange() / 2;
 					iPosY -= m_pVerticalScrollBar->GetScrollPos();
 				}
@@ -167,7 +167,7 @@ namespace DuiLib
 			}
 			else if (iChildAlign == DT_BOTTOM) {
 				int iPosY = rc.bottom;
-				if( m_pVerticalScrollBar && m_pVerticalScrollBar->IsVisible() ) {
+				if ( m_pVerticalScrollBar && m_pVerticalScrollBar->IsVisible() ) {
 					iPosY += m_pVerticalScrollBar->GetScrollRange();
 					iPosY -= m_pVerticalScrollBar->GetScrollPos();
 				}
@@ -176,7 +176,7 @@ namespace DuiLib
 			}
 			else {
 				int iPosY = rc.top;
-				if( m_pVerticalScrollBar && m_pVerticalScrollBar->IsVisible() ) {
+				if ( m_pVerticalScrollBar && m_pVerticalScrollBar->IsVisible() ) {
 					iPosY -= m_pVerticalScrollBar->GetScrollPos();
 				}
 				RECT rcCtrl = { iPosX + rcPadding.left, iPosY + rcPadding.top, iPosX + sz.cx + rcPadding.left, iPosY + sz.cy + rcPadding.top };
@@ -191,14 +191,18 @@ namespace DuiLib
 
 		// Process the scrollbar
 		ProcessScrollBar(rc, cxNeeded, cyNeeded);
+
+		return (0L);
 	}
 
-	void CHorizontalLayoutUI::DoPostPaint(HDC hDC, const RECT& rcPaint)
+	LRESULT CHorizontalLayoutUI::DoPostPaint(HDC hDC, const RECT& rcPaint)
 	{
-		if( (m_uButtonState & UISTATE_CAPTURED) != 0 && !m_bImmMode ) {
+		if ( (m_uButtonState & UISTATE_CAPTURED) != 0 && !m_bImmMode ) {
 			RECT rcSeparator = GetThumbRect(true);
 			CRenderEngine::DrawColor(hDC, rcSeparator, 0xAA000000);
 		}
+
+		return (0L);
 	}
 
 	void CHorizontalLayoutUI::SetSepWidth(int iWidth)
@@ -206,86 +210,86 @@ namespace DuiLib
 		m_iSepWidth = iWidth;
 	}
 
-	int CHorizontalLayoutUI::GetSepWidth() const
+	LONG CHorizontalLayoutUI::GetSepWidth() const
 	{
 		return m_iSepWidth;
 	}
 
-	void CHorizontalLayoutUI::SetSepImmMode(bool bImmediately)
+	void CHorizontalLayoutUI::SetSepImmMode(BOOL bImmediately)
 	{
-		if( m_bImmMode == bImmediately ) return;
-		if( (m_uButtonState & UISTATE_CAPTURED) != 0 && !m_bImmMode && m_pManager != NULL ) {
+		if ( m_bImmMode == bImmediately ) return;
+		if ( (m_uButtonState & UISTATE_CAPTURED) != 0 && !m_bImmMode && m_pManager != NULL ) {
 			m_pManager->RemovePostPaint(this);
 		}
 
 		m_bImmMode = bImmediately;
 	}
 
-	bool CHorizontalLayoutUI::IsSepImmMode() const
+	BOOL CHorizontalLayoutUI::IsSepImmMode() const
 	{
 		return m_bImmMode;
 	}
 
 	void CHorizontalLayoutUI::SetAttribute(LPCTSTR pstrName, LPCTSTR pstrValue)
 	{
-		if( _tcscmp(pstrName, _T("sepwidth")) == 0 ) SetSepWidth(_ttoi(pstrValue));
-		else if( _tcscmp(pstrName, _T("sepimm")) == 0 ) SetSepImmMode(_tcscmp(pstrValue, _T("true")) == 0);
+		if ( _tcscmp(pstrName, _T("sepwidth")) == 0 ) SetSepWidth(_ttoi(pstrValue));
+		else if ( _tcscmp(pstrName, _T("sepimm")) == 0 ) SetSepImmMode(_tcscmp(pstrValue, _T("true")) == 0);
 		else CContainerUI::SetAttribute(pstrName, pstrValue);
 	}
 
-	void CHorizontalLayoutUI::DoEvent(TEventUI& event)
+	LRESULT CHorizontalLayoutUI::DoEvent(TEventUI& event)
 	{
-		if( m_iSepWidth != 0 ) {
-			if( event.Type == UIEVENT_BUTTONDOWN && IsEnabled() )
+		if ( m_iSepWidth != 0 ) {
+			if ( event.Type == UIEVENT_BUTTONDOWN && IsEnabled() )
 			{
 				RECT rcSeparator = GetThumbRect(false);
-				if( ::PtInRect(&rcSeparator, event.ptMouse) ) {
+				if ( ::PtInRect(&rcSeparator, event.ptMouse) ) {
 					m_uButtonState |= UISTATE_CAPTURED;
 					m_ptLastMouse = event.ptMouse;
 					m_rcNewPos = m_rcItem;
-					if( !m_bImmMode && m_pManager ) m_pManager->AddPostPaint(this);
-					return;
+					if ( !m_bImmMode && m_pManager ) m_pManager->AddPostPaint(this);
+					return (0L);
 				}
 			}
-			if( event.Type == UIEVENT_BUTTONUP )
+			if ( event.Type == UIEVENT_BUTTONUP )
 			{
-				if( (m_uButtonState & UISTATE_CAPTURED) != 0 ) {
+				if ( (m_uButtonState & UISTATE_CAPTURED) != 0 ) {
 					m_uButtonState &= ~UISTATE_CAPTURED;
 					m_rcItem = m_rcNewPos;
-					if( !m_bImmMode && m_pManager ) m_pManager->RemovePostPaint(this);
+					if ( !m_bImmMode && m_pManager ) m_pManager->RemovePostPaint(this);
 					NeedParentUpdate();
-					return;
+					return (0L);
 				}
 			}
-			if( event.Type == UIEVENT_MOUSEMOVE )
+			else if ( event.Type == UIEVENT_MOUSEMOVE )
 			{
-				if( (m_uButtonState & UISTATE_CAPTURED) != 0 ) {
+				if ( (m_uButtonState & UISTATE_CAPTURED) != 0 ) {
 					LONG cx = event.ptMouse.x - m_ptLastMouse.x;
 					m_ptLastMouse = event.ptMouse;
 					RECT rc = m_rcNewPos;
-					if( m_iSepWidth >= 0 ) {
-						if( cx > 0 && event.ptMouse.x < m_rcNewPos.right - m_iSepWidth ) return;
-						if( cx < 0 && event.ptMouse.x > m_rcNewPos.right ) return;
+					if ( m_iSepWidth >= 0 ) {
+						if ( cx > 0 && event.ptMouse.x < m_rcNewPos.right - m_iSepWidth ) return 0;
+						if ( cx < 0 && event.ptMouse.x > m_rcNewPos.right ) return 0;
 						rc.right += cx;
-						if( rc.right - rc.left <= GetMinWidth() ) {
-							if( m_rcNewPos.right - m_rcNewPos.left <= GetMinWidth() ) return;
+						if ( rc.right - rc.left <= GetMinWidth() ) {
+							if ( m_rcNewPos.right - m_rcNewPos.left <= GetMinWidth() ) return 0;
 							rc.right = rc.left + GetMinWidth();
 						}
-						if( rc.right - rc.left >= GetMaxWidth() ) {
-							if( m_rcNewPos.right - m_rcNewPos.left >= GetMaxWidth() ) return;
+						if ( rc.right - rc.left >= GetMaxWidth() ) {
+							if ( m_rcNewPos.right - m_rcNewPos.left >= GetMaxWidth() ) return 0;
 							rc.right = rc.left + GetMaxWidth();
 						}
 					}
 					else {
-						if( cx > 0 && event.ptMouse.x < m_rcNewPos.left ) return;
-						if( cx < 0 && event.ptMouse.x > m_rcNewPos.left - m_iSepWidth ) return;
+						if ( cx > 0 && event.ptMouse.x < m_rcNewPos.left ) return 0;
+						if ( cx < 0 && event.ptMouse.x > m_rcNewPos.left - m_iSepWidth ) return 0;
 						rc.left += cx;
-						if( rc.right - rc.left <= GetMinWidth() ) {
-							if( m_rcNewPos.right - m_rcNewPos.left <= GetMinWidth() ) return;
+						if ( rc.right - rc.left <= GetMinWidth() ) {
+							if ( m_rcNewPos.right - m_rcNewPos.left <= GetMinWidth() ) return 0;
 							rc.left = rc.right - GetMinWidth();
 						}
-						if( rc.right - rc.left >= GetMaxWidth() ) {
-							if( m_rcNewPos.right - m_rcNewPos.left >= GetMaxWidth() ) return;
+						if ( rc.right - rc.left >= GetMaxWidth() ) {
+							if ( m_rcNewPos.right - m_rcNewPos.left >= GetMaxWidth() ) return 0;
 							rc.left = rc.right - GetMaxWidth();
 						}
 					}
@@ -294,38 +298,38 @@ namespace DuiLib
 					m_rcNewPos = rc;
 					m_cxyFixed.cx = m_rcNewPos.right - m_rcNewPos.left;
 
-					if( m_bImmMode ) {
+					if ( m_bImmMode ) {
 						m_rcItem = m_rcNewPos;
 						NeedParentUpdate();
 					}
 					else {
 						rcInvalidate.Join(GetThumbRect(true));
 						rcInvalidate.Join(GetThumbRect(false));
-						if( m_pManager ) m_pManager->Invalidate(rcInvalidate);
+						if ( m_pManager ) m_pManager->Invalidate(rcInvalidate);
 					}
-					return;
+					return (0L);
 				}
 			}
-			if( event.Type == UIEVENT_SETCURSOR )
+			else if ( event.Type == UIEVENT_SETCURSOR )
 			{
 				RECT rcSeparator = GetThumbRect(false);
-				if( IsEnabled() && ::PtInRect(&rcSeparator, event.ptMouse) ) {
-					::SetCursor(::LoadCursor(NULL, /*MAKEINTRESOURCE*/(IDC_SIZEWE)));
-					return;
+				if ( IsEnabled() && ::PtInRect(&rcSeparator, event.ptMouse) ) {
+					::SetCursor(::LoadCursor(NULL, MAKEINTRESOURCE(IDC_SIZEWE)));
+					return (0L);
 				}
 			}
 		}
-		CContainerUI::DoEvent(event);
+		return CContainerUI::DoEvent(event);
 	}
 
-	RECT CHorizontalLayoutUI::GetThumbRect(bool bUseNew) const
+	RECT CHorizontalLayoutUI::GetThumbRect(BOOL bUseNew) const
 	{
-		if( (m_uButtonState & UISTATE_CAPTURED) != 0 && bUseNew) {
-			if( m_iSepWidth >= 0 ) return CDuiRect(m_rcNewPos.right - m_iSepWidth, m_rcNewPos.top, m_rcNewPos.right, m_rcNewPos.bottom);
+		if ( (m_uButtonState & UISTATE_CAPTURED) != 0 && bUseNew) {
+			if ( m_iSepWidth >= 0 ) return CDuiRect(m_rcNewPos.right - m_iSepWidth, m_rcNewPos.top, m_rcNewPos.right, m_rcNewPos.bottom);
 			else return CDuiRect(m_rcNewPos.left, m_rcNewPos.top, m_rcNewPos.left - m_iSepWidth, m_rcNewPos.bottom);
 		}
 		else {
-			if( m_iSepWidth >= 0 ) return CDuiRect(m_rcItem.right - m_iSepWidth, m_rcItem.top, m_rcItem.right, m_rcItem.bottom);
+			if ( m_iSepWidth >= 0 ) return CDuiRect(m_rcItem.right - m_iSepWidth, m_rcItem.top, m_rcItem.right, m_rcItem.bottom);
 			else return CDuiRect(m_rcItem.left, m_rcItem.top, m_rcItem.left - m_iSepWidth, m_rcItem.bottom);
 		}
 	}

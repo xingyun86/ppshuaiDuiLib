@@ -16,7 +16,7 @@ namespace DuiLib
 
 	LPVOID CTileLayoutUI::GetInterface(LPCTSTR pstrName)
 	{
-		if( _tcscmp(pstrName, DUI_CTR_TILELAYOUT) == 0 ) return static_cast<CTileLayoutUI*>(this);
+		if ( _tcscmp(pstrName, DUI_CTR_TILELAYOUT) == 0 ) return static_cast<CTileLayoutUI*>(this);
 		return CContainerUI::GetInterface(pstrName);
 	}
 
@@ -27,7 +27,7 @@ namespace DuiLib
 
 	void CTileLayoutUI::SetFixedColumns(int iColums)
 	{
-		if( iColums < 0 ) return;
+		if ( iColums < 0 ) return;
 		m_nColumnsFixed = iColums;
 		NeedUpdate();
 	}
@@ -51,7 +51,7 @@ namespace DuiLib
 
 	void CTileLayoutUI::SetItemSize(SIZE szSize)
 	{
-		if( m_szItem.cx != szSize.cx || m_szItem.cy != szSize.cy ) {
+		if ( m_szItem.cx != szSize.cx || m_szItem.cy != szSize.cy ) {
 			m_szItem = szSize;
 			NeedUpdate();
 		}
@@ -69,19 +69,19 @@ namespace DuiLib
 
 	void CTileLayoutUI::SetAttribute(LPCTSTR pstrName, LPCTSTR pstrValue)
 	{
-		if( _tcscmp(pstrName, _T("itemsize")) == 0 ) {
+		if ( _tcscmp(pstrName, _T("itemsize")) == 0 ) {
 			SIZE szItem = { 0 };
 			LPTSTR pstr = NULL;
 			szItem.cx = _tcstol(pstrValue, &pstr, 10);  ASSERT(pstr);    
 			szItem.cy = _tcstol(pstr + 1, &pstr, 10);   ASSERT(pstr);     
 			SetItemSize(szItem);
 		}
-		else if( _tcscmp(pstrName, _T("columns")) == 0 ) SetFixedColumns(_ttoi(pstrValue));
-		else if( _tcscmp(pstrName, _T("childvpadding")) == 0 ) SetChildVPadding(_ttoi(pstrValue));
+		else if ( _tcscmp(pstrName, _T("columns")) == 0 ) SetFixedColumns(_ttoi(pstrValue));
+		else if ( _tcscmp(pstrName, _T("childvpadding")) == 0 ) SetChildVPadding(_ttoi(pstrValue));
 		else CContainerUI::SetAttribute(pstrName, pstrValue);
 	}
 
-	void CTileLayoutUI::SetPos(RECT rc, bool bNeedInvalidate)
+	LRESULT CTileLayoutUI::SetPos(RECT rc, BOOL bNeedInvalidate)
 	{
 		CControlUI::SetPos(rc, bNeedInvalidate);
 		rc = m_rcItem;
@@ -91,26 +91,26 @@ namespace DuiLib
 		rc.top += m_rcInset.top;
 		rc.right -= m_rcInset.right;
 		rc.bottom -= m_rcInset.bottom;
-		if( m_pVerticalScrollBar && m_pVerticalScrollBar->IsVisible() ) rc.right -= m_pVerticalScrollBar->GetFixedWidth();
-		if( m_pHorizontalScrollBar && m_pHorizontalScrollBar->IsVisible() ) rc.bottom -= m_pHorizontalScrollBar->GetFixedHeight();
+		if ( m_pVerticalScrollBar && m_pVerticalScrollBar->IsVisible() ) rc.right -= m_pVerticalScrollBar->GetFixedWidth();
+		if ( m_pHorizontalScrollBar && m_pHorizontalScrollBar->IsVisible() ) rc.bottom -= m_pHorizontalScrollBar->GetFixedHeight();
 
-		if( m_items.GetSize() == 0) {
+		if ( m_items.GetSize() == 0) {
 			ProcessScrollBar(rc, 0, 0);
-			return;
+			return (0L);
 		}
 
 		// Determine the minimum size
 		SIZE szAvailable = { rc.right - rc.left, rc.bottom - rc.top };
-		if( m_pHorizontalScrollBar && m_pHorizontalScrollBar->IsVisible() ) 
+		if ( m_pHorizontalScrollBar && m_pHorizontalScrollBar->IsVisible() ) 
 			szAvailable.cx += m_pHorizontalScrollBar->GetScrollRange();
-		if( m_pVerticalScrollBar && m_pVerticalScrollBar->IsVisible() ) 
+		if ( m_pVerticalScrollBar && m_pVerticalScrollBar->IsVisible() ) 
 			szAvailable.cy += m_pVerticalScrollBar->GetScrollRange();
 
 		int nEstimateNum = 0;
 		for( int it = 0; it < m_items.GetSize(); it++ ) {
 			CControlUI* pControl = static_cast<CControlUI*>(m_items[it]);
-			if( !pControl->IsVisible() ) continue;
-			if( pControl->IsFloat() ) continue;
+			if ( !pControl->IsVisible() ) continue;
+			if ( pControl->IsFloat() ) continue;
 			nEstimateNum++;
 		}
 
@@ -162,8 +162,8 @@ namespace DuiLib
 
 		for( int it1 = 0; it1 < m_items.GetSize(); it1++ ) {
 			CControlUI* pControl = static_cast<CControlUI*>(m_items[it1]);
-			if( !pControl->IsVisible() ) continue;
-			if( pControl->IsFloat() ) {
+			if ( !pControl->IsVisible() ) continue;
+			if ( pControl->IsFloat() ) {
 				SetFloatPos(it1);
 				continue;
 			}
@@ -172,21 +172,21 @@ namespace DuiLib
 			SIZE sz = m_szItem;
 			sz.cx -= rcPadding.left + rcPadding.right;
 			sz.cy -= rcPadding.top + rcPadding.bottom;
-			if( sz.cx > pControl->GetMaxWidth() ) sz.cx = pControl->GetMaxWidth();
-			if( sz.cy > pControl->GetMaxHeight() ) sz.cy = pControl->GetMaxHeight();
-			if( sz.cx < 0) sz.cx = 0;
-			if( sz.cy < 0) sz.cy = 0;
+			if ( sz.cx > pControl->GetMaxWidth() ) sz.cx = pControl->GetMaxWidth();
+			if ( sz.cy > pControl->GetMaxHeight() ) sz.cy = pControl->GetMaxHeight();
+			if ( sz.cx < 0) sz.cx = 0;
+			if ( sz.cy < 0) sz.cy = 0;
 
 			UINT iChildAlign = GetChildAlign(); 
 			UINT iChildVAlign = GetChildVAlign();
 			int iColumnIndex = it1/m_nColumns;
 			int iRowIndex = it1%m_nColumns;
 			int iPosX = rc.left + iRowIndex*(m_szItem.cx+iChildPadding);
-			if( m_pHorizontalScrollBar && m_pHorizontalScrollBar->IsVisible() ) {
+			if ( m_pHorizontalScrollBar && m_pHorizontalScrollBar->IsVisible() ) {
 				iPosX -= m_pHorizontalScrollBar->GetScrollPos();
 			}
 			int iPosY = rc.top + iColumnIndex*(m_szItem.cy+m_iChildVPadding);
-			if( m_pVerticalScrollBar && m_pVerticalScrollBar->IsVisible() ) {
+			if ( m_pVerticalScrollBar && m_pVerticalScrollBar->IsVisible() ) {
 				iPosY -= m_pVerticalScrollBar->GetScrollPos();
 			}
 			if (iChildAlign == DT_CENTER) {
@@ -239,64 +239,64 @@ namespace DuiLib
 
 
 	//	// Position the elements
-	//	if( m_szItem.cx > 0 ) {
+	//	if ( m_szItem.cx > 0 ) {
 	//		m_nColumns = (rc.right - rc.left) / m_szItem.cx;
-	//		if( m_pHorizontalScrollBar && m_pHorizontalScrollBar->IsVisible() ) 
+	//		if ( m_pHorizontalScrollBar && m_pHorizontalScrollBar->IsVisible() ) 
 	//			m_nColumns = (rc.right - rc.left + m_pHorizontalScrollBar->GetScrollRange() ) / m_szItem.cx;
 	//	}
 
-	//	if( m_nColumns == 0 ) m_nColumns = 1;
+	//	if ( m_nColumns == 0 ) m_nColumns = 1;
 
 	//	int cyNeeded = 0;
 	//	int cxWidth = (rc.right - rc.left) / m_nColumns;
-	//	if( m_pHorizontalScrollBar && m_pHorizontalScrollBar->IsVisible() ) 
+	//	if ( m_pHorizontalScrollBar && m_pHorizontalScrollBar->IsVisible() ) 
 	//		cxWidth = (rc.right - rc.left + m_pHorizontalScrollBar->GetScrollRange() ) / m_nColumns;
 
 	//	int cyHeight = 0;
 	//	int iCount = 0;
 	//	POINT ptTile = { rc.left, rc.top };
-	//	if( m_pVerticalScrollBar && m_pVerticalScrollBar->IsVisible() ) {
+	//	if ( m_pVerticalScrollBar && m_pVerticalScrollBar->IsVisible() ) {
 	//		ptTile.y -= m_pVerticalScrollBar->GetScrollPos();
 	//	}
 	//	int iPosX = rc.left;
-	//	if( m_pHorizontalScrollBar && m_pHorizontalScrollBar->IsVisible() ) {
+	//	if ( m_pHorizontalScrollBar && m_pHorizontalScrollBar->IsVisible() ) {
 	//		iPosX -= m_pHorizontalScrollBar->GetScrollPos();
 	//		ptTile.x = iPosX;
 	//	}
 	//	for( int it1 = 0; it1 < m_items.GetSize(); it1++ ) {
 	//		CControlUI* pControl = static_cast<CControlUI*>(m_items[it1]);
-	//		if( !pControl->IsVisible() ) continue;
-	//		if( pControl->IsFloat() ) {
+	//		if ( !pControl->IsVisible() ) continue;
+	//		if ( pControl->IsFloat() ) {
 	//			SetFloatPos(it1);
 	//			continue;
 	//		}
 
 	//		// Determine size
 	//		RECT rcTile = { ptTile.x, ptTile.y, ptTile.x + cxWidth, ptTile.y };
-	//		if( (iCount % m_nColumns) == 0 )
+	//		if ( (iCount % m_nColumns) == 0 )
 	//		{
 	//			int iIndex = iCount;
 	//			for( int it2 = it1; it2 < m_items.GetSize(); it2++ ) {
 	//				CControlUI* pLineControl = static_cast<CControlUI*>(m_items[it2]);
-	//				if( !pLineControl->IsVisible() ) continue;
-	//				if( pLineControl->IsFloat() ) continue;
+	//				if ( !pLineControl->IsVisible() ) continue;
+	//				if ( pLineControl->IsFloat() ) continue;
 
 	//				RECT rcPadding = pLineControl->GetPadding();
 	//				SIZE szAvailable = { rcTile.right - rcTile.left - rcPadding.left - rcPadding.right, 9999 };
 
-	//				if( szAvailable.cx < pControl->GetMinWidth() ) szAvailable.cx = pControl->GetMinWidth();
-	//				if( szAvailable.cx > pControl->GetMaxWidth() ) szAvailable.cx = pControl->GetMaxWidth();
+	//				if ( szAvailable.cx < pControl->GetMinWidth() ) szAvailable.cx = pControl->GetMinWidth();
+	//				if ( szAvailable.cx > pControl->GetMaxWidth() ) szAvailable.cx = pControl->GetMaxWidth();
 
 	//				SIZE szTile = pLineControl->EstimateSize(szAvailable);
-	//				if( szTile.cx == 0 ) szTile.cx = m_szItem.cx;
-	//				if( szTile.cy == 0 ) szTile.cy = m_szItem.cy;
-	//				if( szTile.cx < pControl->GetMinWidth() ) szTile.cx = pControl->GetMinWidth();
-	//				if( szTile.cx > pControl->GetMaxWidth() ) szTile.cx = pControl->GetMaxWidth();
-	//				if( szTile.cy < pControl->GetMinHeight() ) szTile.cy = pControl->GetMinHeight();
-	//				if( szTile.cy > pControl->GetMaxHeight() ) szTile.cy = pControl->GetMaxHeight();
+	//				if ( szTile.cx == 0 ) szTile.cx = m_szItem.cx;
+	//				if ( szTile.cy == 0 ) szTile.cy = m_szItem.cy;
+	//				if ( szTile.cx < pControl->GetMinWidth() ) szTile.cx = pControl->GetMinWidth();
+	//				if ( szTile.cx > pControl->GetMaxWidth() ) szTile.cx = pControl->GetMaxWidth();
+	//				if ( szTile.cy < pControl->GetMinHeight() ) szTile.cy = pControl->GetMinHeight();
+	//				if ( szTile.cy > pControl->GetMaxHeight() ) szTile.cy = pControl->GetMaxHeight();
 
 	//				cyHeight = MAX(cyHeight, szTile.cy + rcPadding.top + rcPadding.bottom);
-	//				if( (++iIndex % m_nColumns) == 0) break;
+	//				if ( (++iIndex % m_nColumns) == 0) break;
 	//			}
 	//		}
 
@@ -311,19 +311,19 @@ namespace DuiLib
 
 	//		SIZE szAvailable = { rcTile.right - rcTile.left, rcTile.bottom - rcTile.top };
 	//		SIZE szTile = pControl->EstimateSize(szAvailable);
-	//		if( szTile.cx == 0 ) szTile.cx = m_szItem.cx;
-	//		if( szTile.cy == 0 ) szTile.cy = m_szItem.cy;
-	//		if( szTile.cx == 0 ) szTile.cx = szAvailable.cx;
-	//		if( szTile.cy == 0 ) szTile.cy = szAvailable.cy;
-	//		if( szTile.cx < pControl->GetMinWidth() ) szTile.cx = pControl->GetMinWidth();
-	//		if( szTile.cx > pControl->GetMaxWidth() ) szTile.cx = pControl->GetMaxWidth();
-	//		if( szTile.cy < pControl->GetMinHeight() ) szTile.cy = pControl->GetMinHeight();
-	//		if( szTile.cy > pControl->GetMaxHeight() ) szTile.cy = pControl->GetMaxHeight();
+	//		if ( szTile.cx == 0 ) szTile.cx = m_szItem.cx;
+	//		if ( szTile.cy == 0 ) szTile.cy = m_szItem.cy;
+	//		if ( szTile.cx == 0 ) szTile.cx = szAvailable.cx;
+	//		if ( szTile.cy == 0 ) szTile.cy = szAvailable.cy;
+	//		if ( szTile.cx < pControl->GetMinWidth() ) szTile.cx = pControl->GetMinWidth();
+	//		if ( szTile.cx > pControl->GetMaxWidth() ) szTile.cx = pControl->GetMaxWidth();
+	//		if ( szTile.cy < pControl->GetMinHeight() ) szTile.cy = pControl->GetMinHeight();
+	//		if ( szTile.cy > pControl->GetMaxHeight() ) szTile.cy = pControl->GetMaxHeight();
 	//		RECT rcPos = {(rcTile.left + rcTile.right - szTile.cx) / 2, (rcTile.top + rcTile.bottom - szTile.cy) / 2,
 	//			(rcTile.left + rcTile.right - szTile.cx) / 2 + szTile.cx, (rcTile.top + rcTile.bottom - szTile.cy) / 2 + szTile.cy};
 	//		pControl->SetPos(rcPos, false);
 
-	//		if( (++iCount % m_nColumns) == 0 ) {
+	//		if ( (++iCount % m_nColumns) == 0 ) {
 	//			ptTile.x = iPosX;
 	//			ptTile.y += cyHeight + iChildPadding;
 	//			cyHeight = 0;
@@ -332,10 +332,12 @@ namespace DuiLib
 	//			ptTile.x += cxWidth;
 	//		}
 	//		cyNeeded = rcTile.bottom - rc.top;
-	//		if( m_pVerticalScrollBar && m_pVerticalScrollBar->IsVisible() ) cyNeeded += m_pVerticalScrollBar->GetScrollPos();
+	//		if ( m_pVerticalScrollBar && m_pVerticalScrollBar->IsVisible() ) cyNeeded += m_pVerticalScrollBar->GetScrollPos();
 	//	}
 
 	//	// Process the scrollbar
 	//	ProcessScrollBar(rc, 0, cyNeeded);
+
+		return (0L);
 	}
 }

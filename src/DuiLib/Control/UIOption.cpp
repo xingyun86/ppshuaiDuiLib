@@ -9,7 +9,7 @@ namespace DuiLib
 
 	COptionUI::~COptionUI()
 	{
-		if( !m_sGroupName.IsEmpty() && m_pManager ) m_pManager->RemoveOptionGroup(m_sGroupName, this);
+		if ( !m_sGroupName.IsEmpty() && m_pManager ) m_pManager->RemoveOptionGroup(m_sGroupName, this);
 	}
 
 	LPCTSTR COptionUI::GetClass() const
@@ -19,14 +19,14 @@ namespace DuiLib
 
 	LPVOID COptionUI::GetInterface(LPCTSTR pstrName)
 	{
-		if( _tcscmp(pstrName, DUI_CTR_OPTION) == 0 ) return static_cast<COptionUI*>(this);
+		if ( _tcscmp(pstrName, DUI_CTR_OPTION) == 0 ) return static_cast<COptionUI*>(this);
 		return CButtonUI::GetInterface(pstrName);
 	}
 
-	void COptionUI::SetManager(CPaintManagerUI* pManager, CControlUI* pParent, bool bInit)
+	void COptionUI::SetManager(CPaintManagerUI* pManager, CControlUI* pParent, BOOL bInit)
 	{
 		CControlUI::SetManager(pManager, pParent, bInit);
-		if( bInit && !m_sGroupName.IsEmpty() ) {
+		if ( bInit && !m_sGroupName.IsEmpty() ) {
 			if (m_pManager) m_pManager->AddOptionGroup(m_sGroupName, this);
 		}
 	}
@@ -38,17 +38,17 @@ namespace DuiLib
 
 	void COptionUI::SetGroup(LPCTSTR pStrGroupName)
 	{
-		if( pStrGroupName == NULL ) {
-			if( m_sGroupName.IsEmpty() ) return;
+		if ( pStrGroupName == NULL ) {
+			if ( m_sGroupName.IsEmpty() ) return;
 			m_sGroupName.Empty();
 		}
 		else {
-			if( m_sGroupName == pStrGroupName ) return;
+			if ( m_sGroupName == pStrGroupName ) return;
 			if (!m_sGroupName.IsEmpty() && m_pManager) m_pManager->RemoveOptionGroup(m_sGroupName, this);
 			m_sGroupName = pStrGroupName;
 		}
 
-		if( !m_sGroupName.IsEmpty() ) {
+		if ( !m_sGroupName.IsEmpty() ) {
 			if (m_pManager) m_pManager->AddOptionGroup(m_sGroupName, this);
 		}
 		else {
@@ -58,25 +58,25 @@ namespace DuiLib
 		Selected(m_bSelected);
 	}
 
-	bool COptionUI::IsSelected() const
+	BOOL COptionUI::IsSelected() const
 	{
 		return m_bSelected;
 	}
 
-	void COptionUI::Selected(bool bSelected, bool bTriggerEvent)
+	void COptionUI::Selected(BOOL bSelected, BOOL bTriggerEvent)
 	{
-		if( m_bSelected == bSelected ) return;
+		if ( m_bSelected == bSelected ) return;
 		m_bSelected = bSelected;
-		if( m_bSelected ) m_uButtonState |= UISTATE_SELECTED;
+		if ( m_bSelected ) m_uButtonState |= UISTATE_SELECTED;
 		else m_uButtonState &= ~UISTATE_SELECTED;
 
-		if( m_pManager != NULL ) {
-			if( !m_sGroupName.IsEmpty() ) {
-				if( m_bSelected ) {
+		if ( m_pManager != NULL ) {
+			if ( !m_sGroupName.IsEmpty() ) {
+				if ( m_bSelected ) {
 					CDuiPtrArray* aOptionGroup = m_pManager->GetOptionGroup(m_sGroupName);
 					for( int i = 0; i < aOptionGroup->GetSize(); i++ ) {
 						COptionUI* pControl = static_cast<COptionUI*>(aOptionGroup->GetAt(i));
-						if( pControl != this ) {
+						if ( pControl != this ) {
 							pControl->Selected(false, bTriggerEvent);
 						}
 					}
@@ -91,20 +91,20 @@ namespace DuiLib
 		Invalidate();
 	}
 
-	bool COptionUI::Activate()
+	BOOL COptionUI::Activate()
 	{
-		if( !CButtonUI::Activate() ) return false;
-		if( !m_sGroupName.IsEmpty() ) Selected(true);
+		if ( !CButtonUI::Activate() ) return false;
+		if ( !m_sGroupName.IsEmpty() ) Selected(true);
 		else Selected(!m_bSelected);
 
 		return true;
 	}
 
-	void COptionUI::SetEnabled(bool bEnable)
+	void COptionUI::SetEnabled(BOOL bEnable)
 	{
 		CControlUI::SetEnabled(bEnable);
-		if( !IsEnabled() ) {
-			if( m_bSelected ) m_uButtonState = UISTATE_SELECTED;
+		if ( !IsEnabled() ) {
+			if ( m_bSelected ) m_uButtonState = UISTATE_SELECTED;
 			else m_uButtonState = 0;
 		}
 	}
@@ -116,7 +116,7 @@ namespace DuiLib
 
 	void COptionUI::SetSelectedImage(LPCTSTR pStrImage)
 	{
-		if( m_diSelected.sDrawString == pStrImage && m_diSelected.pImageInfo != NULL ) return;
+		if ( m_diSelected.sDrawString == pStrImage && m_diSelected.pImageInfo != NULL ) return;
 		m_diSelected.Clear();
 		m_diSelected.sDrawString = pStrImage;
 		Invalidate();
@@ -129,7 +129,7 @@ namespace DuiLib
 
 	void COptionUI::SetSelectedHotImage( LPCTSTR pStrImage )
 	{
-		if( m_diSelectedHot.sDrawString == pStrImage && m_diSelectedHot.pImageInfo != NULL ) return;
+		if ( m_diSelectedHot.sDrawString == pStrImage && m_diSelectedHot.pImageInfo != NULL ) return;
 		m_diSelectedHot.Clear();
 		m_diSelectedHot.sDrawString = pStrImage;
 		Invalidate();
@@ -163,7 +163,7 @@ namespace DuiLib
 
 	void COptionUI::SetForeImage(LPCTSTR pStrImage)
 	{
-		if( m_diFore.sDrawString == pStrImage && m_diFore.pImageInfo != NULL ) return;
+		if ( m_diFore.sDrawString == pStrImage && m_diFore.pImageInfo != NULL ) return;
 		m_diFore.Clear();
 		m_diFore.sDrawString = pStrImage;
 		Invalidate();
@@ -171,25 +171,25 @@ namespace DuiLib
 
 	SIZE COptionUI::EstimateSize(SIZE szAvailable)
 	{
-		if( m_cxyFixed.cy == 0 ) return CDuiSize(m_cxyFixed.cx, m_pManager->GetFontInfo(GetFont())->tm.tmHeight + 8);
+		if ( m_cxyFixed.cy == 0 ) return CDuiSize(m_cxyFixed.cx, m_pManager->GetFontInfo(GetFont())->tm.tmHeight + 8);
 		return CControlUI::EstimateSize(szAvailable);
 	}
 
 	void COptionUI::SetAttribute(LPCTSTR pstrName, LPCTSTR pstrValue)
 	{
-		if( _tcscmp(pstrName, _T("group")) == 0 ) SetGroup(pstrValue);
-		else if( _tcscmp(pstrName, _T("selected")) == 0 ) Selected(_tcscmp(pstrValue, _T("true")) == 0);
-		else if( _tcscmp(pstrName, _T("selectedimage")) == 0 ) SetSelectedImage(pstrValue);
-		else if( _tcscmp(pstrName, _T("selectedhotimage")) == 0 ) SetSelectedHotImage(pstrValue);
-		else if( _tcscmp(pstrName, _T("foreimage")) == 0 ) SetForeImage(pstrValue);
-		else if( _tcscmp(pstrName, _T("selectedbkcolor")) == 0 ) {
-			if( *pstrValue == _T('#')) pstrValue = ::CharNext(pstrValue);
+		if ( _tcscmp(pstrName, _T("group")) == 0 ) SetGroup(pstrValue);
+		else if ( _tcscmp(pstrName, _T("selected")) == 0 ) Selected(_tcscmp(pstrValue, _T("true")) == 0);
+		else if ( _tcscmp(pstrName, _T("selectedimage")) == 0 ) SetSelectedImage(pstrValue);
+		else if ( _tcscmp(pstrName, _T("selectedhotimage")) == 0 ) SetSelectedHotImage(pstrValue);
+		else if ( _tcscmp(pstrName, _T("foreimage")) == 0 ) SetForeImage(pstrValue);
+		else if ( _tcscmp(pstrName, _T("selectedbkcolor")) == 0 ) {
+			if ( *pstrValue == _T('#')) pstrValue = ::CharNext(pstrValue);
 			LPTSTR pstr = NULL;
 			DWORD clrColor = _tcstoul(pstrValue, &pstr, 16);
 			SetSelectedBkColor(clrColor);
 		}
-		else if( _tcscmp(pstrName, _T("selectedtextcolor")) == 0 ) {
-			if( *pstrValue == _T('#')) pstrValue = ::CharNext(pstrValue);
+		else if ( _tcscmp(pstrName, _T("selectedtextcolor")) == 0 ) {
+			if ( *pstrValue == _T('#')) pstrValue = ::CharNext(pstrValue);
 			LPTSTR pstr = NULL;
 			DWORD clrColor = _tcstoul(pstrValue, &pstr, 16);
 			SetSelectedTextColor(clrColor);
@@ -197,17 +197,17 @@ namespace DuiLib
 		else CButtonUI::SetAttribute(pstrName, pstrValue);
 	}
 
-	void COptionUI::PaintStatusImage(HDC hDC)
+	LRESULT COptionUI::PaintStatusImage(HDC hDC)
 	{
-	    UINT uSavedState;
-		if( (m_uButtonState & UISTATE_SELECTED) != 0 ) {
+	    UINT uSavedState = (0);
+		if ( (m_uButtonState & UISTATE_SELECTED) != 0 ) {
 			if ((m_uButtonState & UISTATE_HOT) != 0)
 			{
-				if (DrawImage(hDC, m_diSelectedHot)) goto Label_ForeImage;
+				if (DrawImage(hDC, m_diSelectedHot) >= (0L)) goto Label_ForeImage;
 			}
 
-			if( DrawImage(hDC, m_diSelected) ) goto Label_ForeImage;
-			else if(m_dwSelectedBkColor != 0) {
+			if (DrawImage(hDC, m_diSelected) >= (0L)) goto Label_ForeImage;
+			else if (m_dwSelectedBkColor != 0) {
 				CRenderEngine::DrawColor(hDC, m_rcPaint, GetAdjustColor(m_dwSelectedBkColor));
 				goto Label_ForeImage;
 			}
@@ -220,27 +220,29 @@ namespace DuiLib
 
 Label_ForeImage:
 		DrawImage(hDC, m_diFore);
+
+		return (0L);
 	}
 
-	void COptionUI::PaintText(HDC hDC)
+	LRESULT COptionUI::PaintText(HDC hDC)
 	{
-		if( (m_uButtonState & UISTATE_SELECTED) != 0 )
+		if ( (m_uButtonState & UISTATE_SELECTED) != 0 )
 		{
 			DWORD oldTextColor = m_dwTextColor;
-			if( m_dwSelectedTextColor != 0 ) m_dwTextColor = m_dwSelectedTextColor;
+			if ( m_dwSelectedTextColor != 0 ) m_dwTextColor = m_dwSelectedTextColor;
 
-			if( m_dwTextColor == 0 ) m_dwTextColor = m_pManager->GetDefaultFontColor();
-			if( m_dwDisabledTextColor == 0 ) m_dwDisabledTextColor = m_pManager->GetDefaultDisabledColor();
+			if ( m_dwTextColor == 0 ) m_dwTextColor = m_pManager->GetDefaultFontColor();
+			if ( m_dwDisabledTextColor == 0 ) m_dwDisabledTextColor = m_pManager->GetDefaultDisabledColor();
 
-			if( m_sText.IsEmpty() ) return;
-			int nLinks = 0;
+			if ( m_sText.IsEmpty() ) return (-1L);
+			LONG nLinks = 0;
 			RECT rc = m_rcItem;
 			rc.left += m_rcTextPadding.left;
 			rc.right -= m_rcTextPadding.right;
 			rc.top += m_rcTextPadding.top;
 			rc.bottom -= m_rcTextPadding.bottom;
 
-			if( m_bShowHtml )
+			if ( m_bShowHtml )
 				CRenderEngine::DrawHtmlText(hDC, m_pManager, rc, m_sText, IsEnabled()?m_dwTextColor:m_dwDisabledTextColor, \
 				NULL, NULL, nLinks, m_iFont, m_uTextStyle);
 			else
@@ -256,5 +258,6 @@ Label_ForeImage:
 			CButtonUI::PaintText(hDC);
 			m_uButtonState = uSavedState;
 		}
+		return (0L);
 	}
 }

@@ -46,9 +46,9 @@ namespace DuiLib
 	CLabelUI::~CLabelUI()
 	{
 #ifdef _UNICODE
-		if( m_pWideText && m_pWideText != m_sText.GetData()) delete[] m_pWideText;
+		if ( m_pWideText && m_pWideText != m_sText.GetData()) delete[] m_pWideText;
 #else
-		if( m_pWideText ) delete[] m_pWideText;
+		if ( m_pWideText ) delete[] m_pWideText;
 #endif
 
 #ifdef _USE_GDIPLUS
@@ -63,7 +63,7 @@ namespace DuiLib
 
 	LPVOID CLabelUI::GetInterface(LPCTSTR pstrName)
 	{
-		if( _tcscmp(pstrName, DUI_CTR_LABEL) == 0 ) return static_cast<CLabelUI*>(this);
+		if ( _tcscmp(pstrName, DUI_CTR_LABEL) == 0 ) return static_cast<CLabelUI*>(this);
 		return CControlUI::GetInterface(pstrName);
 	}
 
@@ -83,7 +83,7 @@ namespace DuiLib
 	{
 		CControlUI::SetText(pstrText);
         m_bNeedEstimateSize = true;
-		if( m_EnableEffect) {
+		if ( m_EnableEffect) {
 #ifdef _UNICODE
 			m_pWideText = (LPWSTR)m_sText.GetData();
 #else 
@@ -108,12 +108,12 @@ namespace DuiLib
 		return m_uTextStyle;
 	}
 
-	bool CLabelUI::IsMultiLine()
+	BOOL CLabelUI::IsMultiLine()
 	{
 		return (m_uTextStyle & DT_SINGLELINE) == 0;
 	}
 
-	void CLabelUI::SetMultiLine(bool bMultiLine)
+	void CLabelUI::SetMultiLine(BOOL bMultiLine)
 	{
 		if (bMultiLine)	{
             m_uTextStyle  &= ~DT_SINGLELINE;
@@ -169,14 +169,14 @@ namespace DuiLib
 		Invalidate();
 	}
 
-	bool CLabelUI::IsShowHtml()
+	BOOL CLabelUI::IsShowHtml()
 	{
 		return m_bShowHtml;
 	}
 
-	void CLabelUI::SetShowHtml(bool bShowHtml)
+	void CLabelUI::SetShowHtml(BOOL bShowHtml)
 	{
-		if( m_bShowHtml == bShowHtml ) return;
+		if ( m_bShowHtml == bShowHtml ) return;
 
 		m_bShowHtml = bShowHtml;
         m_bNeedEstimateSize = true;
@@ -203,8 +203,8 @@ namespace DuiLib
                 }
                 if (m_cxyFixedLast.cx == 0) {
                     RECT rcText = { 0, 0, 9999, m_cxyFixedLast.cy };
-                    if( m_bShowHtml ) {
-                        int nLinks = 0;
+                    if ( m_bShowHtml ) {
+                        LONG nLinks = 0;
                         CRenderEngine::DrawHtmlText(m_pManager->GetPaintDC(), m_pManager, rcText, m_sText, 0, NULL, NULL, nLinks, m_iFont, DT_CALCRECT | m_uTextStyle & ~DT_RIGHT & ~DT_CENTER);
                     }
                     else {
@@ -214,14 +214,14 @@ namespace DuiLib
                 }
             }
             else {
-                if( m_cxyFixedLast.cx == 0 ) {
+                if ( m_cxyFixedLast.cx == 0 ) {
                     m_cxyFixedLast.cx = szAvailable.cx;
                 }
                 RECT rcText = { 0, 0, m_cxyFixedLast.cx, 9999 };
                 rcText.left += m_rcTextPadding.left;
                 rcText.right -= m_rcTextPadding.right;
-                if( m_bShowHtml ) {
-                    int nLinks = 0;
+                if ( m_bShowHtml ) {
+                    LONG nLinks = 0;
                     CRenderEngine::DrawHtmlText(m_pManager->GetPaintDC(), m_pManager, rcText, m_sText, 0, NULL, NULL, nLinks, m_iFont, DT_CALCRECT | m_uTextStyle & ~DT_RIGHT & ~DT_CENTER);
                 }
                 else {
@@ -233,33 +233,33 @@ namespace DuiLib
         return m_cxyFixedLast;
 	}
 
-	void CLabelUI::DoEvent(TEventUI& event)
+	LRESULT CLabelUI::DoEvent(TEventUI& event)
 	{
-		if( event.Type == UIEVENT_SETFOCUS ) 
+		if ( event.Type == UIEVENT_SETFOCUS ) 
 		{
 			m_bFocused = true;
-			return;
+			return (0L);
 		}
-		if( event.Type == UIEVENT_KILLFOCUS ) 
+		else if ( event.Type == UIEVENT_KILLFOCUS ) 
 		{
 			m_bFocused = false;
-			return;
+			return (0L);
 		}
-		CControlUI::DoEvent(event);
+		return CControlUI::DoEvent(event);
 	}
 
 	void CLabelUI::SetAttribute(LPCTSTR pstrName, LPCTSTR pstrValue)
 	{
-		if( _tcscmp(pstrName, _T("align")) == 0 ) {
-			if( _tcsstr(pstrValue, _T("left")) != NULL ) {
+		if ( _tcscmp(pstrName, _T("align")) == 0 ) {
+			if ( _tcsstr(pstrValue, _T("left")) != NULL ) {
 				m_uTextStyle &= ~(DT_CENTER | DT_RIGHT);
 				m_uTextStyle |= DT_LEFT;
 			}
-			if( _tcsstr(pstrValue, _T("center")) != NULL ) {
+			if ( _tcsstr(pstrValue, _T("center")) != NULL ) {
 				m_uTextStyle &= ~(DT_LEFT | DT_RIGHT);
 				m_uTextStyle |= DT_CENTER;
 			}
-			if( _tcsstr(pstrValue, _T("right")) != NULL ) {
+			if ( _tcsstr(pstrValue, _T("right")) != NULL ) {
 				m_uTextStyle &= ~(DT_LEFT | DT_CENTER);
 				m_uTextStyle |= DT_RIGHT;
 			}
@@ -279,24 +279,24 @@ namespace DuiLib
 		        m_uTextStyle |= DT_BOTTOM;
 		    }
 		}
-		else if( _tcscmp(pstrName, _T("endellipsis")) == 0 ) {
-			if( _tcscmp(pstrValue, _T("true")) == 0 ) m_uTextStyle |= DT_END_ELLIPSIS;
+		else if ( _tcscmp(pstrName, _T("endellipsis")) == 0 ) {
+			if ( _tcscmp(pstrValue, _T("true")) == 0 ) m_uTextStyle |= DT_END_ELLIPSIS;
 			else m_uTextStyle &= ~DT_END_ELLIPSIS;
 		}    
-		else if( _tcscmp(pstrName, _T("font")) == 0 ) SetFont(_ttoi(pstrValue));
-		else if( _tcscmp(pstrName, _T("textcolor")) == 0 ) {
-			if( *pstrValue == _T('#')) pstrValue = ::CharNext(pstrValue);
+		else if ( _tcscmp(pstrName, _T("font")) == 0 ) SetFont(_ttoi(pstrValue));
+		else if ( _tcscmp(pstrName, _T("textcolor")) == 0 ) {
+			if ( *pstrValue == _T('#')) pstrValue = ::CharNext(pstrValue);
 			LPTSTR pstr = NULL;
 			DWORD clrColor = _tcstoul(pstrValue, &pstr, 16);
 			SetTextColor(clrColor);
 		}
-		else if( _tcscmp(pstrName, _T("disabledtextcolor")) == 0 ) {
-			if( *pstrValue == _T('#')) pstrValue = ::CharNext(pstrValue);
+		else if ( _tcscmp(pstrName, _T("disabledtextcolor")) == 0 ) {
+			if ( *pstrValue == _T('#')) pstrValue = ::CharNext(pstrValue);
 			LPTSTR pstr = NULL;
 			DWORD clrColor = _tcstoul(pstrValue, &pstr, 16);
 			SetDisabledTextColor(clrColor);
 		}
-		else if( _tcscmp(pstrName, _T("textpadding")) == 0 ) {
+		else if ( _tcscmp(pstrName, _T("textpadding")) == 0 ) {
 			RECT rcTextPadding = { 0 };
 			LPTSTR pstr = NULL;
 			rcTextPadding.left = _tcstol(pstrValue, &pstr, 10);  ASSERT(pstr);    
@@ -305,41 +305,41 @@ namespace DuiLib
 			rcTextPadding.bottom = _tcstol(pstr + 1, &pstr, 10); ASSERT(pstr);    
 			SetTextPadding(rcTextPadding);
 		}
-		else if( _tcscmp(pstrName, _T("multiline")) == 0 ) SetMultiLine(_tcscmp(pstrValue, _T("true")) == 0);
-		else if( _tcscmp(pstrName, _T("showhtml")) == 0 ) SetShowHtml(_tcscmp(pstrValue, _T("true")) == 0);
-		else if( _tcscmp(pstrName, _T("enabledeffect")) == 0 ) SetEnabledEffect(_tcscmp(pstrValue, _T("true")) == 0);
-		else if( _tcscmp(pstrName, _T("enabledluminous")) == 0 ) SetEnabledLuminous(_tcscmp(pstrValue, _T("true")) == 0);
-		else if( _tcscmp(pstrName, _T("luminousfuzzy")) == 0 ) SetLuminousFuzzy((float)_tstof(pstrValue));
-		else if( _tcscmp(pstrName, _T("gradientangle")) == 0 ) SetGradientAngle(_ttoi(pstrValue));
-		else if( _tcscmp(pstrName, _T("enabledstroke")) == 0 ) SetEnabledStroke(_tcscmp(pstrValue, _T("true")) == 0);
-		else if( _tcscmp(pstrName, _T("enabledshadow")) == 0 ) SetEnabledShadow(_tcscmp(pstrValue, _T("true")) == 0);
-		else if( _tcscmp(pstrName, _T("gradientlength")) == 0 ) SetGradientLength(_ttoi(pstrValue));
-		else if( _tcscmp(pstrName, _T("shadowoffset")) == 0 ){
+		else if ( _tcscmp(pstrName, _T("multiline")) == 0 ) SetMultiLine(_tcscmp(pstrValue, _T("true")) == 0);
+		else if ( _tcscmp(pstrName, _T("showhtml")) == 0 ) SetShowHtml(_tcscmp(pstrValue, _T("true")) == 0);
+		else if ( _tcscmp(pstrName, _T("enabledeffect")) == 0 ) SetEnabledEffect(_tcscmp(pstrValue, _T("true")) == 0);
+		else if ( _tcscmp(pstrName, _T("enabledluminous")) == 0 ) SetEnabledLuminous(_tcscmp(pstrValue, _T("true")) == 0);
+		else if ( _tcscmp(pstrName, _T("luminousfuzzy")) == 0 ) SetLuminousFuzzy((float)_tstof(pstrValue));
+		else if ( _tcscmp(pstrName, _T("gradientangle")) == 0 ) SetGradientAngle(_ttoi(pstrValue));
+		else if ( _tcscmp(pstrName, _T("enabledstroke")) == 0 ) SetEnabledStroke(_tcscmp(pstrValue, _T("true")) == 0);
+		else if ( _tcscmp(pstrName, _T("enabledshadow")) == 0 ) SetEnabledShadow(_tcscmp(pstrValue, _T("true")) == 0);
+		else if ( _tcscmp(pstrName, _T("gradientlength")) == 0 ) SetGradientLength(_ttoi(pstrValue));
+		else if ( _tcscmp(pstrName, _T("shadowoffset")) == 0 ){
 			LPTSTR pstr = NULL;
 			int offsetx = _tcstol(pstrValue, &pstr, 10);	ASSERT(pstr);    
 			int offsety = _tcstol(pstr + 1, &pstr, 10);		ASSERT(pstr);
 			SetShadowOffset(offsetx,offsety);
 		}
-		else if( _tcscmp(pstrName, _T("textcolor1")) == 0 ) {
-			if( *pstrValue == _T('#')) pstrValue = ::CharNext(pstrValue);
+		else if ( _tcscmp(pstrName, _T("textcolor1")) == 0 ) {
+			if ( *pstrValue == _T('#')) pstrValue = ::CharNext(pstrValue);
 			LPTSTR pstr = NULL;
 			DWORD clrColor = _tcstoul(pstrValue, &pstr, 16);
 			SetTextColor1(clrColor);
 		}
-		else if( _tcscmp(pstrName, _T("textshadowcolora")) == 0 ) {
-			if( *pstrValue == _T('#')) pstrValue = ::CharNext(pstrValue);
+		else if ( _tcscmp(pstrName, _T("textshadowcolora")) == 0 ) {
+			if ( *pstrValue == _T('#')) pstrValue = ::CharNext(pstrValue);
 			LPTSTR pstr = NULL;
 			DWORD clrColor = _tcstoul(pstrValue, &pstr, 16);
 			SetTextShadowColorA(clrColor);
 		}
-		else if( _tcscmp(pstrName, _T("textshadowcolorb")) == 0 ) {
-			if( *pstrValue == _T('#')) pstrValue = ::CharNext(pstrValue);
+		else if ( _tcscmp(pstrName, _T("textshadowcolorb")) == 0 ) {
+			if ( *pstrValue == _T('#')) pstrValue = ::CharNext(pstrValue);
 			LPTSTR pstr = NULL;
 			DWORD clrColor = _tcstoul(pstrValue, &pstr, 16);
 			SetTextShadowColorB(clrColor);
 		}
-		else if( _tcscmp(pstrName, _T("strokecolor")) == 0 ) {
-			if( *pstrValue == _T('#')) pstrValue = ::CharNext(pstrValue);
+		else if ( _tcscmp(pstrName, _T("strokecolor")) == 0 ) {
+			if ( *pstrValue == _T('#')) pstrValue = ::CharNext(pstrValue);
 			LPTSTR pstr = NULL;
 			DWORD clrColor = _tcstoul(pstrValue, &pstr, 16);
 			SetStrokeColor(clrColor);
@@ -347,10 +347,10 @@ namespace DuiLib
 		else CControlUI::SetAttribute(pstrName, pstrValue);
 	}
 
-	void CLabelUI::PaintText(HDC hDC)
+	LRESULT CLabelUI::PaintText(HDC hDC)
 	{
-		if( m_dwTextColor == 0 ) m_dwTextColor = m_pManager->GetDefaultFontColor();
-		if( m_dwDisabledTextColor == 0 ) m_dwDisabledTextColor = m_pManager->GetDefaultDisabledColor();
+		if ( m_dwTextColor == 0 ) m_dwTextColor = m_pManager->GetDefaultFontColor();
+		if ( m_dwDisabledTextColor == 0 ) m_dwDisabledTextColor = m_pManager->GetDefaultDisabledColor();
 
 		RECT rc = m_rcItem;
 		rc.left += m_rcTextPadding.left;
@@ -358,12 +358,12 @@ namespace DuiLib
 		rc.top += m_rcTextPadding.top;
 		rc.bottom -= m_rcTextPadding.bottom;
 
-		if(!GetEnabledEffect())
+		if (!GetEnabledEffect())
 		{
-			if( m_sText.IsEmpty() ) return;
-			int nLinks = 0;
-			if( IsEnabled() ) {
-				if( m_bShowHtml )
+			if ( m_sText.IsEmpty() ) return (-1L);
+			LONG nLinks = 0;
+			if ( IsEnabled() ) {
+				if ( m_bShowHtml )
 					CRenderEngine::DrawHtmlText(hDC, m_pManager, rc, m_sText, m_dwTextColor, \
 					NULL, NULL, nLinks, m_iFont, m_uTextStyle);
 				else
@@ -371,7 +371,7 @@ namespace DuiLib
 					m_iFont, m_uTextStyle);
 			}
 			else {
-				if( m_bShowHtml )
+				if ( m_bShowHtml )
 					CRenderEngine::DrawHtmlText(hDC, m_pManager, rc, m_sText, m_dwDisabledTextColor, \
 					NULL, NULL, nLinks, m_iFont, m_uTextStyle);
 				else
@@ -389,11 +389,11 @@ namespace DuiLib
 			StringFormat format;
 			StringAlignment sa = StringAlignment::StringAlignmentNear;
 			if ((m_uTextStyle & DT_VCENTER) != 0) sa = StringAlignment::StringAlignmentCenter;
-			else if( (m_uTextStyle & DT_BOTTOM) != 0) sa = StringAlignment::StringAlignmentFar;
+			else if ( (m_uTextStyle & DT_BOTTOM) != 0) sa = StringAlignment::StringAlignmentFar;
 			format.SetLineAlignment((StringAlignment)sa);
 			sa = StringAlignment::StringAlignmentNear;
 			if ((m_uTextStyle & DT_CENTER) != 0) sa = StringAlignment::StringAlignmentCenter;
-			else if( (m_uTextStyle & DT_RIGHT) != 0) sa = StringAlignment::StringAlignmentFar;
+			else if ( (m_uTextStyle & DT_RIGHT) != 0) sa = StringAlignment::StringAlignmentFar;
 			format.SetAlignment((StringAlignment)sa);
 
 			RectF nRc((float)rc.left,(float)rc.top,(float)rc.right-rc.left,(float)rc.bottom-rc.top);
@@ -403,7 +403,7 @@ namespace DuiLib
 
 			int nGradientLength	= GetGradientLength();
 
-			if(nGradientLength == 0)
+			if (nGradientLength == 0)
 				nGradientLength = (rc.bottom-rc.top);
 
 			LinearGradientBrush nLineGrBrushA(Point(GetGradientAngle(), 0),Point(0,nGradientLength),ARGB2Color(GetTextShadowColorA()),ARGB2Color(GetTextShadowColorB() == -1?GetTextShadowColorA():GetTextShadowColorB()));
@@ -441,7 +441,7 @@ namespace DuiLib
 				nGraphics.DrawImage(&Bit1, nRc.X, nRc.Y);
 			}
 			
-			if(GetEnabledStroke() && GetStrokeColor() > 0)
+			if (GetEnabledStroke() && GetStrokeColor() > 0)
 			{
 				LinearGradientBrush nLineGrBrushStroke(Point(GetGradientAngle(),0),Point(0,rc.bottom-rc.top+2),ARGB2Color(GetStrokeColor()),ARGB2Color(GetStrokeColor()));
 #ifdef _UNICODE
@@ -468,31 +468,32 @@ namespace DuiLib
 #endif	
 			}
 #ifdef _UNICODE
-			if(GetEnabledShadow() && (GetTextShadowColorA() > 0 || GetTextShadowColorB() > 0))
+			if (GetEnabledShadow() && (GetTextShadowColorA() > 0 || GetTextShadowColorB() > 0))
 				nGraphics.DrawString(m_sText,m_sText.GetLength(),&nFont,nShadowRc,&format,&nLineGrBrushA);
 
 			nGraphics.DrawString(m_sText,m_sText.GetLength(),&nFont,nRc,&format,&nLineGrBrushB);
 #else
 			int iLen = wcslen(m_pWideText);
-			if(GetEnabledShadow() && (GetTextShadowColorA() > 0 || GetTextShadowColorB() > 0))
+			if (GetEnabledShadow() && (GetTextShadowColorA() > 0 || GetTextShadowColorB() > 0))
 				nGraphics.DrawString(m_pWideText,iLen,&nFont,nShadowRc,&format,&nLineGrBrushA);
 
 			nGraphics.DrawString(m_pWideText,iLen,&nFont,nRc,&format,&nLineGrBrushB);
 #endif
 #endif
 		}
+		return (0L);
 	}
 
 	void CLabelUI::SetShadowOffset( int _offset,int _angle )
 	{
-		if(_angle > 180 || _angle < -180) return;
+		if (_angle > 180 || _angle < -180) return;
 
 		RECT rc = m_rcItem;
-		if(_angle >= 0 && _angle <= 180) rc.top -= _offset;
-		else if(_angle > -180 && _angle < 0) rc.top += _offset;
+		if (_angle >= 0 && _angle <= 180) rc.top -= _offset;
+		else if (_angle > -180 && _angle < 0) rc.top += _offset;
 
-		if(_angle > -90 && _angle <= 90) rc.left -= _offset;
-		else if( _angle > 90 || _angle < -90) rc.left += _offset;
+		if (_angle > -90 && _angle <= 90) rc.left -= _offset;
+		else if ( _angle > 90 || _angle < -90) rc.left += _offset;
 
 		m_ShadowOffset.X = (float)rc.top;
 		m_ShadowOffset.Y = (float)rc.left;
@@ -504,7 +505,7 @@ namespace DuiLib
 		return m_ShadowOffset;
 	}
 
-	void CLabelUI::SetEnabledEffect( bool _EnabledEffect )
+	void CLabelUI::SetEnabledEffect( BOOL _EnabledEffect )
 	{
 		m_EnableEffect = _EnabledEffect;
 		if (m_EnableEffect) {
@@ -521,18 +522,18 @@ namespace DuiLib
 		Invalidate();
 	}
 
-	bool CLabelUI::GetEnabledEffect()
+	BOOL CLabelUI::GetEnabledEffect()
 	{
 		return m_EnableEffect;
 	}
 
-	void CLabelUI::SetEnabledLuminous(bool bEnableLuminous)
+	void CLabelUI::SetEnabledLuminous(BOOL bEnableLuminous)
 	{
 		m_bEnableLuminous = bEnableLuminous;
 		Invalidate();
 	}
 
-	bool CLabelUI::GetEnabledLuminous()
+	BOOL CLabelUI::GetEnabledLuminous()
 	{
 		return m_bEnableLuminous;
 	}
@@ -582,24 +583,24 @@ namespace DuiLib
 		return m_dwTextShadowColorB;
 	}
 
-	void CLabelUI::SetGradientAngle( int _SetGradientAngle )
+	void CLabelUI::SetGradientAngle( LONG _SetGradientAngle )
 	{
 		m_GradientAngle	= _SetGradientAngle;
 		Invalidate();
 	}
 
-	int CLabelUI::GetGradientAngle()
+	LONG CLabelUI::GetGradientAngle()
 	{
 		return m_GradientAngle;
 	}
 
-	void CLabelUI::SetEnabledStroke( bool _EnabledStroke )
+	void CLabelUI::SetEnabledStroke( BOOL _EnabledStroke )
 	{
 		m_EnabledStroke = _EnabledStroke;
 		Invalidate();
 	}
 
-	bool CLabelUI::GetEnabledStroke()
+	BOOL CLabelUI::GetEnabledStroke()
 	{
 		return m_EnabledStroke;
 	}
@@ -615,24 +616,24 @@ namespace DuiLib
 		return m_dwStrokeColor;
 	}
 
-	void CLabelUI::SetEnabledShadow( bool _EnabledShadowe )
+	void CLabelUI::SetEnabledShadow( BOOL _EnabledShadowe )
 	{
 		m_EnabledShadow = _EnabledShadowe;
 		Invalidate();
 	}
 
-	bool CLabelUI::GetEnabledShadow()
+	BOOL CLabelUI::GetEnabledShadow()
 	{
 		return m_EnabledShadow;
 	}
 
-	void CLabelUI::SetGradientLength( int _GradientLength )
+	void CLabelUI::SetGradientLength( LONG _GradientLength )
 	{
 		m_GradientLength	= _GradientLength;
 		Invalidate();
 	}
 
-	int CLabelUI::GetGradientLength()
+	LONG CLabelUI::GetGradientLength()
 	{
 		return m_GradientLength;
 	}

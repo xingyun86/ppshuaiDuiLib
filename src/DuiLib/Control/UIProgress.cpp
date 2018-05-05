@@ -16,51 +16,51 @@ namespace DuiLib
 
 	LPVOID CProgressUI::GetInterface(LPCTSTR pstrName)
 	{
-		if( _tcscmp(pstrName, DUI_CTR_PROGRESS) == 0 ) return static_cast<CProgressUI*>(this);
+		if ( _tcscmp(pstrName, DUI_CTR_PROGRESS) == 0 ) return static_cast<CProgressUI*>(this);
 		return CLabelUI::GetInterface(pstrName);
 	}
 
-	bool CProgressUI::IsHorizontal()
+	BOOL CProgressUI::IsHorizontal()
 	{
 		return m_bHorizontal;
 	}
 
-	void CProgressUI::SetHorizontal(bool bHorizontal)
+	void CProgressUI::SetHorizontal(BOOL bHorizontal)
 	{
-		if( m_bHorizontal == bHorizontal ) return;
+		if ( m_bHorizontal == bHorizontal ) return;
 
 		m_bHorizontal = bHorizontal;
 		Invalidate();
 	}
 
-	int CProgressUI::GetMinValue() const
+	LONG CProgressUI::GetMinValue() const
 	{
 		return m_nMin;
 	}
 
-	void CProgressUI::SetMinValue(int nMin)
+	void CProgressUI::SetMinValue(LONG nMin)
 	{
 		m_nMin = nMin;
 		Invalidate();
 	}
 
-	int CProgressUI::GetMaxValue() const
+	LONG CProgressUI::GetMaxValue() const
 	{
 		return m_nMax;
 	}
 
-	void CProgressUI::SetMaxValue(int nMax)
+	void CProgressUI::SetMaxValue(LONG nMax)
 	{
 		m_nMax = nMax;
 		Invalidate();
 	}
 
-	int CProgressUI::GetValue() const
+	LONG CProgressUI::GetValue() const
 	{
 		return m_nValue;
 	}
 
-	void CProgressUI::SetValue(int nValue)
+	void CProgressUI::SetValue(LONG nValue)
 	{
 		m_nValue = nValue;
 		if (m_nValue > m_nMax) m_nValue = m_nMax;
@@ -75,7 +75,7 @@ namespace DuiLib
 
 	void CProgressUI::SetForeImage(LPCTSTR pStrImage)
 	{
-		if( m_diFore.sDrawString == pStrImage && m_diFore.pImageInfo != NULL ) return;
+		if ( m_diFore.sDrawString == pStrImage && m_diFore.pImageInfo != NULL ) return;
 		m_diFore.Clear();
 		m_diFore.sDrawString = pStrImage;
 		Invalidate();
@@ -83,22 +83,22 @@ namespace DuiLib
 
 	void CProgressUI::SetAttribute(LPCTSTR pstrName, LPCTSTR pstrValue)
 	{
-		if( _tcscmp(pstrName, _T("foreimage")) == 0 ) SetForeImage(pstrValue);
-		else if( _tcscmp(pstrName, _T("hor")) == 0 ) SetHorizontal(_tcscmp(pstrValue, _T("true")) == 0);
-		else if( _tcscmp(pstrName, _T("min")) == 0 ) SetMinValue(_ttoi(pstrValue));
-		else if( _tcscmp(pstrName, _T("max")) == 0 ) SetMaxValue(_ttoi(pstrValue));
-		else if( _tcscmp(pstrName, _T("value")) == 0 ) SetValue(_ttoi(pstrValue));
+		if ( _tcscmp(pstrName, _T("foreimage")) == 0 ) SetForeImage(pstrValue);
+		else if ( _tcscmp(pstrName, _T("hor")) == 0 ) SetHorizontal(_tcscmp(pstrValue, _T("true")) == 0);
+		else if ( _tcscmp(pstrName, _T("min")) == 0 ) SetMinValue(_ttoi(pstrValue));
+		else if ( _tcscmp(pstrName, _T("max")) == 0 ) SetMaxValue(_ttoi(pstrValue));
+		else if ( _tcscmp(pstrName, _T("value")) == 0 ) SetValue(_ttoi(pstrValue));
 		else CLabelUI::SetAttribute(pstrName, pstrValue);
 	}
 
-	void CProgressUI::PaintStatusImage(HDC hDC)
+	LRESULT CProgressUI::PaintStatusImage(HDC hDC)
 	{
-		if( m_nMax <= m_nMin ) m_nMax = m_nMin + 1;
-		if( m_nValue > m_nMax ) m_nValue = m_nMax;
-		if( m_nValue < m_nMin ) m_nValue = m_nMin;
+		if ( m_nMax <= m_nMin ) m_nMax = m_nMin + 1;
+		if ( m_nValue > m_nMax ) m_nValue = m_nMax;
+		if ( m_nValue < m_nMin ) m_nValue = m_nMin;
 
 		RECT rc = {0};
-		if( m_bHorizontal ) {
+		if ( m_bHorizontal ) {
 			rc.right = (m_nValue - m_nMin) * (m_rcItem.right - m_rcItem.left) / (m_nMax - m_nMin);
 			rc.bottom = m_rcItem.bottom - m_rcItem.top;
 		}
@@ -108,6 +108,7 @@ namespace DuiLib
 			rc.bottom = m_rcItem.bottom - m_rcItem.top;
 		}
 		m_diFore.rcDestOffset = rc;
-		if( DrawImage(hDC, m_diFore) ) return;
+
+		return DrawImage(hDC, m_diFore);
 	}
 }

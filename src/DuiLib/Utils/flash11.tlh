@@ -17,41 +17,41 @@
 struct __declspec(uuid("d27cdb6b-ae6d-11cf-96b8-444553540000"))
 /* LIBID */ __ShockwaveFlashObjects;
 struct __declspec(uuid("d27cdb6c-ae6d-11cf-96b8-444553540000"))
-/* dual interface */ IShockwaveFlash;
+/* dual interface */ __IShockwaveFlash;
 struct __declspec(uuid("c5598e60-b307-11d1-b27d-006008c3fbfb"))
-/* interface */ ICanHandleException;
+/* interface */ __ICanHandleException;
 struct __declspec(uuid("d27cdb6d-ae6d-11cf-96b8-444553540000"))
-/* dispinterface */ _IShockwaveFlashEvents;
-struct /* coclass */ ShockwaveFlash;
+/* dispinterface */ __IShockwaveFlashEvents;
+struct /* coclass */ __ShockwaveFlash;
 struct __declspec(uuid("d27cdb70-ae6d-11cf-96b8-444553540000"))
-/* interface */ IFlashFactory;
+/* interface */ __IFlashFactory;
 struct __declspec(uuid("d27cdb72-ae6d-11cf-96b8-444553540000"))
-/* interface */ IFlashObjectInterface;
+/* interface */ __IFlashObjectInterface;
 struct __declspec(uuid("a6ef9860-c720-11d0-9337-00a0c90dcaa9"))
-/* interface */ IDispatchEx;
-struct /* coclass */ FlashObjectInterface;
+/* interface */ __IDispatchEx;
+struct /* coclass */ __FlashObjectInterface;
 struct __declspec(uuid("86230738-d762-4c50-a2de-a753e5b1686f"))
-/* dual interface */ IFlashObject;
-struct /* coclass */ FlashObject;
+/* dual interface */ __IFlashObject;
+struct /* coclass */ __FlashObject;
 
 //
 // Smart pointer typedef declarations
 //
 
-_COM_SMARTPTR_TYPEDEF(IShockwaveFlash, __uuidof(IShockwaveFlash));
-_COM_SMARTPTR_TYPEDEF(ICanHandleException, __uuidof(ICanHandleException));
-_COM_SMARTPTR_TYPEDEF(_IShockwaveFlashEvents, __uuidof(_IShockwaveFlashEvents));
-_COM_SMARTPTR_TYPEDEF(IFlashFactory, __uuidof(IFlashFactory));
-_COM_SMARTPTR_TYPEDEF(IDispatchEx, __uuidof(IDispatchEx));
-_COM_SMARTPTR_TYPEDEF(IFlashObjectInterface, __uuidof(IFlashObjectInterface));
-_COM_SMARTPTR_TYPEDEF(IFlashObject, __uuidof(IFlashObject));
+_COM_SMARTPTR_TYPEDEF(__IShockwaveFlash, __uuidof(__IShockwaveFlash));
+_COM_SMARTPTR_TYPEDEF(__ICanHandleException, __uuidof(__ICanHandleException));
+_COM_SMARTPTR_TYPEDEF(__IShockwaveFlashEvents, __uuidof(__IShockwaveFlashEvents));
+_COM_SMARTPTR_TYPEDEF(__IFlashFactory, __uuidof(__IFlashFactory));
+_COM_SMARTPTR_TYPEDEF(__IDispatchEx, __uuidof(__IDispatchEx));
+_COM_SMARTPTR_TYPEDEF(__IFlashObjectInterface, __uuidof(__IFlashObjectInterface));
+_COM_SMARTPTR_TYPEDEF(__IFlashObject, __uuidof(__IFlashObject));
 
 //
 // Type library items
 //
 
 struct __declspec(uuid("d27cdb6c-ae6d-11cf-96b8-444553540000"))
-IShockwaveFlash : IDispatch
+__IShockwaveFlash : IDispatch
 {
     //
     // Raw methods provided by interface
@@ -264,7 +264,7 @@ IShockwaveFlash : IDispatch
 };
 
 struct __declspec(uuid("c5598e60-b307-11d1-b27d-006008c3fbfb"))
-ICanHandleException : IUnknown
+__ICanHandleException : IUnknown
 {
     //
     // Raw methods provided by interface
@@ -276,20 +276,20 @@ ICanHandleException : IUnknown
 };
 
 struct __declspec(uuid("d27cdb6d-ae6d-11cf-96b8-444553540000"))
-_IShockwaveFlashEvents : IDispatch
+__IShockwaveFlashEvents : IDispatch
 {};
 
 struct __declspec(uuid("d27cdb6e-ae6d-11cf-96b8-444553540000"))
-ShockwaveFlash;
+__ShockwaveFlash;
     // [ default ] interface IShockwaveFlash
     // [ default, source ] dispinterface _IShockwaveFlashEvents
 
 struct __declspec(uuid("d27cdb70-ae6d-11cf-96b8-444553540000"))
-IFlashFactory : IUnknown
+__IFlashFactory : IUnknown
 {};
 
 struct __declspec(uuid("a6ef9860-c720-11d0-9337-00a0c90dcaa9"))
-IDispatchEx : IDispatch
+__IDispatchEx : IDispatch
 {
     //
     // Raw methods provided by interface
@@ -331,7 +331,7 @@ IDispatchEx : IDispatch
 };
 
 struct __declspec(uuid("d27cdb72-ae6d-11cf-96b8-444553540000"))
-IFlashObjectInterface : IDispatchEx
+__IFlashObjectInterface : __IDispatchEx
 {};
 
 struct __declspec(uuid("d27cdb71-ae6d-11cf-96b8-444553540000"))
@@ -339,11 +339,11 @@ FlashObjectInterface;
     // [ default ] interface IFlashObjectInterface
 
 struct __declspec(uuid("86230738-d762-4c50-a2de-a753e5b1686f"))
-IFlashObject : IDispatchEx
+__IFlashObject : __IDispatchEx
 {};
 
 struct __declspec(uuid("e0920e11-6b65-4d5d-9c58-b1fc5c07dc43"))
-FlashObject;
+__FlashObject;
     // [ default ] interface IFlashObject
 
 #pragma pack(pop)

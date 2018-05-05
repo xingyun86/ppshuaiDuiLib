@@ -75,7 +75,7 @@ protected:
 	LPARAM m_WndSize;
 
 	// Set this to true if the shadow should not be update until next WM_PAINT is received
-	bool m_bUpdate;
+	BOOL m_bUpdate;
 
 	COLORREF m_Color;	// Color of shadow
 
@@ -84,21 +84,21 @@ protected:
 	RECT m_rcHoleOffset;
 
 public:
-	static bool Initialize(HINSTANCE hInstance);
+	static BOOL Initialize(HINSTANCE hInstance);
 
 	HWND GetHWND() const;
 	operator HWND() const;
 	void Create(HWND hParentWnd);
 
 	// 使用图片只需要调用这个方法(rcHoleOffset作用是修复圆角显示空白的bug)
-	bool SetImage(LPCTSTR image, RECT rcCorner, RECT rcHoleOffset);
+	BOOL SetImage(LPCTSTR image, RECT rcCorner, RECT rcHoleOffset);
 
 	// 使用颜色可以使用如下几个方法
-	bool SetSize(int NewSize = 0);
-	bool SetSharpness(unsigned int NewSharpness = 5);
-	bool SetDarkness(unsigned int NewDarkness = 200);
-	bool SetPosition(int NewXOffset = 5, int NewYOffset = 5);
-	bool SetColor(COLORREF NewColor = 0);
+	BOOL SetSize(int NewSize = 0);
+	BOOL SetSharpness(unsigned int NewSharpness = 5);
+	BOOL SetDarkness(unsigned int NewDarkness = 200);
+	BOOL SetPosition(int NewXOffset = 5, int NewYOffset = 5);
+	BOOL SetColor(COLORREF NewColor = 0);
 
 protected:
 	static LRESULT CALLBACK WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);

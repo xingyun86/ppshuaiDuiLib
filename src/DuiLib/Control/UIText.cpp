@@ -22,104 +22,104 @@ namespace DuiLib
 
 	LPVOID CTextUI::GetInterface(LPCTSTR pstrName)
 	{
-		if( _tcscmp(pstrName, DUI_CTR_TEXT) == 0 ) return static_cast<CTextUI*>(this);
+		if ( _tcscmp(pstrName, DUI_CTR_TEXT) == 0 ) return static_cast<CTextUI*>(this);
 		return CLabelUI::GetInterface(pstrName);
 	}
 
 	UINT CTextUI::GetControlFlags() const
 	{
-		if( IsEnabled() && m_nLinks > 0 ) return UIFLAG_SETCURSOR;
+		if ( IsEnabled() && m_nLinks > 0 ) return UIFLAG_SETCURSOR;
 		else return 0;
 	}
 
 	CDuiString* CTextUI::GetLinkContent(int iIndex)
 	{
-		if( iIndex >= 0 && iIndex < m_nLinks ) return &m_sLinks[iIndex];
+		if ( iIndex >= 0 && iIndex < m_nLinks ) return &m_sLinks[iIndex];
 		return NULL;
 	}
 
-	void CTextUI::DoEvent(TEventUI& event)
+	LRESULT CTextUI::DoEvent(TEventUI& event)
 	{
-		if( !IsMouseEnabled() && event.Type > UIEVENT__MOUSEBEGIN && event.Type < UIEVENT__MOUSEEND ) {
-			if( m_pParent != NULL ) m_pParent->DoEvent(event);
+		if ( !IsMouseEnabled() && event.Type > UIEVENT__MOUSEBEGIN && event.Type < UIEVENT__MOUSEEND ) {
+			if ( m_pParent != NULL ) m_pParent->DoEvent(event);
 			else CLabelUI::DoEvent(event);
-			return;
+			return (0L);
 		}
 
-		if( event.Type == UIEVENT_SETCURSOR ) {
+		if ( event.Type == UIEVENT_SETCURSOR ) {
 			for( int i = 0; i < m_nLinks; i++ ) {
-				if( ::PtInRect(&m_rcLinks[i], event.ptMouse) ) {
-					::SetCursor(::LoadCursor(NULL, /*MAKEINTRESOURCE*/(IDC_HAND)));
-					return;
+				if ( ::PtInRect(&m_rcLinks[i], event.ptMouse) ) {
+					::SetCursor(::LoadCursor(NULL, MAKEINTRESOURCE(IDC_HAND)));
+					return (0L);
 				}
 			}
 		}
-		if( event.Type == UIEVENT_BUTTONDOWN || event.Type == UIEVENT_DBLCLICK && IsEnabled() ) {
+		if ( event.Type == UIEVENT_BUTTONDOWN || event.Type == UIEVENT_DBLCLICK && IsEnabled() ) {
 			for( int i = 0; i < m_nLinks; i++ ) {
-				if( ::PtInRect(&m_rcLinks[i], event.ptMouse) ) {
+				if ( ::PtInRect(&m_rcLinks[i], event.ptMouse) ) {
 					Invalidate();
-					return;
+					return (0L);
 				}
 			}
 		}
-		if( event.Type == UIEVENT_BUTTONUP && IsEnabled() ) {
+		if ( event.Type == UIEVENT_BUTTONUP && IsEnabled() ) {
 			for( int i = 0; i < m_nLinks; i++ ) {
-				if( ::PtInRect(&m_rcLinks[i], event.ptMouse) ) {
+				if ( ::PtInRect(&m_rcLinks[i], event.ptMouse) ) {
 					m_pManager->SendNotify(this, DUI_MSGTYPE_LINK, i);
-					return;
+					return (0L);
 				}
 			}
 		}
-		if( event.Type == UIEVENT_CONTEXTMENU )
+		if ( event.Type == UIEVENT_CONTEXTMENU )
 		{
-			return;
+			return (0L);
 		}
 		// When you move over a link
-		if( m_nLinks > 0 && event.Type == UIEVENT_MOUSEMOVE && IsEnabled() ) {
+		if ( m_nLinks > 0 && event.Type == UIEVENT_MOUSEMOVE && IsEnabled() ) {
 			int nHoverLink = -1;
 			for( int i = 0; i < m_nLinks; i++ ) {
-				if( ::PtInRect(&m_rcLinks[i], event.ptMouse) ) {
+				if ( ::PtInRect(&m_rcLinks[i], event.ptMouse) ) {
 					nHoverLink = i;
 					break;
 				}
 			}
 
-			if(m_nHoverLink != nHoverLink) {
+			if (m_nHoverLink != nHoverLink) {
 				m_nHoverLink = nHoverLink;
 				Invalidate();
-				return;
+				return (0L);
 			}
 		}
-		if( event.Type == UIEVENT_MOUSELEAVE ) {
-			if( m_nLinks > 0 && IsEnabled() ) {
-				if(m_nHoverLink != -1) {
-                    if( !::PtInRect(&m_rcLinks[m_nHoverLink], event.ptMouse) ) {
+		if ( event.Type == UIEVENT_MOUSELEAVE ) {
+			if ( m_nLinks > 0 && IsEnabled() ) {
+				if (m_nHoverLink != -1) {
+                    if ( !::PtInRect(&m_rcLinks[m_nHoverLink], event.ptMouse) ) {
                         m_nHoverLink = -1;
                         Invalidate();
                         if (m_pManager) m_pManager->RemoveMouseLeaveNeeded(this);
                     }
                     else {
                         if (m_pManager) m_pManager->AddMouseLeaveNeeded(this);
-                        return;
+                        return (0L);
                     }
 				}
 			}
 		}
 
-		CLabelUI::DoEvent(event);
+		return CLabelUI::DoEvent(event);
 	}
 
-	void CTextUI::PaintText(HDC hDC)
+	LRESULT CTextUI::PaintText(HDC hDC)
 	{
-		if( m_sText.IsEmpty() ) {
+		if ( m_sText.IsEmpty() ) {
 			m_nLinks = 0;
-			return;
+			return (-1L);
 		}
 
-		if( m_dwTextColor == 0 ) m_dwTextColor = m_pManager->GetDefaultFontColor();
-		if( m_dwDisabledTextColor == 0 ) m_dwDisabledTextColor = m_pManager->GetDefaultDisabledColor();
+		if ( m_dwTextColor == 0 ) m_dwTextColor = m_pManager->GetDefaultFontColor();
+		if ( m_dwDisabledTextColor == 0 ) m_dwDisabledTextColor = m_pManager->GetDefaultDisabledColor();
 
-		if( m_sText.IsEmpty() ) return;
+		if ( m_sText.IsEmpty() ) return (-1L);
 
 		m_nLinks = lengthof(m_rcLinks);
 		RECT rc = m_rcItem;
@@ -127,8 +127,8 @@ namespace DuiLib
 		rc.right -= m_rcTextPadding.right;
 		rc.top += m_rcTextPadding.top;
 		rc.bottom -= m_rcTextPadding.bottom;
-		if( IsEnabled() ) {
-			if( m_bShowHtml )
+		if ( IsEnabled() ) {
+			if ( m_bShowHtml )
 				CRenderEngine::DrawHtmlText(hDC, m_pManager, rc, m_sText, m_dwTextColor, \
 				m_rcLinks, m_sLinks, m_nLinks, m_iFont, m_uTextStyle);
 			else
@@ -136,12 +136,13 @@ namespace DuiLib
 				m_iFont, m_uTextStyle);
 		}
 		else {
-			if( m_bShowHtml )
+			if ( m_bShowHtml )
 				CRenderEngine::DrawHtmlText(hDC, m_pManager, rc, m_sText, m_dwDisabledTextColor, \
 				m_rcLinks, m_sLinks, m_nLinks, m_iFont, m_uTextStyle);
 			else
 				CRenderEngine::DrawText(hDC, m_pManager, rc, m_sText, m_dwDisabledTextColor, \
 				m_iFont, m_uTextStyle);
 		}
+		return (0L);
 	}
 }

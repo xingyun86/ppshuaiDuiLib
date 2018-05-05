@@ -23,13 +23,13 @@ public:
     CMarkup(LPCTSTR pstrXML = NULL);
     ~CMarkup();
 
-    bool Load(LPCTSTR pstrXML);
-    bool LoadFromMem(BYTE* pByte, DWORD dwSize, int encoding = XMLFILE_ENCODING_UTF8);
-    bool LoadFromFile(LPCTSTR pstrFilename, int encoding = XMLFILE_ENCODING_UTF8);
+	BOOL Load(LPCTSTR pstrXML);
+	BOOL LoadFromMem(BYTE* pByte, DWORD dwSize, LONG encoding = XMLFILE_ENCODING_UTF8);
+	BOOL LoadFromFile(LPCTSTR pstrFilename, LONG encoding = XMLFILE_ENCODING_UTF8);
     void Release();
-    bool IsValid() const;
+	BOOL IsValid() const;
 
-    void SetPreserveWhitespace(bool bPreserve = true);
+	void SetPreserveWhitespace(BOOL bPreserve = TRUE);
     void GetLastErrorMessage(LPTSTR pstrMessage, SIZE_T cchMax) const;
     void GetLastErrorLocation(LPTSTR pstrSource, SIZE_T cchMax) const;
 
@@ -51,20 +51,20 @@ private:
     ULONG m_nReservedElements;
     TCHAR m_szErrorMsg[100];
     TCHAR m_szErrorXML[50];
-    bool m_bPreserveWhitespace;
+	BOOL m_bPreserveWhitespace;
 
 private:
-    bool _Parse();
-    bool _Parse(LPTSTR& pstrText, ULONG iParent);
+	BOOL _Parse();
+	BOOL _Parse(LPTSTR& pstrText, ULONG iParent);
     XMLELEMENT* _ReserveElement();
     inline void _SkipWhitespace(LPTSTR& pstr) const;
     inline void _SkipWhitespace(LPCTSTR& pstr) const;
     inline void _SkipIdentifier(LPTSTR& pstr) const;
     inline void _SkipIdentifier(LPCTSTR& pstr) const;
-    bool _ParseData(LPTSTR& pstrText, LPTSTR& pstrData, char cEnd);
+	BOOL _ParseData(LPTSTR& pstrText, LPTSTR& pstrData, char cEnd);
     void _ParseMetaChar(LPTSTR& pstrText, LPTSTR& pstrDest);
-    bool _ParseAttributes(LPTSTR& pstrText);
-    bool _Failed(LPCTSTR pstrError, LPCTSTR pstrLocation = NULL);
+	BOOL _ParseAttributes(LPTSTR& pstrText);
+	BOOL _Failed(LPCTSTR pstrError, LPCTSTR pstrLocation = NULL);
 };
 
 
@@ -76,26 +76,26 @@ private:
     CMarkupNode(CMarkup* pOwner, int iPos);
 
 public:
-    bool IsValid() const;
+	BOOL IsValid() const;
 
     CMarkupNode GetParent();
     CMarkupNode GetSibling();
     CMarkupNode GetChild();
     CMarkupNode GetChild(LPCTSTR pstrName);
 
-    bool HasSiblings() const;
-    bool HasChildren() const;
+	BOOL HasSiblings() const;
+	BOOL HasChildren() const;
     LPCTSTR GetName() const;
     LPCTSTR GetValue() const;
 
-    bool HasAttributes();
-    bool HasAttribute(LPCTSTR pstrName);
+	BOOL HasAttributes();
+	BOOL HasAttribute(LPCTSTR pstrName);
     int GetAttributeCount();
     LPCTSTR GetAttributeName(int iIndex);
     LPCTSTR GetAttributeValue(int iIndex);
     LPCTSTR GetAttributeValue(LPCTSTR pstrName);
-    bool GetAttributeValue(int iIndex, LPTSTR pstrValue, SIZE_T cchMax);
-    bool GetAttributeValue(LPCTSTR pstrName, LPTSTR pstrValue, SIZE_T cchMax);
+	BOOL GetAttributeValue(int iIndex, LPTSTR pstrValue, SIZE_T cchMax);
+	BOOL GetAttributeValue(LPCTSTR pstrName, LPTSTR pstrValue, SIZE_T cchMax);
 
 private:
     void _MapAttributes();

@@ -249,7 +249,7 @@ static BOOL WINAPI AlphaBitBlt(HDC hDC, int nDestX, int nDestY, int dwWidth, int
     {
         nAlpha = LOBYTE(*pSrcBits >> 24);
         src_darken = (double) (nAlpha * ftn.SourceConstantAlpha) / 255.0 / 255.0;
-        if( src_darken < 0.0 ) src_darken = 0.0;
+        if ( src_darken < 0.0 ) src_darken = 0.0;
         *pDestBits = PixelAlpha(*pSrcBits, src_darken, *pDestBits, 1.0 - src_darken);
     } //for
 
@@ -273,7 +273,7 @@ static BOOL WINAPI AlphaBitBlt(HDC hDC, int nDestX, int nDestY, int dwWidth, int
 
 DWORD CRenderEngine::AdjustColor(DWORD dwColor, short H, short S, short L)
 {
-    if( H == 180 && S == 100 && L == 100 ) return dwColor;
+    if ( H == 180 && S == 100 && L == 100 ) return dwColor;
     float fH, fS, fL;
     float S1 = S / 100.0f;
     float L1 = L / 100.0f;
@@ -309,12 +309,12 @@ HBITMAP CRenderEngine::CreateARGB32Bitmap(HDC hDC, int cx, int cy, COLORREF** pB
 	return hBitmap;
 }
 
-void CRenderEngine::AdjustImage(bool bUseHSL, TImageInfo* imageInfo, short H, short S, short L)
+void CRenderEngine::AdjustImage(BOOL bUseHSL, TImageInfo* imageInfo, short H, short S, short L)
 {
-	if( imageInfo == NULL || imageInfo->bUseHSL == false || imageInfo->hBitmap == NULL || 
+	if ( imageInfo == NULL || imageInfo->bUseHSL == false || imageInfo->hBitmap == NULL || 
 		imageInfo->pBits == NULL || imageInfo->pSrcBits == NULL ) 
 		return;
-	if( bUseHSL == false || (H == 180 && S == 100 && L == 100)) {
+	if ( bUseHSL == false || (H == 180 && S == 100 && L == 100)) {
 		::CopyMemory(imageInfo->pBits, imageInfo->pSrcBits, imageInfo->nX * imageInfo->nY * 4);
 		return;
 	}
@@ -339,22 +339,22 @@ TImageInfo* CRenderEngine::LoadImage(STRINGorID bitmap, LPCTSTR type, DWORD mask
 
 	do 
 	{
-		if( type == NULL ) {
+		if ( type == NULL ) {
 			CDuiString sFile = CPaintManagerUI::GetResourcePath();
-			if( CPaintManagerUI::GetResourceZip().IsEmpty() ) {
+			if ( CPaintManagerUI::GetResourceZip().IsEmpty() ) {
 				sFile += bitmap.m_lpstr;
 				HANDLE hFile = ::CreateFile(sFile.GetData(), GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, \
 					FILE_ATTRIBUTE_NORMAL, NULL);
-				if( hFile == INVALID_HANDLE_VALUE ) break;
+				if ( hFile == INVALID_HANDLE_VALUE ) break;
 				dwSize = ::GetFileSize(hFile, NULL);
-				if( dwSize == 0 ) break;
+				if ( dwSize == 0 ) break;
 
 				DWORD dwRead = 0;
 				pData = new BYTE[ dwSize ];
 				::ReadFile( hFile, pData, dwSize, &dwRead, NULL );
 				::CloseHandle( hFile );
 
-				if( dwRead != dwSize ) {
+				if ( dwRead != dwSize ) {
 					delete[] pData;
 					pData = NULL;
 					break;
@@ -363,23 +363,23 @@ TImageInfo* CRenderEngine::LoadImage(STRINGorID bitmap, LPCTSTR type, DWORD mask
 			else {
 				sFile += CPaintManagerUI::GetResourceZip();
 				HZIP hz = NULL;
-				if( CPaintManagerUI::IsCachedResourceZip() ) hz = (HZIP)CPaintManagerUI::GetResourceZipHandle();
+				if ( CPaintManagerUI::IsCachedResourceZip() ) hz = (HZIP)CPaintManagerUI::GetResourceZipHandle();
 				else hz = OpenZip((void*)sFile.GetData(), 0, 2);
-				if( hz == NULL ) break;
+				if ( hz == NULL ) break;
 				ZIPENTRY ze; 
 				int i; 
-				if( FindZipItem(hz, bitmap.m_lpstr, true, &i, &ze) != 0 ) break;
+				if ( FindZipItem(hz, bitmap.m_lpstr, true, &i, &ze) != 0 ) break;
 				dwSize = ze.unc_size;
-				if( dwSize == 0 ) break;
+				if ( dwSize == 0 ) break;
 				pData = new BYTE[ dwSize ];
 				int res = UnzipItem(hz, i, pData, dwSize, 3);
-				if( res != 0x00000000 && res != 0x00000600) {
+				if ( res != 0x00000000 && res != 0x00000600) {
 					delete[] pData;
 					pData = NULL;
-					if( !CPaintManagerUI::IsCachedResourceZip() ) CloseZip(hz);
+					if ( !CPaintManagerUI::IsCachedResourceZip() ) CloseZip(hz);
 					break;
 				}
-				if( !CPaintManagerUI::IsCachedResourceZip() ) CloseZip(hz);
+				if ( !CPaintManagerUI::IsCachedResourceZip() ) CloseZip(hz);
 			}
 		}
 		else if (_tcscmp(type, RES_TYPE_COLOR) == 0) {
@@ -387,15 +387,15 @@ TImageInfo* CRenderEngine::LoadImage(STRINGorID bitmap, LPCTSTR type, DWORD mask
 		}
 		else {
 			HRSRC hResource = ::FindResource(CPaintManagerUI::GetResourceDll(), bitmap.m_lpstr, type);
-			if( hResource == NULL ) break;
+			if ( hResource == NULL ) break;
 			HGLOBAL hGlobal = ::LoadResource(CPaintManagerUI::GetResourceDll(), hResource);
-			if( hGlobal == NULL ) {
+			if ( hGlobal == NULL ) {
 				FreeResource(hResource);
 				break;
 			}
 
 			dwSize = ::SizeofResource(CPaintManagerUI::GetResourceDll(), hResource);
-			if( dwSize == 0 ) break;
+			if ( dwSize == 0 ) break;
 			pData = new BYTE[ dwSize ];
 			::CopyMemory(pData, (LPBYTE)::LockResource(hGlobal), dwSize);
 			::FreeResource(hResource);
@@ -407,16 +407,16 @@ TImageInfo* CRenderEngine::LoadImage(STRINGorID bitmap, LPCTSTR type, DWORD mask
 		//读不到图片, 则直接去读取bitmap.m_lpstr指向的路径
 		HANDLE hFile = ::CreateFile(bitmap.m_lpstr, GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, \
 			FILE_ATTRIBUTE_NORMAL, NULL);
-		if( hFile == INVALID_HANDLE_VALUE ) break;
+		if ( hFile == INVALID_HANDLE_VALUE ) break;
 		dwSize = ::GetFileSize(hFile, NULL);
-		if( dwSize == 0 ) break;
+		if ( dwSize == 0 ) break;
 
 		DWORD dwRead = 0;
 		pData = new BYTE[ dwSize ];
 		::ReadFile( hFile, pData, dwSize, &dwRead, NULL );
 		::CloseHandle( hFile );
 
-		if( dwRead != dwSize ) {
+		if ( dwRead != dwSize ) {
 			delete[] pData;
 			pData = NULL;
 		}
@@ -433,7 +433,7 @@ TImageInfo* CRenderEngine::LoadImage(STRINGorID bitmap, LPCTSTR type, DWORD mask
     if (!type || _tcscmp(type, RES_TYPE_COLOR) != 0) {
         pImage = stbi_load_from_memory(pData, dwSize, &x, &y, &n, 4);
         delete[] pData;
-        if( !pImage ) {
+        if ( !pImage ) {
             //::MessageBox(0, _T("解析图片失败"), _T("抓BUG"), MB_OK);
             return NULL;
         }
@@ -451,7 +451,7 @@ TImageInfo* CRenderEngine::LoadImage(STRINGorID bitmap, LPCTSTR type, DWORD mask
     bool bAlphaChannel = false;
     LPBYTE pDest = NULL;
     HBITMAP hBitmap = ::CreateDIBSection(NULL, &bmi, DIB_RGB_COLORS, (void**)&pDest, NULL, 0);
-	if( !hBitmap ) {
+	if ( !hBitmap ) {
 		//::MessageBox(0, _T("CreateDIBSection失败"), _T("抓BUG"), MB_OK);
 		return NULL;
 	}
@@ -475,7 +475,7 @@ TImageInfo* CRenderEngine::LoadImage(STRINGorID bitmap, LPCTSTR type, DWORD mask
     for( int i = 0; i < x * y; i++ ) 
     {
         pDest[i*4 + 3] = pImage[i*4 + 3];
-        if( pDest[i*4 + 3] < 255 )
+        if ( pDest[i*4 + 3] < 255 )
         {
             pDest[i*4] = (BYTE)(DWORD(pImage[i*4 + 2])*pImage[i*4 + 3]/255);
             pDest[i*4 + 1] = (BYTE)(DWORD(pImage[i*4 + 1])*pImage[i*4 + 3]/255);
@@ -489,7 +489,7 @@ TImageInfo* CRenderEngine::LoadImage(STRINGorID bitmap, LPCTSTR type, DWORD mask
             pDest[i*4 + 2] = pImage[i*4]; 
         }
 
-        if( *(DWORD*)(&pDest[i*4]) == mask ) {
+        if ( *(DWORD*)(&pDest[i*4]) == mask ) {
             pDest[i*4] = (BYTE)0;
             pDest[i*4 + 1] = (BYTE)0;
             pDest[i*4 + 2] = (BYTE)0; 
@@ -513,7 +513,7 @@ TImageInfo* CRenderEngine::LoadImage(STRINGorID bitmap, LPCTSTR type, DWORD mask
 	return data;
 }
 
-void CRenderEngine::FreeImage(TImageInfo* bitmap, bool bDelete)
+void CRenderEngine::FreeImage(TImageInfo* bitmap, BOOL bDelete)
 {
 	if (bitmap == NULL) return;
 	if (bitmap->hBitmap) {
@@ -528,16 +528,16 @@ void CRenderEngine::FreeImage(TImageInfo* bitmap, bool bDelete)
 }
 
 void CRenderEngine::DrawImage(HDC hDC, HBITMAP hBitmap, const RECT& rc, const RECT& rcPaint,
-							  const RECT& rcBmpPart, const RECT& rcScale9, bool bAlpha, 
-							  BYTE uFade, bool bHole, bool bTiledX, bool bTiledY)
+							  const RECT& rcBmpPart, const RECT& rcScale9, BOOL bAlpha, 
+							  BYTE uFade, BOOL bHole, BOOL bTiledX, BOOL bTiledY)
 {
 	ASSERT(::GetObjectType(hDC)==OBJ_DC || ::GetObjectType(hDC)==OBJ_MEMDC);
 
 	typedef BOOL (WINAPI *LPALPHABLEND)(HDC, int, int, int, int,HDC, int, int, int, int, BLENDFUNCTION);
 	static LPALPHABLEND lpAlphaBlend = (LPALPHABLEND) ::GetProcAddress(::GetModuleHandle(_T("msimg32.dll")), "AlphaBlend");
 
-	if( lpAlphaBlend == NULL ) lpAlphaBlend = AlphaBitBlt;
-	if( hBitmap == NULL ) return;
+	if ( lpAlphaBlend == NULL ) lpAlphaBlend = AlphaBitBlt;
+	if ( hBitmap == NULL ) return;
 
 	HDC hCloneDC = ::CreateCompatibleDC(hDC);
 	HBITMAP hOldBitmap = (HBITMAP) ::SelectObject(hCloneDC, hBitmap);
@@ -545,18 +545,18 @@ void CRenderEngine::DrawImage(HDC hDC, HBITMAP hBitmap, const RECT& rc, const RE
 
 	RECT rcTemp = {0};
 	RECT rcDest = {0};
-	if( lpAlphaBlend && (bAlpha || uFade < 255) ) {
+	if ( lpAlphaBlend && (bAlpha || uFade < 255) ) {
 		BLENDFUNCTION bf = { AC_SRC_OVER, 0, uFade, AC_SRC_ALPHA };
 		// middle
-		if( !bHole ) {
+		if ( !bHole ) {
 			rcDest.left = rc.left + rcScale9.left;
 			rcDest.top = rc.top + rcScale9.top;
 			rcDest.right = rc.right - rc.left - rcScale9.left - rcScale9.right;
 			rcDest.bottom = rc.bottom - rc.top - rcScale9.top - rcScale9.bottom;
 			rcDest.right += rcDest.left;
 			rcDest.bottom += rcDest.top;
-			if( ::IntersectRect(&rcTemp, &rcPaint, &rcDest) ) {
-				if( !bTiledX && !bTiledY ) {
+			if ( ::IntersectRect(&rcTemp, &rcPaint, &rcDest) ) {
+				if ( !bTiledX && !bTiledY ) {
 					rcDest.right -= rcDest.left;
 					rcDest.bottom -= rcDest.top;
 					lpAlphaBlend(hDC, rcDest.left, rcDest.top, rcDest.right, rcDest.bottom, hCloneDC, \
@@ -564,7 +564,7 @@ void CRenderEngine::DrawImage(HDC hDC, HBITMAP hBitmap, const RECT& rc, const RE
 						rcBmpPart.right - rcBmpPart.left - rcScale9.left - rcScale9.right, \
 						rcBmpPart.bottom - rcBmpPart.top - rcScale9.top - rcScale9.bottom, bf);
 				}
-				else if( bTiledX && bTiledY ) {
+				else if ( bTiledX && bTiledY ) {
 					LONG lWidth = rcBmpPart.right - rcBmpPart.left - rcScale9.left - rcScale9.right;
 					LONG lHeight = rcBmpPart.bottom - rcBmpPart.top - rcScale9.top - rcScale9.bottom;
 					int iTimesX = (rcDest.right - rcDest.left + lWidth - 1) / lWidth;
@@ -573,7 +573,7 @@ void CRenderEngine::DrawImage(HDC hDC, HBITMAP hBitmap, const RECT& rc, const RE
 						LONG lDestTop = rcDest.top + lHeight * j;
 						LONG lDestBottom = rcDest.top + lHeight * (j + 1);
 						LONG lDrawHeight = lHeight;
-						if( lDestBottom > rcDest.bottom ) {
+						if ( lDestBottom > rcDest.bottom ) {
 							lDrawHeight -= lDestBottom - rcDest.bottom;
 							lDestBottom = rcDest.bottom;
 						}
@@ -581,7 +581,7 @@ void CRenderEngine::DrawImage(HDC hDC, HBITMAP hBitmap, const RECT& rc, const RE
 							LONG lDestLeft = rcDest.left + lWidth * i;
 							LONG lDestRight = rcDest.left + lWidth * (i + 1);
 							LONG lDrawWidth = lWidth;
-							if( lDestRight > rcDest.right ) {
+							if ( lDestRight > rcDest.right ) {
 								lDrawWidth -= lDestRight - rcDest.right;
 								lDestRight = rcDest.right;
 							}
@@ -591,14 +591,14 @@ void CRenderEngine::DrawImage(HDC hDC, HBITMAP hBitmap, const RECT& rc, const RE
 						}
 					}
 				}
-				else if( bTiledX ) {
+				else if ( bTiledX ) {
 					LONG lWidth = rcBmpPart.right - rcBmpPart.left - rcScale9.left - rcScale9.right;
 					int iTimes = (rcDest.right - rcDest.left + lWidth - 1) / lWidth;
 					for( int i = 0; i < iTimes; ++i ) {
 						LONG lDestLeft = rcDest.left + lWidth * i;
 						LONG lDestRight = rcDest.left + lWidth * (i + 1);
 						LONG lDrawWidth = lWidth;
-						if( lDestRight > rcDest.right ) {
+						if ( lDestRight > rcDest.right ) {
 							lDrawWidth -= lDestRight - rcDest.right;
 							lDestRight = rcDest.right;
 						}
@@ -615,7 +615,7 @@ void CRenderEngine::DrawImage(HDC hDC, HBITMAP hBitmap, const RECT& rc, const RE
 						LONG lDestTop = rcDest.top + lHeight * i;
 						LONG lDestBottom = rcDest.top + lHeight * (i + 1);
 						LONG lDrawHeight = lHeight;
-						if( lDestBottom > rcDest.bottom ) {
+						if ( lDestBottom > rcDest.bottom ) {
 							lDrawHeight -= lDestBottom - rcDest.bottom;
 							lDestBottom = rcDest.bottom;
 						}
@@ -629,14 +629,14 @@ void CRenderEngine::DrawImage(HDC hDC, HBITMAP hBitmap, const RECT& rc, const RE
 		}
 
 		// left-top
-		if( rcScale9.left > 0 && rcScale9.top > 0 ) {
+		if ( rcScale9.left > 0 && rcScale9.top > 0 ) {
 			rcDest.left = rc.left;
 			rcDest.top = rc.top;
 			rcDest.right = rcScale9.left;
 			rcDest.bottom = rcScale9.top;
 			rcDest.right += rcDest.left;
 			rcDest.bottom += rcDest.top;
-			if( ::IntersectRect(&rcTemp, &rcPaint, &rcDest) ) {
+			if ( ::IntersectRect(&rcTemp, &rcPaint, &rcDest) ) {
 				rcDest.right -= rcDest.left;
 				rcDest.bottom -= rcDest.top;
 				lpAlphaBlend(hDC, rcDest.left, rcDest.top, rcDest.right, rcDest.bottom, hCloneDC, \
@@ -644,14 +644,14 @@ void CRenderEngine::DrawImage(HDC hDC, HBITMAP hBitmap, const RECT& rc, const RE
 			}
 		}
 		// top
-		if( rcScale9.top > 0 ) {
+		if ( rcScale9.top > 0 ) {
 			rcDest.left = rc.left + rcScale9.left;
 			rcDest.top = rc.top;
 			rcDest.right = rc.right - rc.left - rcScale9.left - rcScale9.right;
 			rcDest.bottom = rcScale9.top;
 			rcDest.right += rcDest.left;
 			rcDest.bottom += rcDest.top;
-			if( ::IntersectRect(&rcTemp, &rcPaint, &rcDest) ) {
+			if ( ::IntersectRect(&rcTemp, &rcPaint, &rcDest) ) {
 				rcDest.right -= rcDest.left;
 				rcDest.bottom -= rcDest.top;
 				lpAlphaBlend(hDC, rcDest.left, rcDest.top, rcDest.right, rcDest.bottom, hCloneDC, \
@@ -660,14 +660,14 @@ void CRenderEngine::DrawImage(HDC hDC, HBITMAP hBitmap, const RECT& rc, const RE
 			}
 		}
 		// right-top
-		if( rcScale9.right > 0 && rcScale9.top > 0 ) {
+		if ( rcScale9.right > 0 && rcScale9.top > 0 ) {
 			rcDest.left = rc.right - rcScale9.right;
 			rcDest.top = rc.top;
 			rcDest.right = rcScale9.right;
 			rcDest.bottom = rcScale9.top;
 			rcDest.right += rcDest.left;
 			rcDest.bottom += rcDest.top;
-			if( ::IntersectRect(&rcTemp, &rcPaint, &rcDest) ) {
+			if ( ::IntersectRect(&rcTemp, &rcPaint, &rcDest) ) {
 				rcDest.right -= rcDest.left;
 				rcDest.bottom -= rcDest.top;
 				lpAlphaBlend(hDC, rcDest.left, rcDest.top, rcDest.right, rcDest.bottom, hCloneDC, \
@@ -675,14 +675,14 @@ void CRenderEngine::DrawImage(HDC hDC, HBITMAP hBitmap, const RECT& rc, const RE
 			}
 		}
 		// left
-		if( rcScale9.left > 0 ) {
+		if ( rcScale9.left > 0 ) {
 			rcDest.left = rc.left;
 			rcDest.top = rc.top + rcScale9.top;
 			rcDest.right = rcScale9.left;
 			rcDest.bottom = rc.bottom - rc.top - rcScale9.top - rcScale9.bottom;
 			rcDest.right += rcDest.left;
 			rcDest.bottom += rcDest.top;
-			if( ::IntersectRect(&rcTemp, &rcPaint, &rcDest) ) {
+			if ( ::IntersectRect(&rcTemp, &rcPaint, &rcDest) ) {
 				rcDest.right -= rcDest.left;
 				rcDest.bottom -= rcDest.top;
 				lpAlphaBlend(hDC, rcDest.left, rcDest.top, rcDest.right, rcDest.bottom, hCloneDC, \
@@ -691,14 +691,14 @@ void CRenderEngine::DrawImage(HDC hDC, HBITMAP hBitmap, const RECT& rc, const RE
 			}
 		}
 		// right
-		if( rcScale9.right > 0 ) {
+		if ( rcScale9.right > 0 ) {
 			rcDest.left = rc.right - rcScale9.right;
 			rcDest.top = rc.top + rcScale9.top;
 			rcDest.right = rcScale9.right;
 			rcDest.bottom = rc.bottom - rc.top - rcScale9.top - rcScale9.bottom;
 			rcDest.right += rcDest.left;
 			rcDest.bottom += rcDest.top;
-			if( ::IntersectRect(&rcTemp, &rcPaint, &rcDest) ) {
+			if ( ::IntersectRect(&rcTemp, &rcPaint, &rcDest) ) {
 				rcDest.right -= rcDest.left;
 				rcDest.bottom -= rcDest.top;
 				lpAlphaBlend(hDC, rcDest.left, rcDest.top, rcDest.right, rcDest.bottom, hCloneDC, \
@@ -707,14 +707,14 @@ void CRenderEngine::DrawImage(HDC hDC, HBITMAP hBitmap, const RECT& rc, const RE
 			}
 		}
 		// left-bottom
-		if( rcScale9.left > 0 && rcScale9.bottom > 0 ) {
+		if ( rcScale9.left > 0 && rcScale9.bottom > 0 ) {
 			rcDest.left = rc.left;
 			rcDest.top = rc.bottom - rcScale9.bottom;
 			rcDest.right = rcScale9.left;
 			rcDest.bottom = rcScale9.bottom;
 			rcDest.right += rcDest.left;
 			rcDest.bottom += rcDest.top;
-			if( ::IntersectRect(&rcTemp, &rcPaint, &rcDest) ) {
+			if ( ::IntersectRect(&rcTemp, &rcPaint, &rcDest) ) {
 				rcDest.right -= rcDest.left;
 				rcDest.bottom -= rcDest.top;
 				lpAlphaBlend(hDC, rcDest.left, rcDest.top, rcDest.right, rcDest.bottom, hCloneDC, \
@@ -722,14 +722,14 @@ void CRenderEngine::DrawImage(HDC hDC, HBITMAP hBitmap, const RECT& rc, const RE
 			}
 		}
 		// bottom
-		if( rcScale9.bottom > 0 ) {
+		if ( rcScale9.bottom > 0 ) {
 			rcDest.left = rc.left + rcScale9.left;
 			rcDest.top = rc.bottom - rcScale9.bottom;
 			rcDest.right = rc.right - rc.left - rcScale9.left - rcScale9.right;
 			rcDest.bottom = rcScale9.bottom;
 			rcDest.right += rcDest.left;
 			rcDest.bottom += rcDest.top;
-			if( ::IntersectRect(&rcTemp, &rcPaint, &rcDest) ) {
+			if ( ::IntersectRect(&rcTemp, &rcPaint, &rcDest) ) {
 				rcDest.right -= rcDest.left;
 				rcDest.bottom -= rcDest.top;
 				lpAlphaBlend(hDC, rcDest.left, rcDest.top, rcDest.right, rcDest.bottom, hCloneDC, \
@@ -738,14 +738,14 @@ void CRenderEngine::DrawImage(HDC hDC, HBITMAP hBitmap, const RECT& rc, const RE
 			}
 		}
 		// right-bottom
-		if( rcScale9.right > 0 && rcScale9.bottom > 0 ) {
+		if ( rcScale9.right > 0 && rcScale9.bottom > 0 ) {
 			rcDest.left = rc.right - rcScale9.right;
 			rcDest.top = rc.bottom - rcScale9.bottom;
 			rcDest.right = rcScale9.right;
 			rcDest.bottom = rcScale9.bottom;
 			rcDest.right += rcDest.left;
 			rcDest.bottom += rcDest.top;
-			if( ::IntersectRect(&rcTemp, &rcPaint, &rcDest) ) {
+			if ( ::IntersectRect(&rcTemp, &rcPaint, &rcDest) ) {
 				rcDest.right -= rcDest.left;
 				rcDest.bottom -= rcDest.top;
 				lpAlphaBlend(hDC, rcDest.left, rcDest.top, rcDest.right, rcDest.bottom, hCloneDC, \
@@ -760,7 +760,7 @@ void CRenderEngine::DrawImage(HDC hDC, HBITMAP hBitmap, const RECT& rc, const RE
 			&& rc.bottom - rc.top == rcBmpPart.bottom - rcBmpPart.top \
 			&& rcScale9.left == 0 && rcScale9.right == 0 && rcScale9.top == 0 && rcScale9.bottom == 0)
 		{
-			if( ::IntersectRect(&rcTemp, &rcPaint, &rc) ) {
+			if ( ::IntersectRect(&rcTemp, &rcPaint, &rc) ) {
 				::BitBlt(hDC, rcTemp.left, rcTemp.top, rcTemp.right - rcTemp.left, rcTemp.bottom - rcTemp.top, \
 					hCloneDC, rcBmpPart.left + rcTemp.left - rc.left, rcBmpPart.top + rcTemp.top - rc.top, SRCCOPY);
 			}
@@ -768,15 +768,15 @@ void CRenderEngine::DrawImage(HDC hDC, HBITMAP hBitmap, const RECT& rc, const RE
 		else
 		{
 			// middle
-			if( !bHole ) {
+			if ( !bHole ) {
 				rcDest.left = rc.left + rcScale9.left;
 				rcDest.top = rc.top + rcScale9.top;
 				rcDest.right = rc.right - rc.left - rcScale9.left - rcScale9.right;
 				rcDest.bottom = rc.bottom - rc.top - rcScale9.top - rcScale9.bottom;
 				rcDest.right += rcDest.left;
 				rcDest.bottom += rcDest.top;
-				if( ::IntersectRect(&rcTemp, &rcPaint, &rcDest) ) {
-					if( !bTiledX && !bTiledY ) {
+				if ( ::IntersectRect(&rcTemp, &rcPaint, &rcDest) ) {
+					if ( !bTiledX && !bTiledY ) {
 						rcDest.right -= rcDest.left;
 						rcDest.bottom -= rcDest.top;
 						::StretchBlt(hDC, rcDest.left, rcDest.top, rcDest.right, rcDest.bottom, hCloneDC, \
@@ -784,7 +784,7 @@ void CRenderEngine::DrawImage(HDC hDC, HBITMAP hBitmap, const RECT& rc, const RE
 							rcBmpPart.right - rcBmpPart.left - rcScale9.left - rcScale9.right, \
 							rcBmpPart.bottom - rcBmpPart.top - rcScale9.top - rcScale9.bottom, SRCCOPY);
 					}
-					else if( bTiledX && bTiledY ) {
+					else if ( bTiledX && bTiledY ) {
 						LONG lWidth = rcBmpPart.right - rcBmpPart.left - rcScale9.left - rcScale9.right;
 						LONG lHeight = rcBmpPart.bottom - rcBmpPart.top - rcScale9.top - rcScale9.bottom;
 						int iTimesX = (rcDest.right - rcDest.left + lWidth - 1) / lWidth;
@@ -793,7 +793,7 @@ void CRenderEngine::DrawImage(HDC hDC, HBITMAP hBitmap, const RECT& rc, const RE
 							LONG lDestTop = rcDest.top + lHeight * j;
 							LONG lDestBottom = rcDest.top + lHeight * (j + 1);
 							LONG lDrawHeight = lHeight;
-							if( lDestBottom > rcDest.bottom ) {
+							if ( lDestBottom > rcDest.bottom ) {
 								lDrawHeight -= lDestBottom - rcDest.bottom;
 								lDestBottom = rcDest.bottom;
 							}
@@ -801,7 +801,7 @@ void CRenderEngine::DrawImage(HDC hDC, HBITMAP hBitmap, const RECT& rc, const RE
 								LONG lDestLeft = rcDest.left + lWidth * i;
 								LONG lDestRight = rcDest.left + lWidth * (i + 1);
 								LONG lDrawWidth = lWidth;
-								if( lDestRight > rcDest.right ) {
+								if ( lDestRight > rcDest.right ) {
 									lDrawWidth -= lDestRight - rcDest.right;
 									lDestRight = rcDest.right;
 								}
@@ -811,14 +811,14 @@ void CRenderEngine::DrawImage(HDC hDC, HBITMAP hBitmap, const RECT& rc, const RE
 							}
 						}
 					}
-					else if( bTiledX ) {
+					else if ( bTiledX ) {
 						LONG lWidth = rcBmpPart.right - rcBmpPart.left - rcScale9.left - rcScale9.right;
 						int iTimes = (rcDest.right - rcDest.left + lWidth - 1) / lWidth;
 						for( int i = 0; i < iTimes; ++i ) {
 							LONG lDestLeft = rcDest.left + lWidth * i;
 							LONG lDestRight = rcDest.left + lWidth * (i + 1);
 							LONG lDrawWidth = lWidth;
-							if( lDestRight > rcDest.right ) {
+							if ( lDestRight > rcDest.right ) {
 								lDrawWidth -= lDestRight - rcDest.right;
 								lDestRight = rcDest.right;
 							}
@@ -835,7 +835,7 @@ void CRenderEngine::DrawImage(HDC hDC, HBITMAP hBitmap, const RECT& rc, const RE
 							LONG lDestTop = rcDest.top + lHeight * i;
 							LONG lDestBottom = rcDest.top + lHeight * (i + 1);
 							LONG lDrawHeight = lHeight;
-							if( lDestBottom > rcDest.bottom ) {
+							if ( lDestBottom > rcDest.bottom ) {
 								lDrawHeight -= lDestBottom - rcDest.bottom;
 								lDestBottom = rcDest.bottom;
 							}
@@ -849,14 +849,14 @@ void CRenderEngine::DrawImage(HDC hDC, HBITMAP hBitmap, const RECT& rc, const RE
 			}
 
 			// left-top
-			if( rcScale9.left > 0 && rcScale9.top > 0 ) {
+			if ( rcScale9.left > 0 && rcScale9.top > 0 ) {
 				rcDest.left = rc.left;
 				rcDest.top = rc.top;
 				rcDest.right = rcScale9.left;
 				rcDest.bottom = rcScale9.top;
 				rcDest.right += rcDest.left;
 				rcDest.bottom += rcDest.top;
-				if( ::IntersectRect(&rcTemp, &rcPaint, &rcDest) ) {
+				if ( ::IntersectRect(&rcTemp, &rcPaint, &rcDest) ) {
 					rcDest.right -= rcDest.left;
 					rcDest.bottom -= rcDest.top;
 					::StretchBlt(hDC, rcDest.left, rcDest.top, rcDest.right, rcDest.bottom, hCloneDC, \
@@ -864,14 +864,14 @@ void CRenderEngine::DrawImage(HDC hDC, HBITMAP hBitmap, const RECT& rc, const RE
 				}
 			}
 			// top
-			if( rcScale9.top > 0 ) {
+			if ( rcScale9.top > 0 ) {
 				rcDest.left = rc.left + rcScale9.left;
 				rcDest.top = rc.top;
 				rcDest.right = rc.right - rc.left - rcScale9.left - rcScale9.right;
 				rcDest.bottom = rcScale9.top;
 				rcDest.right += rcDest.left;
 				rcDest.bottom += rcDest.top;
-				if( ::IntersectRect(&rcTemp, &rcPaint, &rcDest) ) {
+				if ( ::IntersectRect(&rcTemp, &rcPaint, &rcDest) ) {
 					rcDest.right -= rcDest.left;
 					rcDest.bottom -= rcDest.top;
 					::StretchBlt(hDC, rcDest.left, rcDest.top, rcDest.right, rcDest.bottom, hCloneDC, \
@@ -880,14 +880,14 @@ void CRenderEngine::DrawImage(HDC hDC, HBITMAP hBitmap, const RECT& rc, const RE
 				}
 			}
 			// right-top
-			if( rcScale9.right > 0 && rcScale9.top > 0 ) {
+			if ( rcScale9.right > 0 && rcScale9.top > 0 ) {
 				rcDest.left = rc.right - rcScale9.right;
 				rcDest.top = rc.top;
 				rcDest.right = rcScale9.right;
 				rcDest.bottom = rcScale9.top;
 				rcDest.right += rcDest.left;
 				rcDest.bottom += rcDest.top;
-				if( ::IntersectRect(&rcTemp, &rcPaint, &rcDest) ) {
+				if ( ::IntersectRect(&rcTemp, &rcPaint, &rcDest) ) {
 					rcDest.right -= rcDest.left;
 					rcDest.bottom -= rcDest.top;
 					::StretchBlt(hDC, rcDest.left, rcDest.top, rcDest.right, rcDest.bottom, hCloneDC, \
@@ -895,14 +895,14 @@ void CRenderEngine::DrawImage(HDC hDC, HBITMAP hBitmap, const RECT& rc, const RE
 				}
 			}
 			// left
-			if( rcScale9.left > 0 ) {
+			if ( rcScale9.left > 0 ) {
 				rcDest.left = rc.left;
 				rcDest.top = rc.top + rcScale9.top;
 				rcDest.right = rcScale9.left;
 				rcDest.bottom = rc.bottom - rc.top - rcScale9.top - rcScale9.bottom;
 				rcDest.right += rcDest.left;
 				rcDest.bottom += rcDest.top;
-				if( ::IntersectRect(&rcTemp, &rcPaint, &rcDest) ) {
+				if ( ::IntersectRect(&rcTemp, &rcPaint, &rcDest) ) {
 					rcDest.right -= rcDest.left;
 					rcDest.bottom -= rcDest.top;
 					::StretchBlt(hDC, rcDest.left, rcDest.top, rcDest.right, rcDest.bottom, hCloneDC, \
@@ -911,14 +911,14 @@ void CRenderEngine::DrawImage(HDC hDC, HBITMAP hBitmap, const RECT& rc, const RE
 				}
 			}
 			// right
-			if( rcScale9.right > 0 ) {
+			if ( rcScale9.right > 0 ) {
 				rcDest.left = rc.right - rcScale9.right;
 				rcDest.top = rc.top + rcScale9.top;
 				rcDest.right = rcScale9.right;
 				rcDest.bottom = rc.bottom - rc.top - rcScale9.top - rcScale9.bottom;
 				rcDest.right += rcDest.left;
 				rcDest.bottom += rcDest.top;
-				if( ::IntersectRect(&rcTemp, &rcPaint, &rcDest) ) {
+				if ( ::IntersectRect(&rcTemp, &rcPaint, &rcDest) ) {
 					rcDest.right -= rcDest.left;
 					rcDest.bottom -= rcDest.top;
 					::StretchBlt(hDC, rcDest.left, rcDest.top, rcDest.right, rcDest.bottom, hCloneDC, \
@@ -927,14 +927,14 @@ void CRenderEngine::DrawImage(HDC hDC, HBITMAP hBitmap, const RECT& rc, const RE
 				}
 			}
 			// left-bottom
-			if( rcScale9.left > 0 && rcScale9.bottom > 0 ) {
+			if ( rcScale9.left > 0 && rcScale9.bottom > 0 ) {
 				rcDest.left = rc.left;
 				rcDest.top = rc.bottom - rcScale9.bottom;
 				rcDest.right = rcScale9.left;
 				rcDest.bottom = rcScale9.bottom;
 				rcDest.right += rcDest.left;
 				rcDest.bottom += rcDest.top;
-				if( ::IntersectRect(&rcTemp, &rcPaint, &rcDest) ) {
+				if ( ::IntersectRect(&rcTemp, &rcPaint, &rcDest) ) {
 					rcDest.right -= rcDest.left;
 					rcDest.bottom -= rcDest.top;
 					::StretchBlt(hDC, rcDest.left, rcDest.top, rcDest.right, rcDest.bottom, hCloneDC, \
@@ -942,14 +942,14 @@ void CRenderEngine::DrawImage(HDC hDC, HBITMAP hBitmap, const RECT& rc, const RE
 				}
 			}
 			// bottom
-			if( rcScale9.bottom > 0 ) {
+			if ( rcScale9.bottom > 0 ) {
 				rcDest.left = rc.left + rcScale9.left;
 				rcDest.top = rc.bottom - rcScale9.bottom;
 				rcDest.right = rc.right - rc.left - rcScale9.left - rcScale9.right;
 				rcDest.bottom = rcScale9.bottom;
 				rcDest.right += rcDest.left;
 				rcDest.bottom += rcDest.top;
-				if( ::IntersectRect(&rcTemp, &rcPaint, &rcDest) ) {
+				if ( ::IntersectRect(&rcTemp, &rcPaint, &rcDest) ) {
 					rcDest.right -= rcDest.left;
 					rcDest.bottom -= rcDest.top;
 					::StretchBlt(hDC, rcDest.left, rcDest.top, rcDest.right, rcDest.bottom, hCloneDC, \
@@ -958,14 +958,14 @@ void CRenderEngine::DrawImage(HDC hDC, HBITMAP hBitmap, const RECT& rc, const RE
 				}
 			}
 			// right-bottom
-			if( rcScale9.right > 0 && rcScale9.bottom > 0 ) {
+			if ( rcScale9.right > 0 && rcScale9.bottom > 0 ) {
 				rcDest.left = rc.right - rcScale9.right;
 				rcDest.top = rc.bottom - rcScale9.bottom;
 				rcDest.right = rcScale9.right;
 				rcDest.bottom = rcScale9.bottom;
 				rcDest.right += rcDest.left;
 				rcDest.bottom += rcDest.top;
-				if( ::IntersectRect(&rcTemp, &rcPaint, &rcDest) ) {
+				if ( ::IntersectRect(&rcTemp, &rcPaint, &rcDest) ) {
 					rcDest.right -= rcDest.left;
 					rcDest.bottom -= rcDest.top;
 					::StretchBlt(hDC, rcDest.left, rcDest.top, rcDest.right, rcDest.bottom, hCloneDC, \
@@ -980,17 +980,17 @@ void CRenderEngine::DrawImage(HDC hDC, HBITMAP hBitmap, const RECT& rc, const RE
 	::DeleteDC(hCloneDC);
 }
 
-bool CRenderEngine::DrawImage(HDC hDC, CPaintManagerUI* pManager, const RECT& rcItem, const RECT& rcPaint, 
+BOOL CRenderEngine::DrawImage(HDC hDC, CPaintManagerUI* pManager, const RECT& rcItem, const RECT& rcPaint, 
 					  TDrawInfo& drawInfo)
 {
 	// 1、aaa.jpg
 	// 2、file='aaa.jpg' res='' restype='0' dest='0,0,0,0' source='0,0,0,0' scale9='0,0,0,0' 
 	// mask='#FF0000' fade='255' hole='false' xtiled='false' ytiled='false' hsl='false'
-	if( pManager == NULL ) return true;
-	if( drawInfo.pImageInfo == NULL ) {
-		if( drawInfo.bLoaded ) return false;
+	if ( pManager == NULL ) return TRUE;
+	if ( drawInfo.pImageInfo == NULL ) {
+		if ( drawInfo.bLoaded ) return FALSE;
 		drawInfo.bLoaded = true;
-		if( drawInfo.sDrawString.IsEmpty() ) return false;
+		if (drawInfo.sDrawString.IsEmpty()) return FALSE;
 
 		bool bUseRes = false;
 		CDuiString sImageName = drawInfo.sDrawString;
@@ -1013,25 +1013,25 @@ bool CRenderEngine::DrawImage(HDC hDC, CPaintManagerUI* pManager, const RECT& rc
 				}
 			}
 			while( *pstrImage > _T('\0') && *pstrImage <= _T(' ') ) pstrImage = ::CharNext(pstrImage);
-			if( *pstrImage++ != _T('=') ) break;
+			if ( *pstrImage++ != _T('=') ) break;
 			while( *pstrImage > _T('\0') && *pstrImage <= _T(' ') ) pstrImage = ::CharNext(pstrImage);
-			if( *pstrImage++ != _T('\'') ) break;
+			if ( *pstrImage++ != _T('\'') ) break;
 			while( *pstrImage != _T('\0') && *pstrImage != _T('\'') ) {
 				LPTSTR pstrTemp = ::CharNext(pstrImage);
 				while( pstrImage < pstrTemp) {
 					sValue += *pstrImage++;
 				}
 			}
-			if( *pstrImage++ != _T('\'') ) break;
-			if( !sValue.IsEmpty() ) {
-				if( sItem == _T("file") ) {
+			if ( *pstrImage++ != _T('\'') ) break;
+			if ( !sValue.IsEmpty() ) {
+				if ( sItem == _T("file") ) {
 					sImageName = sValue;
 				}
-				else if( sItem == _T("res") ) {
+				else if ( sItem == _T("res") ) {
 					bUseRes = true;
 					sImageName = sValue;
 				}
-				else if( sItem == _T("restype") ) {
+				else if ( sItem == _T("restype") ) {
 					sImageResType = sValue;
 				}
 				else if (sItem == _T("color")) {
@@ -1039,92 +1039,92 @@ bool CRenderEngine::DrawImage(HDC hDC, CPaintManagerUI* pManager, const RECT& rc
 					sImageResType = RES_TYPE_COLOR;
 					sImageName = sValue;
 				}
-				else if( sItem == _T("dest") ) {
+				else if ( sItem == _T("dest") ) {
 					drawInfo.rcDestOffset.left = _tcstol(sValue.GetData(), &pstr, 10);  ASSERT(pstr);    
 					drawInfo.rcDestOffset.top = _tcstol(pstr + 1, &pstr, 10);    ASSERT(pstr);
 					drawInfo.rcDestOffset.right = _tcstol(pstr + 1, &pstr, 10);  ASSERT(pstr);
 					drawInfo.rcDestOffset.bottom = _tcstol(pstr + 1, &pstr, 10); ASSERT(pstr);
 				}
-				else if( sItem == _T("source") ) {
+				else if ( sItem == _T("source") ) {
 					drawInfo.rcBmpPart.left = _tcstol(sValue.GetData(), &pstr, 10);  ASSERT(pstr);    
 					drawInfo.rcBmpPart.top = _tcstol(pstr + 1, &pstr, 10);    ASSERT(pstr);    
 					drawInfo.rcBmpPart.right = _tcstol(pstr + 1, &pstr, 10);  ASSERT(pstr);    
 					drawInfo.rcBmpPart.bottom = _tcstol(pstr + 1, &pstr, 10); ASSERT(pstr);  
 				}
-				else if( sItem == _T("corner") || sItem == _T("scale9")) {
+				else if ( sItem == _T("corner") || sItem == _T("scale9")) {
 					drawInfo.rcScale9.left = _tcstol(sValue.GetData(), &pstr, 10);  ASSERT(pstr);    
 					drawInfo.rcScale9.top = _tcstol(pstr + 1, &pstr, 10);    ASSERT(pstr);    
 					drawInfo.rcScale9.right = _tcstol(pstr + 1, &pstr, 10);  ASSERT(pstr);    
 					drawInfo.rcScale9.bottom = _tcstol(pstr + 1, &pstr, 10); ASSERT(pstr);
 				}
-				else if( sItem == _T("mask") ) {
-					if( sValue[0] == _T('#')) dwMask = _tcstoul(sValue.GetData() + 1, &pstr, 16);
+				else if ( sItem == _T("mask") ) {
+					if ( sValue[0] == _T('#')) dwMask = _tcstoul(sValue.GetData() + 1, &pstr, 16);
 					else dwMask = _tcstoul(sValue.GetData(), &pstr, 16);
 				}
-				else if( sItem == _T("fade") ) {
+				else if ( sItem == _T("fade") ) {
 					drawInfo.uFade = (BYTE)_tcstoul(sValue.GetData(), &pstr, 10);
 				}
-				else if( sItem == _T("hole") ) {
+				else if ( sItem == _T("hole") ) {
 					drawInfo.bHole = (_tcscmp(sValue.GetData(), _T("true")) == 0);
 				}
-				else if( sItem == _T("xtiled") ) {
+				else if ( sItem == _T("xtiled") ) {
 					drawInfo.bTiledX = (_tcscmp(sValue.GetData(), _T("true")) == 0);
 				}
-				else if( sItem == _T("ytiled") ) {
+				else if ( sItem == _T("ytiled") ) {
 					drawInfo.bTiledY = (_tcscmp(sValue.GetData(), _T("true")) == 0);
 				}
-				else if( sItem == _T("hsl") ) {
+				else if ( sItem == _T("hsl") ) {
 					bUseHSL = (_tcscmp(sValue.GetData(), _T("true")) == 0);
 				}
 			}
-			if( *pstrImage++ != _T(' ') ) break;
+			if ( *pstrImage++ != _T(' ') ) break;
 		}
 		drawInfo.sImageName = sImageName;
 
 		const TImageInfo* data = NULL;
-		if( bUseRes == false ) {
+		if ( bUseRes == false ) {
 			data = pManager->GetImageEx((LPCTSTR)sImageName, NULL, dwMask, bUseHSL);
 		}
 		else {
 			data = pManager->GetImageEx((LPCTSTR)sImageName, (LPCTSTR)sImageResType, dwMask, bUseHSL);
 		}
-		if( !data ) return false;
+		if (!data) return FALSE;
 
 		drawInfo.pImageInfo = data;
-		if( drawInfo.rcBmpPart.left == 0 && drawInfo.rcBmpPart.right == 0 && 
+		if ( drawInfo.rcBmpPart.left == 0 && drawInfo.rcBmpPart.right == 0 && 
 			drawInfo.rcBmpPart.top == 0 && drawInfo.rcBmpPart.bottom == 0 ) {
 				drawInfo.rcBmpPart.right = data->nX;
 				drawInfo.rcBmpPart.bottom = data->nY;
 		}
 	}
-	if( drawInfo.rcBmpPart.right > drawInfo.pImageInfo->nX ) drawInfo.rcBmpPart.right = drawInfo.pImageInfo->nX;
-	if( drawInfo.rcBmpPart.bottom > drawInfo.pImageInfo->nY ) drawInfo.rcBmpPart.bottom = drawInfo.pImageInfo->nY;
+	if ( drawInfo.rcBmpPart.right > drawInfo.pImageInfo->nX ) drawInfo.rcBmpPart.right = drawInfo.pImageInfo->nX;
+	if ( drawInfo.rcBmpPart.bottom > drawInfo.pImageInfo->nY ) drawInfo.rcBmpPart.bottom = drawInfo.pImageInfo->nY;
 
-	if( hDC == NULL ) return true;
+	if ( hDC == NULL ) return TRUE;
 
 	RECT rcDest = rcItem;
-	if( drawInfo.rcDestOffset.left != 0 || drawInfo.rcDestOffset.top != 0 ||
+	if ( drawInfo.rcDestOffset.left != 0 || drawInfo.rcDestOffset.top != 0 ||
 		drawInfo.rcDestOffset.right != 0 || drawInfo.rcDestOffset.bottom != 0 ) {
 			rcDest.left = rcItem.left + drawInfo.rcDestOffset.left;
 			rcDest.top = rcItem.top + drawInfo.rcDestOffset.top;
 			rcDest.right = rcItem.left + drawInfo.rcDestOffset.right;
-			if( rcDest.right > rcItem.right ) rcDest.right = rcItem.right;
+			if ( rcDest.right > rcItem.right ) rcDest.right = rcItem.right;
 			rcDest.bottom = rcItem.top + drawInfo.rcDestOffset.bottom;
-			if( rcDest.bottom > rcItem.bottom ) rcDest.bottom = rcItem.bottom;
+			if ( rcDest.bottom > rcItem.bottom ) rcDest.bottom = rcItem.bottom;
 	}
 
 	RECT rcTemp;
-	if( !::IntersectRect(&rcTemp, &rcDest, &rcItem) ) return true;
-	if( !::IntersectRect(&rcTemp, &rcDest, &rcPaint) ) return true;
+	if ( !::IntersectRect(&rcTemp, &rcDest, &rcItem) ) return TRUE;
+	if ( !::IntersectRect(&rcTemp, &rcDest, &rcPaint) ) return TRUE;
 	DrawImage(hDC, drawInfo.pImageInfo->hBitmap, rcDest, rcPaint, drawInfo.rcBmpPart, drawInfo.rcScale9,
 		drawInfo.pImageInfo->bAlpha, drawInfo.uFade, drawInfo.bHole, drawInfo.bTiledX, drawInfo.bTiledY);
-	return true;
+	return TRUE;
 }
 
 void CRenderEngine::DrawColor(HDC hDC, const RECT& rc, DWORD color)
 {
-    if( color <= 0x00FFFFFF ) return;
-    if( color >= 0xFF000000 )
+    if ( color <= 0x00FFFFFF ) return;
+    if ( color >= 0xFF000000 )
     {
         ::SetBkColor(hDC, RGB(GetBValue(color), GetGValue(color), GetRValue(color)));
         ::ExtTextOut(hDC, 0, 0, ETO_OPAQUE, &rc, NULL, 0, NULL);
@@ -1142,7 +1142,7 @@ void CRenderEngine::DrawColor(HDC hDC, const RECT& rc, DWORD color)
         bmi.bmiHeader.biSizeImage = 1 * 1 * sizeof(DWORD);
         LPDWORD pDest = NULL;
         HBITMAP hBitmap = ::CreateDIBSection(hDC, &bmi, DIB_RGB_COLORS, (LPVOID*) &pDest, NULL, 0);
-        if( !hBitmap ) return;
+        if ( !hBitmap ) return;
 
         *pDest = color;
 
@@ -1153,23 +1153,23 @@ void CRenderEngine::DrawColor(HDC hDC, const RECT& rc, DWORD color)
     }
 }
 
-void CRenderEngine::DrawGradient(HDC hDC, const RECT& rc, DWORD dwFirst, DWORD dwSecond, bool bVertical, int nSteps)
+void CRenderEngine::DrawGradient(HDC hDC, const RECT& rc, DWORD dwFirst, DWORD dwSecond, BOOL bVertical, int nSteps)
 {
     typedef BOOL (WINAPI *LPALPHABLEND)(HDC, int, int, int, int,HDC, int, int, int, int, BLENDFUNCTION);
     static LPALPHABLEND lpAlphaBlend = (LPALPHABLEND) ::GetProcAddress(::GetModuleHandle(_T("msimg32.dll")), "AlphaBlend");
-    if( lpAlphaBlend == NULL ) lpAlphaBlend = AlphaBitBlt;
+    if ( lpAlphaBlend == NULL ) lpAlphaBlend = AlphaBitBlt;
     typedef BOOL (WINAPI *PGradientFill)(HDC, PTRIVERTEX, ULONG, PVOID, ULONG, ULONG);
     static PGradientFill lpGradientFill = (PGradientFill) ::GetProcAddress(::GetModuleHandle(_T("msimg32.dll")), "GradientFill");
 
     BYTE bAlpha = (BYTE)(((dwFirst >> 24) + (dwSecond >> 24)) >> 1);
-    if( bAlpha == 0 ) return;
+    if ( bAlpha == 0 ) return;
     int cx = rc.right - rc.left;
     int cy = rc.bottom - rc.top;
     RECT rcPaint = rc;
     HDC hPaintDC = hDC;
     HBITMAP hPaintBitmap = NULL;
     HBITMAP hOldPaintBitmap = NULL;
-    if( bAlpha < 255 ) {
+    if ( bAlpha < 255 ) {
         rcPaint.left = rcPaint.top = 0;
         rcPaint.right = cx;
         rcPaint.bottom = cy;
@@ -1179,7 +1179,7 @@ void CRenderEngine::DrawGradient(HDC hDC, const RECT& rc, DWORD dwFirst, DWORD d
         ASSERT(hPaintBitmap);
         hOldPaintBitmap = (HBITMAP) ::SelectObject(hPaintDC, hPaintBitmap);
     }
-    if( lpGradientFill != NULL ) 
+    if ( lpGradientFill != NULL ) 
     {
         TRIVERTEX triv[2] = 
         {
@@ -1193,11 +1193,11 @@ void CRenderEngine::DrawGradient(HDC hDC, const RECT& rc, DWORD dwFirst, DWORD d
     {
         // Determine how many shades
         int nShift = 1;
-        if( nSteps >= 64 ) nShift = 6;
-        else if( nSteps >= 32 ) nShift = 5;
-        else if( nSteps >= 16 ) nShift = 4;
-        else if( nSteps >= 8 ) nShift = 3;
-        else if( nSteps >= 4 ) nShift = 2;
+        if ( nSteps >= 64 ) nShift = 6;
+        else if ( nSteps >= 32 ) nShift = 5;
+        else if ( nSteps >= 16 ) nShift = 4;
+        else if ( nSteps >= 8 ) nShift = 3;
+        else if ( nSteps >= 4 ) nShift = 2;
         int nLines = 1 << nShift;
         for( int i = 0; i < nLines; i++ ) {
             // Do a little alpha blending
@@ -1207,20 +1207,20 @@ void CRenderEngine::DrawGradient(HDC hDC, const RECT& rc, DWORD dwFirst, DWORD d
             // ... then paint with the resulting color
             HBRUSH hBrush = ::CreateSolidBrush(RGB(bR,bG,bB));
             RECT r2 = rcPaint;
-            if( bVertical ) {
+            if ( bVertical ) {
                 r2.bottom = rc.bottom - ((i * (rc.bottom - rc.top)) >> nShift);
                 r2.top = rc.bottom - (((i + 1) * (rc.bottom - rc.top)) >> nShift);
-                if( (r2.bottom - r2.top) > 0 ) ::FillRect(hDC, &r2, hBrush);
+                if ( (r2.bottom - r2.top) > 0 ) ::FillRect(hDC, &r2, hBrush);
             }
             else {
                 r2.left = rc.right - (((i + 1) * (rc.right - rc.left)) >> nShift);
                 r2.right = rc.right - ((i * (rc.right - rc.left)) >> nShift);
-                if( (r2.right - r2.left) > 0 ) ::FillRect(hPaintDC, &r2, hBrush);
+                if ( (r2.right - r2.left) > 0 ) ::FillRect(hPaintDC, &r2, hBrush);
             }
             ::DeleteObject(hBrush);
         }
     }
-    if( bAlpha < 255 ) {
+    if ( bAlpha < 255 ) {
         BLENDFUNCTION bf = { AC_SRC_OVER, 0, bAlpha, AC_SRC_ALPHA };
         lpAlphaBlend(hDC, rc.left, rc.top, cx, cy, hPaintDC, 0, 0, cx, cy, bf);
         ::SelectObject(hPaintDC, hOldPaintBitmap);
@@ -1271,7 +1271,7 @@ void CRenderEngine::DrawRoundRect(HDC hDC, const RECT& rc, int nSize, int width,
 void CRenderEngine::DrawText(HDC hDC, CPaintManagerUI* pManager, RECT& rc, LPCTSTR pstrText, DWORD dwTextColor, int iFont, UINT uStyle)
 {
     ASSERT(::GetObjectType(hDC)==OBJ_DC || ::GetObjectType(hDC)==OBJ_MEMDC);
-    if( pstrText == NULL || pManager == NULL ) return;
+    if ( pstrText == NULL || pManager == NULL ) return;
 
 	CDuiString sText = pstrText;
 	CPaintManagerUI::ProcessMultiLanguageTokens(sText);
@@ -1284,7 +1284,7 @@ void CRenderEngine::DrawText(HDC hDC, CPaintManagerUI* pManager, RECT& rc, LPCTS
     ::SelectObject(hDC, hOldFont);
 }
 
-void CRenderEngine::DrawHtmlText(HDC hDC, CPaintManagerUI* pManager, RECT& rc, LPCTSTR pstrText, DWORD dwTextColor, RECT* prcLinks, CDuiString* sLinks, int& nLinkRects, int iDefaultFont, UINT uStyle)
+void CRenderEngine::DrawHtmlText(HDC hDC, CPaintManagerUI* pManager, RECT& rc, LPCTSTR pstrText, DWORD dwTextColor, RECT* prcLinks, CDuiString* sLinks, LONG& nLinkRects, int iDefaultFont, UINT uStyle)
 {
     // 考虑到在xml编辑器中使用<>符号不方便，可以使用{}符号代替
     // 支持标签嵌套（如<l><b>text</b></l>），但是交叉嵌套是应该避免的（如<l><b>text</l></b>）
@@ -1306,8 +1306,8 @@ void CRenderEngine::DrawHtmlText(HDC hDC, CPaintManagerUI* pManager, RECT& rc, L
 	//   Vertical align    <v x>				where x = top or x = center or x = bottom
 
     ASSERT(::GetObjectType(hDC)==OBJ_DC || ::GetObjectType(hDC)==OBJ_MEMDC);
-    if( pstrText == NULL || pManager == NULL ) return;
-    if( ::IsRectEmpty(&rc) ) return;
+    if ( pstrText == NULL || pManager == NULL ) return;
+    if ( ::IsRectEmpty(&rc) ) return;
 
     bool bDraw = (uStyle & DT_CALCRECT) == 0;
 
@@ -1320,7 +1320,7 @@ void CRenderEngine::DrawHtmlText(HDC hDC, CPaintManagerUI* pManager, RECT& rc, L
     ::GetClipBox(hDC, &rcClip);
     HRGN hOldRgn = ::CreateRectRgnIndirect(&rcClip);
     HRGN hRgn = ::CreateRectRgnIndirect(&rc);
-    if( bDraw ) ::ExtSelectClipRgn(hDC, hRgn, RGN_AND);
+    if ( bDraw ) ::ExtSelectClipRgn(hDC, hRgn, RGN_AND);
 
 	CDuiString sText = pstrText;
 	CPaintManagerUI::ProcessMultiLanguageTokens(sText);
@@ -1335,28 +1335,28 @@ void CRenderEngine::DrawHtmlText(HDC hDC, CPaintManagerUI* pManager, RECT& rc, L
 
     // If the drawstyle include a alignment, we'll need to first determine the text-size so
     // we can draw it at the correct position...
-	if( ((uStyle & DT_CENTER) != 0 || (uStyle & DT_RIGHT) != 0 || (uStyle & DT_VCENTER) != 0 || (uStyle & DT_BOTTOM) != 0) && (uStyle & DT_CALCRECT) == 0 ) {
+	if ( ((uStyle & DT_CENTER) != 0 || (uStyle & DT_RIGHT) != 0 || (uStyle & DT_VCENTER) != 0 || (uStyle & DT_BOTTOM) != 0) && (uStyle & DT_CALCRECT) == 0 ) {
 		RECT rcText = { 0, 0, 9999, 100 };
 		if ((uStyle & DT_SINGLELINE) == 0) {
 			rcText.right = rc.right - rc.left;
 			rcText.bottom = rc.bottom - rc.top;
 		}
-		int nLinks = 0;
+		LONG nLinks = 0;
 		DrawHtmlText(hDC, pManager, rcText, pstrText, dwTextColor, NULL, NULL, nLinks, iDefaultFont, uStyle | DT_CALCRECT & ~DT_CENTER & ~DT_RIGHT & ~DT_VCENTER & ~DT_BOTTOM);
-		if( (uStyle & DT_SINGLELINE) != 0 ){
-			if( (uStyle & DT_CENTER) != 0 ) {
+		if ( (uStyle & DT_SINGLELINE) != 0 ){
+			if ( (uStyle & DT_CENTER) != 0 ) {
 				rc.left = rc.left + ((rc.right - rc.left) / 2) - ((rcText.right - rcText.left) / 2);
 				rc.right = rc.left + (rcText.right - rcText.left);
 			}
-			if( (uStyle & DT_RIGHT) != 0 ) {
+			if ( (uStyle & DT_RIGHT) != 0 ) {
 				rc.left = rc.right - (rcText.right - rcText.left);
 			}
 		}
-		if( (uStyle & DT_VCENTER) != 0 ) {
+		if ( (uStyle & DT_VCENTER) != 0 ) {
 			rc.top = rc.top + ((rc.bottom - rc.top) / 2) - ((rcText.bottom - rcText.top) / 2);
 			rc.bottom = rc.top + (rcText.bottom - rcText.top);
 		}
-		if( (uStyle & DT_BOTTOM) != 0 ) {
+		if ( (uStyle & DT_BOTTOM) != 0 ) {
 			rc.top = rc.bottom - (rcText.bottom - rcText.top);
 		}
 	}
@@ -1365,7 +1365,7 @@ void CRenderEngine::DrawHtmlText(HDC hDC, CPaintManagerUI* pManager, RECT& rc, L
     CDuiString sHoverLink;
     POINT ptMouse = pManager->GetMousePos();
     for( int i = 0; !bHoverLink && i < nLinkRects; i++ ) {
-        if( ::PtInRect(prcLinks + i, ptMouse) ) {
+        if ( ::PtInRect(prcLinks + i, ptMouse) ) {
             sHoverLink = *(CDuiString*)(sLinks + i);
             bHoverLink = true;
         }
@@ -1399,11 +1399,11 @@ void CRenderEngine::DrawHtmlText(HDC hDC, CPaintManagerUI* pManager, RECT& rc, L
 	int cxOffset = 0;
     bool bLineDraw = false; // 行的第二阶段：绘制
     while( *pstrText != _T('\0') ) {
-        if( pt.x >= rc.right || *pstrText == _T('\n') || bLineEnd ) {
-            if( *pstrText == _T('\n') ) pstrText++;
-            if( bLineEnd ) bLineEnd = false;
-            if( !bLineDraw ) {
-                if( bInLink && iLinkIndex < nLinkRects ) {
+        if ( pt.x >= rc.right || *pstrText == _T('\n') || bLineEnd ) {
+            if ( *pstrText == _T('\n') ) pstrText++;
+            if ( bLineEnd ) bLineEnd = false;
+            if ( !bLineDraw ) {
+                if ( bInLink && iLinkIndex < nLinkRects ) {
                     ::SetRect(&prcLinks[iLinkIndex++], ptLinkStart.x, ptLinkStart.y, MIN(pt.x, rc.right), pt.y + cyLine);
                     CDuiString *pStr1 = (CDuiString*)(sLinks + iLinkIndex - 1);
                     CDuiString *pStr2 = (CDuiString*)(sLinks + iLinkIndex);
@@ -1412,40 +1412,40 @@ void CRenderEngine::DrawHtmlText(HDC hDC, CPaintManagerUI* pManager, RECT& rc, L
                 for( int i = iLineLinkIndex; i < iLinkIndex; i++ ) {
                     prcLinks[i].bottom = pt.y + cyLine;
                 }
-                if( bDraw ) {
+                if ( bDraw ) {
                     bInLink = bLineInLink;
                     iLinkIndex = iLineLinkIndex;
                 }
             }
             else {
-                if( bInLink && iLinkIndex < nLinkRects ) iLinkIndex++;
+                if ( bInLink && iLinkIndex < nLinkRects ) iLinkIndex++;
                 bLineInLink = bInLink;
                 iLineLinkIndex = iLinkIndex;
             }
-            if( (uStyle & DT_SINGLELINE) != 0 && (!bDraw || bLineDraw) ) 
+            if ( (uStyle & DT_SINGLELINE) != 0 && (!bDraw || bLineDraw) ) 
 				break;
-            if( bDraw ) bLineDraw = !bLineDraw; // !
+            if ( bDraw ) bLineDraw = !bLineDraw; // !
             pt.x = rc.left;
 			cxOffset = 0;
 			if (bLineDraw) {
-				if( (uStyle & DT_SINGLELINE) == 0 && (uStyle & DT_CENTER) != 0 ) {
+				if ( (uStyle & DT_SINGLELINE) == 0 && (uStyle & DT_CENTER) != 0 ) {
 					cxOffset = (rc.right - rc.left - cxLineWidth)/2;
 				}
-				else if( (uStyle & DT_SINGLELINE) == 0 && (uStyle & DT_RIGHT) != 0) {
+				else if ( (uStyle & DT_SINGLELINE) == 0 && (uStyle & DT_RIGHT) != 0) {
 					cxOffset = rc.right - rc.left - cxLineWidth;
 				}
 			}
             else {
 				pt.y += cyLine;
 			}
-            if( pt.y > rc.bottom && bDraw ) 
+            if ( pt.y > rc.bottom && bDraw ) 
 				break;
             ptLinkStart = pt;
             cyLine = pTm->tmHeight + pTm->tmExternalLeading + (int)aPIndentArray.GetAt(aPIndentArray.GetSize() - 1);
-            if( pt.x >= rc.right )
+            if ( pt.x >= rc.right )
 				break;
         }
-        else if( !bInRaw && ( *pstrText == _T('<') || *pstrText == _T('{') )
+        else if ( !bInRaw && ( *pstrText == _T('<') || *pstrText == _T('{') )
             && ( pstrText[1] >= _T('a') && pstrText[1] <= _T('z') )
             && ( pstrText[2] == _T(' ') || pstrText[2] == _T('>') || pstrText[2] == _T('}') ) ) {
                 pstrText++;
@@ -1455,7 +1455,7 @@ void CRenderEngine::DrawHtmlText(HDC hDC, CPaintManagerUI* pManager, RECT& rc, L
                 {
                     pstrText++;
                     while( *pstrText > _T('\0') && *pstrText <= _T(' ') ) pstrText = ::CharNext(pstrText);
-                    if( iLinkIndex < nLinkRects && !bLineDraw ) {
+                    if ( iLinkIndex < nLinkRects && !bLineDraw ) {
                         CDuiString *pStr = (CDuiString*)(sLinks + iLinkIndex);
                         pStr->Empty();
                         while( *pstrText != _T('\0') && *pstrText != _T('>') && *pstrText != _T('}') ) {
@@ -1467,21 +1467,21 @@ void CRenderEngine::DrawHtmlText(HDC hDC, CPaintManagerUI* pManager, RECT& rc, L
                     }
 
                     DWORD clrColor = pManager->GetDefaultLinkFontColor();
-                    if( bHoverLink && iLinkIndex < nLinkRects ) {
+                    if ( bHoverLink && iLinkIndex < nLinkRects ) {
                         CDuiString *pStr = (CDuiString*)(sLinks + iLinkIndex);
-                        if( sHoverLink == *pStr ) clrColor = pManager->GetDefaultLinkHoverFontColor();
+                        if ( sHoverLink == *pStr ) clrColor = pManager->GetDefaultLinkHoverFontColor();
                     }
-                    //else if( prcLinks == NULL ) {
-                    //    if( ::PtInRect(&rc, ptMouse) )
+                    //else if ( prcLinks == NULL ) {
+                    //    if ( ::PtInRect(&rc, ptMouse) )
                     //        clrColor = pManager->GetDefaultLinkHoverFontColor();
                     //}
                     aColorArray.Add((LPVOID)clrColor);
                     ::SetTextColor(hDC,  RGB(GetBValue(clrColor), GetGValue(clrColor), GetRValue(clrColor)));
                     TFontInfo* pFontInfo = pManager->GetFontInfo(iDefaultFont);
-                    if( aFontArray.GetSize() > 0 ) pFontInfo = (TFontInfo*)aFontArray.GetAt(aFontArray.GetSize() - 1);
-                    if( pFontInfo->bUnderline == false ) {
+                    if ( aFontArray.GetSize() > 0 ) pFontInfo = (TFontInfo*)aFontArray.GetAt(aFontArray.GetSize() - 1);
+                    if ( pFontInfo->bUnderline == false ) {
                         HFONT hFont = pManager->GetFont(pFontInfo->sFontName, pFontInfo->iSize, pFontInfo->bBold, true, pFontInfo->bItalic);
-						if( hFont == NULL ) {
+						if ( hFont == NULL ) {
 							hFont = pManager->AddFont(g_iFontID, pFontInfo->sFontName, pFontInfo->iSize, pFontInfo->bBold, true, pFontInfo->bItalic);
 							g_iFontID += 1;
 						}
@@ -1499,10 +1499,10 @@ void CRenderEngine::DrawHtmlText(HDC hDC, CPaintManagerUI* pManager, RECT& rc, L
                 {
                     pstrText++;
                     TFontInfo* pFontInfo = pManager->GetFontInfo(iDefaultFont);
-                    if( aFontArray.GetSize() > 0 ) pFontInfo = (TFontInfo*)aFontArray.GetAt(aFontArray.GetSize() - 1);
-                    if( pFontInfo->bBold == false ) {
+                    if ( aFontArray.GetSize() > 0 ) pFontInfo = (TFontInfo*)aFontArray.GetAt(aFontArray.GetSize() - 1);
+                    if ( pFontInfo->bBold == false ) {
                         HFONT hFont = pManager->GetFont(pFontInfo->sFontName, pFontInfo->iSize, true, pFontInfo->bUnderline, pFontInfo->bItalic);
-						if( hFont == NULL ) {
+						if ( hFont == NULL ) {
 							hFont = pManager->AddFont(g_iFontID, pFontInfo->sFontName, pFontInfo->iSize, true, pFontInfo->bUnderline, pFontInfo->bItalic);
 							g_iFontID += 1;
 						}
@@ -1518,7 +1518,7 @@ void CRenderEngine::DrawHtmlText(HDC hDC, CPaintManagerUI* pManager, RECT& rc, L
                 {
                     pstrText++;
                     while( *pstrText > _T('\0') && *pstrText <= _T(' ') ) pstrText = ::CharNext(pstrText);
-                    if( *pstrText == _T('#')) pstrText++;
+                    if ( *pstrText == _T('#')) pstrText++;
                     DWORD clrColor = _tcstol(pstrText, const_cast<LPTSTR*>(&pstrText), 16);
                     aColorArray.Add((LPVOID)clrColor);
                     ::SetTextColor(hDC, RGB(GetBValue(clrColor), GetGValue(clrColor), GetRValue(clrColor)));
@@ -1530,8 +1530,8 @@ void CRenderEngine::DrawHtmlText(HDC hDC, CPaintManagerUI* pManager, RECT& rc, L
                     while( *pstrText > _T('\0') && *pstrText <= _T(' ') ) pstrText = ::CharNext(pstrText);
                     LPCTSTR pstrTemp = pstrText;
                     int iFont = (int) _tcstol(pstrText, const_cast<LPTSTR*>(&pstrText), 10);
-                    //if( isdigit(*pstrText) ) { // debug版本会引起异常
-                    if( pstrTemp != pstrText ) {
+                    //if ( isdigit(*pstrText) ) { // debug版本会引起异常
+                    if ( pstrTemp != pstrText ) {
                         TFontInfo* pFontInfo = pManager->GetFontInfo(iFont);
                         aFontArray.Add(pFontInfo);
                         pTm = &pFontInfo->tm;
@@ -1551,7 +1551,7 @@ void CRenderEngine::DrawHtmlText(HDC hDC, CPaintManagerUI* pManager, RECT& rc, L
                             }
                         }
                         while( *pstrText > _T('\0') && *pstrText <= _T(' ') ) pstrText = ::CharNext(pstrText);
-                        if( isdigit(*pstrText) ) {
+                        if ( isdigit(*pstrText) ) {
                             iFontSize = (int) _tcstol(pstrText, const_cast<LPTSTR*>(&pstrText), 10);
                         }
                         while( *pstrText > _T('\0') && *pstrText <= _T(' ') ) pstrText = ::CharNext(pstrText);
@@ -1562,11 +1562,11 @@ void CRenderEngine::DrawHtmlText(HDC hDC, CPaintManagerUI* pManager, RECT& rc, L
                             }
                         }
                         sFontAttr.MakeLower();
-                        if( sFontAttr.Find(_T("bold")) >= 0 ) bBold = true;
-                        if( sFontAttr.Find(_T("underline")) >= 0 ) bUnderline = true;
-                        if( sFontAttr.Find(_T("italic")) >= 0 ) bItalic = true;
+                        if ( sFontAttr.Find(_T("bold")) >= 0 ) bBold = true;
+                        if ( sFontAttr.Find(_T("underline")) >= 0 ) bUnderline = true;
+                        if ( sFontAttr.Find(_T("italic")) >= 0 ) bItalic = true;
                         HFONT hFont = pManager->GetFont(sFontName, iFontSize, bBold, bUnderline, bItalic);
-						if( hFont == NULL ) {
+						if ( hFont == NULL ) {
 							hFont = pManager->AddFont(g_iFontID, sFontName, iFontSize, bBold, bUnderline, bItalic);
 							g_iFontID += 1;
 						}
@@ -1594,13 +1594,13 @@ void CRenderEngine::DrawHtmlText(HDC hDC, CPaintManagerUI* pManager, RECT& rc, L
                             sName += *pstrText++;
                         }
                     }
-                    if( sName.IsEmpty() ) { // Italic
+                    if ( sName.IsEmpty() ) { // Italic
                         pstrNextStart = NULL;
                         TFontInfo* pFontInfo = pManager->GetFontInfo(iDefaultFont);
-                        if( aFontArray.GetSize() > 0 ) pFontInfo = (TFontInfo*)aFontArray.GetAt(aFontArray.GetSize() - 1);
-                        if( pFontInfo->bItalic == false ) {
+                        if ( aFontArray.GetSize() > 0 ) pFontInfo = (TFontInfo*)aFontArray.GetAt(aFontArray.GetSize() - 1);
+                        if ( pFontInfo->bItalic == false ) {
                             HFONT hFont = pManager->GetFont(pFontInfo->sFontName, pFontInfo->iSize, pFontInfo->bBold, pFontInfo->bUnderline, true);
-							if( hFont == NULL ) {
+							if ( hFont == NULL ) {
 								hFont = pManager->AddFont(g_iFontID, pFontInfo->sFontName, pFontInfo->iSize, pFontInfo->bBold, pFontInfo->bUnderline, true);
 								g_iFontID += 1;
 							}
@@ -1614,12 +1614,12 @@ void CRenderEngine::DrawHtmlText(HDC hDC, CPaintManagerUI* pManager, RECT& rc, L
                     else {
                         while( *pstrText > _T('\0') && *pstrText <= _T(' ') ) pstrText = ::CharNext(pstrText);
                         int iImageListNum = (int) _tcstol(pstrText, const_cast<LPTSTR*>(&pstrText), 10);
-						if( iImageListNum <= 0 ) iImageListNum = 1;
+						if ( iImageListNum <= 0 ) iImageListNum = 1;
 						while( *pstrText > _T('\0') && *pstrText <= _T(' ') ) pstrText = ::CharNext(pstrText);
 						int iImageListIndex = (int) _tcstol(pstrText, const_cast<LPTSTR*>(&pstrText), 10);
-						if( iImageListIndex < 0 || iImageListIndex >= iImageListNum ) iImageListIndex = 0;
+						if ( iImageListIndex < 0 || iImageListIndex >= iImageListNum ) iImageListIndex = 0;
 
-						if( _tcsstr(sImageString.GetData(), _T("file=\'")) != NULL || _tcsstr(sImageString.GetData(), _T("res=\'")) != NULL ) {
+						if ( _tcsstr(sImageString.GetData(), _T("file=\'")) != NULL || _tcsstr(sImageString.GetData(), _T("res=\'")) != NULL ) {
 							CDuiString sImageResType;
 							CDuiString sImageName;
 							LPCTSTR pStrImage = sImageString.GetData();
@@ -1636,25 +1636,25 @@ void CRenderEngine::DrawHtmlText(HDC hDC, CPaintManagerUI* pManager, RECT& rc, L
 									}
 								}
 								while( *pStrImage > _T('\0') && *pStrImage <= _T(' ') ) pStrImage = ::CharNext(pStrImage);
-								if( *pStrImage++ != _T('=') ) break;
+								if ( *pStrImage++ != _T('=') ) break;
 								while( *pStrImage > _T('\0') && *pStrImage <= _T(' ') ) pStrImage = ::CharNext(pStrImage);
-								if( *pStrImage++ != _T('\'') ) break;
+								if ( *pStrImage++ != _T('\'') ) break;
 								while( *pStrImage != _T('\0') && *pStrImage != _T('\'') ) {
 									LPTSTR pstrTemp = ::CharNext(pStrImage);
 									while( pStrImage < pstrTemp) {
 										sValue += *pStrImage++;
 									}
 								}
-								if( *pStrImage++ != _T('\'') ) break;
-								if( !sValue.IsEmpty() ) {
-									if( sItem == _T("file") || sItem == _T("res") ) {
+								if ( *pStrImage++ != _T('\'') ) break;
+								if ( !sValue.IsEmpty() ) {
+									if ( sItem == _T("file") || sItem == _T("res") ) {
 										sImageName = sValue;
 									}
-									else if( sItem == _T("restype") ) {
+									else if ( sItem == _T("restype") ) {
 										sImageResType = sValue;
 									}
 								}
-								if( *pStrImage++ != _T(' ') ) break;
+								if ( *pStrImage++ != _T(' ') ) break;
 							}
 
 							pImageInfo = pManager->GetImageEx((LPCTSTR)sImageName, sImageResType);
@@ -1662,29 +1662,29 @@ void CRenderEngine::DrawHtmlText(HDC hDC, CPaintManagerUI* pManager, RECT& rc, L
 						else
 							pImageInfo = pManager->GetImageEx((LPCTSTR)sName);
 
-						if( pImageInfo ) {
+						if ( pImageInfo ) {
 							iWidth = pImageInfo->nX;
 							iHeight = pImageInfo->nY;
-							if( iImageListNum > 1 ) iWidth /= iImageListNum;
+							if ( iImageListNum > 1 ) iWidth /= iImageListNum;
 
-                            if( pt.x + iWidth > rc.right && pt.x > rc.left && (uStyle & DT_SINGLELINE) == 0 ) {
+                            if ( pt.x + iWidth > rc.right && pt.x > rc.left && (uStyle & DT_SINGLELINE) == 0 ) {
                                 bLineEnd = true;
 								cxLine = pt.x - rc.left;
                             }
                             else {
                                 pstrNextStart = NULL;
-                                if( bDraw && bLineDraw ) {
+                                if ( bDraw && bLineDraw ) {
                                     CDuiRect rcImage(pt.x + cxOffset, pt.y + cyLineHeight - iHeight, pt.x + + cxOffset + iWidth, pt.y + cyLineHeight);
 									iVAlign = DT_BOTTOM;
 									if (aVAlignArray.GetSize() > 0) iVAlign = (UINT)aVAlignArray.GetAt(aVAlignArray.GetSize() - 1); 
 									if (iVAlign == DT_VCENTER) {
-										if( iHeight < cyLineHeight ) { 
+										if ( iHeight < cyLineHeight ) { 
 											rcImage.bottom -= (cyLineHeight - iHeight) / 2;
 											rcImage.top = rcImage.bottom -  iHeight;
 										}
 									}
 									else if (iVAlign == DT_TOP) {
-										if( iHeight < cyLineHeight ) { 
+										if ( iHeight < cyLineHeight ) { 
 											rcImage.bottom = pt.y + iHeight;
 											rcImage.top = pt.y;
 										}
@@ -1712,14 +1712,14 @@ void CRenderEngine::DrawHtmlText(HDC hDC, CPaintManagerUI* pManager, RECT& rc, L
             case _T('n'):  // Newline
                 {
                     pstrText++;
-                    if( (uStyle & DT_SINGLELINE) != 0 ) break;
+                    if ( (uStyle & DT_SINGLELINE) != 0 ) break;
                     bLineEnd = true;
                 }
                 break;
             case _T('p'):  // Paragraph
                 {
                     pstrText++;
-                    if( pt.x > rc.left ) bLineEnd = true;
+                    if ( pt.x > rc.left ) bLineEnd = true;
                     while( *pstrText > _T('\0') && *pstrText <= _T(' ') ) pstrText = ::CharNext(pstrText);
                     int cyLineExtra = (int)_tcstol(pstrText, const_cast<LPTSTR*>(&pstrText), 10);
                     aPIndentArray.Add((LPVOID)cyLineExtra);
@@ -1754,8 +1754,8 @@ void CRenderEngine::DrawHtmlText(HDC hDC, CPaintManagerUI* pManager, RECT& rc, L
                 {
                     pstrText++;
                     bInSelected = !bInSelected;
-                    if( bDraw && bLineDraw ) {
-                        if( bInSelected ) ::SetBkMode(hDC, OPAQUE);
+                    if ( bDraw && bLineDraw ) {
+                        if ( bInSelected ) ::SetBkMode(hDC, OPAQUE);
                         else ::SetBkMode(hDC, TRANSPARENT);
                     }
                 }
@@ -1764,10 +1764,10 @@ void CRenderEngine::DrawHtmlText(HDC hDC, CPaintManagerUI* pManager, RECT& rc, L
                 {
                     pstrText++;
                     TFontInfo* pFontInfo = pManager->GetFontInfo(iDefaultFont);
-                    if( aFontArray.GetSize() > 0 ) pFontInfo = (TFontInfo*)aFontArray.GetAt(aFontArray.GetSize() - 1);
-                    if( pFontInfo->bUnderline == false ) {
+                    if ( aFontArray.GetSize() > 0 ) pFontInfo = (TFontInfo*)aFontArray.GetAt(aFontArray.GetSize() - 1);
+                    if ( pFontInfo->bUnderline == false ) {
                         HFONT hFont = pManager->GetFont(pFontInfo->sFontName, pFontInfo->iSize, pFontInfo->bBold, true, pFontInfo->bItalic);
-						if( hFont == NULL ) {
+						if ( hFont == NULL ) {
 							hFont = pManager->AddFont(g_iFontID, pFontInfo->sFontName, pFontInfo->iSize, pFontInfo->bBold, true, pFontInfo->bItalic);
 							g_iFontID += 1;
 						}
@@ -1795,13 +1795,13 @@ void CRenderEngine::DrawHtmlText(HDC hDC, CPaintManagerUI* pManager, RECT& rc, L
                 }
                 break;
                 }
-            if( pstrNextStart != NULL ) pstrText = pstrNextStart;
+            if ( pstrNextStart != NULL ) pstrText = pstrNextStart;
             else {
                 while( *pstrText != _T('\0') && *pstrText != _T('>') && *pstrText != _T('}') ) pstrText = ::CharNext(pstrText);
                 pstrText = ::CharNext(pstrText);
             }
         }
-        else if( !bInRaw && ( *pstrText == _T('<') || *pstrText == _T('{') ) && pstrText[1] == _T('/') )
+        else if ( !bInRaw && ( *pstrText == _T('<') || *pstrText == _T('{') ) && pstrText[1] == _T('/') )
         {
             pstrText++;
             pstrText++;
@@ -1812,13 +1812,13 @@ void CRenderEngine::DrawHtmlText(HDC hDC, CPaintManagerUI* pManager, RECT& rc, L
                     pstrText++;
                     aColorArray.Remove(aColorArray.GetSize() - 1);
                     DWORD clrColor = dwTextColor;
-                    if( aColorArray.GetSize() > 0 ) clrColor = (int)aColorArray.GetAt(aColorArray.GetSize() - 1);
+                    if ( aColorArray.GetSize() > 0 ) clrColor = (int)aColorArray.GetAt(aColorArray.GetSize() - 1);
                     ::SetTextColor(hDC, RGB(GetBValue(clrColor), GetGValue(clrColor), GetRValue(clrColor)));
                 }
                 break;
             case _T('p'):
                 pstrText++;
-                if( pt.x > rc.left ) bLineEnd = true;
+                if ( pt.x > rc.left ) bLineEnd = true;
                 aPIndentArray.Remove(aPIndentArray.GetSize() - 1);
                 cyLine = MAX(cyLine, pTm->tmHeight + pTm->tmExternalLeading + (int)aPIndentArray.GetAt(aPIndentArray.GetSize() - 1));
                 break;
@@ -1830,21 +1830,21 @@ void CRenderEngine::DrawHtmlText(HDC hDC, CPaintManagerUI* pManager, RECT& rc, L
                 {
                     pstrText++;
                     bInSelected = !bInSelected;
-                    if( bDraw && bLineDraw ) {
-                        if( bInSelected ) ::SetBkMode(hDC, OPAQUE);
+                    if ( bDraw && bLineDraw ) {
+                        if ( bInSelected ) ::SetBkMode(hDC, OPAQUE);
                         else ::SetBkMode(hDC, TRANSPARENT);
                     }
                 }
                 break;
             case _T('a'):
                 {
-                    if( iLinkIndex < nLinkRects ) {
-                        if( !bLineDraw ) ::SetRect(&prcLinks[iLinkIndex], ptLinkStart.x, ptLinkStart.y, MIN(pt.x, rc.right), pt.y + pTm->tmHeight + pTm->tmExternalLeading);
+                    if ( iLinkIndex < nLinkRects ) {
+                        if ( !bLineDraw ) ::SetRect(&prcLinks[iLinkIndex], ptLinkStart.x, ptLinkStart.y, MIN(pt.x, rc.right), pt.y + pTm->tmHeight + pTm->tmExternalLeading);
                         iLinkIndex++;
                     }
                     aColorArray.Remove(aColorArray.GetSize() - 1);
                     DWORD clrColor = dwTextColor;
-                    if( aColorArray.GetSize() > 0 ) clrColor = (int)aColorArray.GetAt(aColorArray.GetSize() - 1);
+                    if ( aColorArray.GetSize() > 0 ) clrColor = (int)aColorArray.GetAt(aColorArray.GetSize() - 1);
                     ::SetTextColor(hDC, RGB(GetBValue(clrColor), GetGValue(clrColor), GetRValue(clrColor)));
                     bInLink = false;
                 }
@@ -1856,8 +1856,8 @@ void CRenderEngine::DrawHtmlText(HDC hDC, CPaintManagerUI* pManager, RECT& rc, L
                     pstrText++;
                     aFontArray.Remove(aFontArray.GetSize() - 1);
                     TFontInfo* pFontInfo = (TFontInfo*)aFontArray.GetAt(aFontArray.GetSize() - 1);
-                    if( pFontInfo == NULL ) pFontInfo = pManager->GetFontInfo(iDefaultFont);
-                    if( pTm->tmItalic && pFontInfo->bItalic == false ) {
+                    if ( pFontInfo == NULL ) pFontInfo = pManager->GetFontInfo(iDefaultFont);
+                    if ( pTm->tmItalic && pFontInfo->bItalic == false ) {
                         ABC abc;
                         ::GetCharABCWidths(hDC, _T(' '), _T(' '), &abc);
                         pt.x += abc.abcC / 2; // 简单修正一下斜体混排的问题, 正确做法应该是http://support.microsoft.com/kb/244798/en-us
@@ -1871,11 +1871,11 @@ void CRenderEngine::DrawHtmlText(HDC hDC, CPaintManagerUI* pManager, RECT& rc, L
             while( *pstrText != _T('\0') && *pstrText != _T('>') && *pstrText != _T('}') ) pstrText = ::CharNext(pstrText);
             pstrText = ::CharNext(pstrText);
         }
-        else if( !bInRaw &&  *pstrText == _T('<') && pstrText[2] == _T('>') && (pstrText[1] == _T('{')  || pstrText[1] == _T('}')) )
+        else if ( !bInRaw &&  *pstrText == _T('<') && pstrText[2] == _T('>') && (pstrText[1] == _T('{')  || pstrText[1] == _T('}')) )
         {
             SIZE szSpace = { 0 };
             ::GetTextExtentPoint32(hDC, &pstrText[1], 1, &szSpace);
-            if( bDraw && bLineDraw ) {
+            if ( bDraw && bLineDraw ) {
 				iVAlign = DT_BOTTOM;
 				if (aVAlignArray.GetSize() > 0) iVAlign = (UINT)aVAlignArray.GetAt(aVAlignArray.GetSize() - 1); 
 				if (iVAlign == DT_VCENTER) ::TextOut(hDC, pt.x + cxOffset, pt.y + (cyLineHeight - pTm->tmHeight - pTm->tmExternalLeading)/2, &pstrText[1], 1);
@@ -1887,11 +1887,11 @@ void CRenderEngine::DrawHtmlText(HDC hDC, CPaintManagerUI* pManager, RECT& rc, L
             cxLine = pt.x - rc.left;
             pstrText++;pstrText++;pstrText++;
         }
-        else if( !bInRaw &&  *pstrText == _T('{') && pstrText[2] == _T('}') && (pstrText[1] == _T('<')  || pstrText[1] == _T('>')) )
+        else if ( !bInRaw &&  *pstrText == _T('{') && pstrText[2] == _T('}') && (pstrText[1] == _T('<')  || pstrText[1] == _T('>')) )
         {
             SIZE szSpace = { 0 };
             ::GetTextExtentPoint32(hDC, &pstrText[1], 1, &szSpace);
-            if( bDraw && bLineDraw ) {
+            if ( bDraw && bLineDraw ) {
 				iVAlign = DT_BOTTOM;
 				if (aVAlignArray.GetSize() > 0) iVAlign = (UINT)aVAlignArray.GetAt(aVAlignArray.GetSize() - 1); 
 				if (iVAlign == DT_VCENTER) ::TextOut(hDC, pt.x + cxOffset, pt.y + (cyLineHeight - pTm->tmHeight - pTm->tmExternalLeading)/2, &pstrText[1], 1);
@@ -1903,13 +1903,13 @@ void CRenderEngine::DrawHtmlText(HDC hDC, CPaintManagerUI* pManager, RECT& rc, L
             cxLine = pt.x - rc.left;
             pstrText++;pstrText++;pstrText++;
         }
-        else if( !bInRaw &&  *pstrText == _T(' ') )
+        else if ( !bInRaw &&  *pstrText == _T(' ') )
         {
             SIZE szSpace = { 0 };
             ::GetTextExtentPoint32(hDC, _T(" "), 1, &szSpace);
             // Still need to paint the space because the font might have
             // underline formatting.
-            if( bDraw && bLineDraw ) {
+            if ( bDraw && bLineDraw ) {
 				iVAlign = DT_BOTTOM;
 				if (aVAlignArray.GetSize() > 0) iVAlign = (UINT)aVAlignArray.GetAt(aVAlignArray.GetSize() - 1); 
 				if (iVAlign == DT_VCENTER) ::TextOut(hDC, pt.x + cxOffset, pt.y + (cyLineHeight - pTm->tmHeight - pTm->tmExternalLeading)/2, _T(" "), 1);
@@ -1930,14 +1930,14 @@ void CRenderEngine::DrawHtmlText(HDC hDC, CPaintManagerUI* pManager, RECT& rc, L
             LPCTSTR p = pstrText;
             LPCTSTR pstrNext;
             SIZE szText = { 0 };
-            if( !bInRaw && *p == _T('<') || *p == _T('{') ) p++, cchChars++, cchSize++;
+            if ( !bInRaw && *p == _T('<') || *p == _T('{') ) p++, cchChars++, cchSize++;
             while( *p != _T('\0') && *p != _T('\n') ) {
                 // This part makes sure that we're word-wrapping if needed or providing support
                 // for DT_END_ELLIPSIS. Unfortunately the GetTextExtentPoint32() call is pretty
                 // slow when repeated so often.
                 // TODO: Rewrite and use GetTextExtentExPoint() instead!
-                if( bInRaw ) {
-                    if( ( *p == _T('<') || *p == _T('{') ) && p[1] == _T('/') 
+                if ( bInRaw ) {
+                    if ( ( *p == _T('<') || *p == _T('{') ) && p[1] == _T('/') 
                         && p[2] == _T('r') && ( p[3] == _T('>') || p[3] == _T('}') ) ) {
                             p += 4;
                             bInRaw = false;
@@ -1945,28 +1945,28 @@ void CRenderEngine::DrawHtmlText(HDC hDC, CPaintManagerUI* pManager, RECT& rc, L
                     }
                 }
                 else {
-                    if( *p == _T('<') || *p == _T('{') ) break;
+                    if ( *p == _T('<') || *p == _T('{') ) break;
                 }
                 pstrNext = ::CharNext(p);
                 cchChars++;
                 cchSize += (int)(pstrNext - p);
                 szText.cx = cchChars * pTm->tmMaxCharWidth;
-                if( pt.x + szText.cx >= rc.right ) {
+                if ( pt.x + szText.cx >= rc.right ) {
                     ::GetTextExtentPoint32(hDC, pstrText, cchSize, &szText);
                 }
-                if( pt.x + szText.cx > rc.right ) {
-                    if( pt.x + szText.cx > rc.right && cchChars > 1) {
+                if ( pt.x + szText.cx > rc.right ) {
+                    if ( pt.x + szText.cx > rc.right && cchChars > 1) {
                         cchChars--;
                         cchSize -= (int)(pstrNext - p);
                     }
-                    if( (uStyle & DT_WORDBREAK) != 0 && cchLastGoodWord > 0 ) {
+                    if ( (uStyle & DT_WORDBREAK) != 0 && cchLastGoodWord > 0 ) {
                         cchChars = cchLastGoodWord;
                         cchSize = cchLastGoodSize;                 
                     }
-                    if( (uStyle & DT_END_ELLIPSIS) != 0 && cchChars > 0 ) {
+                    if ( (uStyle & DT_END_ELLIPSIS) != 0 && cchChars > 0 ) {
                         cchChars -= 1;
                         LPCTSTR pstrPrev = ::CharPrev(pstrText, p);
-                        if( cchChars > 0 ) {
+                        if ( cchChars > 0 ) {
                             cchChars -= 1;
                             pstrPrev = ::CharPrev(pstrText, pstrPrev);
                             cchSize -= (int)(p - pstrPrev);
@@ -1984,7 +1984,7 @@ void CRenderEngine::DrawHtmlText(HDC hDC, CPaintManagerUI* pManager, RECT& rc, L
                     cchLastGoodWord = cchChars;
                     cchLastGoodSize = cchSize;
                 }
-                if( *p == _T(' ') ) {
+                if ( *p == _T(' ') ) {
                     cchLastGoodWord = cchChars;
                     cchLastGoodSize = cchSize;
                 }
@@ -1992,14 +1992,14 @@ void CRenderEngine::DrawHtmlText(HDC hDC, CPaintManagerUI* pManager, RECT& rc, L
             }
             
             ::GetTextExtentPoint32(hDC, pstrText, cchSize, &szText);
-            if( bDraw && bLineDraw ) {
+            if ( bDraw && bLineDraw ) {
 				iVAlign = DT_BOTTOM;
 				if (aVAlignArray.GetSize() > 0) iVAlign = (UINT)aVAlignArray.GetAt(aVAlignArray.GetSize() - 1); 
 				if (iVAlign == DT_VCENTER) ::TextOut(hDC, pt.x + cxOffset, pt.y + (cyLineHeight - pTm->tmHeight - pTm->tmExternalLeading)/2, pstrText, cchSize);
 				else if (iVAlign == DT_TOP) ::TextOut(hDC, pt.x + cxOffset, pt.y, pstrText, cchSize);
 				else ::TextOut(hDC, pt.x + cxOffset, pt.y + cyLineHeight - pTm->tmHeight - pTm->tmExternalLeading, pstrText, cchSize);
 
-				if( pt.x >= rc.right && (uStyle & DT_END_ELLIPSIS) != 0 ) {
+				if ( pt.x >= rc.right && (uStyle & DT_END_ELLIPSIS) != 0 ) {
 					if (iVAlign == DT_VCENTER) ::TextOut(hDC, pt.x + cxOffset + szText.cx, pt.y + (cyLineHeight - pTm->tmHeight - pTm->tmExternalLeading)/2, _T("..."), 3);
 					else if (iVAlign == DT_TOP) ::TextOut(hDC, pt.x + cxOffset + szText.cx, pt.y, _T("..."), 3);
 					else ::TextOut(hDC, pt.x + cxOffset + szText.cx, pt.y + cyLineHeight - pTm->tmHeight - pTm->tmExternalLeading, _T("..."), 3);
@@ -2011,9 +2011,9 @@ void CRenderEngine::DrawHtmlText(HDC hDC, CPaintManagerUI* pManager, RECT& rc, L
             pstrText += cchSize;
         }
 
-        if( pt.x >= rc.right || *pstrText == _T('\n') || *pstrText == _T('\0') ) bLineEnd = true;
-        if( bDraw && bLineEnd ) {
-            if( !bLineDraw ) {
+        if ( pt.x >= rc.right || *pstrText == _T('\n') || *pstrText == _T('\0') ) bLineEnd = true;
+        if ( bDraw && bLineEnd ) {
+            if ( !bLineDraw ) {
                 aFontArray.Resize(aLineFontArray.GetSize());
                 ::CopyMemory(aFontArray.GetData(), aLineFontArray.GetData(), aLineFontArray.GetSize() * sizeof(LPVOID));
                 aColorArray.Resize(aLineColorArray.GetSize());
@@ -2030,13 +2030,13 @@ void CRenderEngine::DrawHtmlText(HDC hDC, CPaintManagerUI* pManager, RECT& rc, L
                 bInSelected = bLineInSelected;
 
                 DWORD clrColor = dwTextColor;
-                if( aColorArray.GetSize() > 0 ) clrColor = (int)aColorArray.GetAt(aColorArray.GetSize() - 1);
+                if ( aColorArray.GetSize() > 0 ) clrColor = (int)aColorArray.GetAt(aColorArray.GetSize() - 1);
                 ::SetTextColor(hDC, RGB(GetBValue(clrColor), GetGValue(clrColor), GetRValue(clrColor)));
                 TFontInfo* pFontInfo = (TFontInfo*)aFontArray.GetAt(aFontArray.GetSize() - 1);
-                if( pFontInfo == NULL ) pFontInfo = pManager->GetFontInfo(iDefaultFont);
+                if ( pFontInfo == NULL ) pFontInfo = pManager->GetFontInfo(iDefaultFont);
                 pTm = &pFontInfo->tm;
                 ::SelectObject(hDC, pFontInfo->hFont);
-                if( bInSelected ) ::SetBkMode(hDC, OPAQUE);
+                if ( bInSelected ) ::SetBkMode(hDC, OPAQUE);
             }
             else {
                 aLineFontArray.Resize(aFontArray.GetSize());
@@ -2060,12 +2060,12 @@ void CRenderEngine::DrawHtmlText(HDC hDC, CPaintManagerUI* pManager, RECT& rc, L
     nLinkRects = iLinkIndex;
 
     // Return size of text when requested
-    if( (uStyle & DT_CALCRECT) != 0 ) {
+    if ( (uStyle & DT_CALCRECT) != 0 ) {
         rc.bottom = MAX(cyMinHeight, pt.y + cyLine);
         rc.right = MIN(rc.right, cxMaxWidth);
     }
 
-    if( bDraw ) ::SelectClipRgn(hDC, hOldRgn);
+    if ( bDraw ) ::SelectClipRgn(hDC, hOldRgn);
     ::DeleteObject(hOldRgn);
     ::DeleteObject(hRgn);
 
@@ -2083,7 +2083,7 @@ HBITMAP CRenderEngine::GenerateBitmap(CPaintManagerUI* pManager, RECT rc, CContr
 	ASSERT(hPaintDC);
 	HBITMAP hPaintBitmap = NULL;
 	if (pStopControl == NULL && !pManager->IsLayered()) hPaintBitmap = pManager->GetPaintOffscreenBitmap();
-	if( hPaintBitmap == NULL ) {
+	if ( hPaintBitmap == NULL ) {
 		bUseOffscreenBitmap = false;
 		hPaintBitmap = ::CreateCompatibleBitmap(pManager->GetPaintDC(), rc.right, rc.bottom);
 		ASSERT(hPaintBitmap);
@@ -2107,7 +2107,7 @@ HBITMAP CRenderEngine::GenerateBitmap(CPaintManagerUI* pManager, RECT rc, CContr
 	HBITMAP hBitmap = ::CreateDIBSection(pManager->GetPaintDC(), &bmi, DIB_RGB_COLORS, (LPVOID*) &pDest, NULL, 0);
 	ASSERT(hCloneDC);
 	ASSERT(hBitmap);
-	if( hBitmap != NULL )
+	if ( hBitmap != NULL )
 	{
 		HBITMAP hOldBitmap = (HBITMAP) ::SelectObject(hCloneDC, hBitmap);
 		::BitBlt(hCloneDC, 0, 0, cx, cy, hPaintDC, rc.left, rc.top, SRCCOPY);
@@ -2152,7 +2152,7 @@ HBITMAP CRenderEngine::GenerateBitmap(CPaintManagerUI* pManager, CControlUI* pCo
     HBITMAP hBitmap = ::CreateDIBSection(pManager->GetPaintDC(), &bmi, DIB_RGB_COLORS, (LPVOID*) &pDest, NULL, 0);
     ASSERT(hCloneDC);
     ASSERT(hBitmap);
-    if( hBitmap != NULL )
+    if ( hBitmap != NULL )
     {
         HBITMAP hOldBitmap = (HBITMAP) ::SelectObject(hCloneDC, hBitmap);
         ::BitBlt(hCloneDC, 0, 0, cx, cy, hPaintDC, rc.left, rc.top, SRCCOPY);
@@ -2178,7 +2178,7 @@ SIZE CRenderEngine::GetTextSize( HDC hDC, CPaintManagerUI* pManager , LPCTSTR ps
 	pstrText = sText;
 	SIZE size = {0,0};
 	ASSERT(::GetObjectType(hDC)==OBJ_DC || ::GetObjectType(hDC)==OBJ_MEMDC);
-	if( pstrText == NULL || pManager == NULL ) return size;
+	if ( pstrText == NULL || pManager == NULL ) return size;
 	::SetBkMode(hDC, TRANSPARENT);
 	HFONT hOldFont = (HFONT)::SelectObject(hDC, pManager->GetFont(iFont));
 	GetTextExtentPoint32(hDC, pstrText, _tcslen(pstrText) , &size);

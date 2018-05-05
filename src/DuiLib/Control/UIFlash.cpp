@@ -1,12 +1,6 @@
 #include "stdafx.h"
 #include "UIFlash.h"
-
-#ifdef _MSC_VER
 #include <atlcomcli.h>
-#else
-//#include <iconv.h>
-//#include <atlcomcli.h>
-#endif // _MSC_VER
 
 #define DISPID_FLASHEVENT_FLASHCALL	 ( 0x00C5 )
 #define DISPID_FLASHEVENT_FSCOMMAND	 ( 0x0096 )
@@ -48,7 +42,7 @@ namespace DuiLib
 
 	LPVOID CFlashUI::GetInterface( LPCTSTR pstrName )
 	{
-		if( _tcscmp(pstrName, DUI_CTR_FLASH) == 0 ) return static_cast<CFlashUI*>(this);
+		if ( _tcscmp(pstrName, DUI_CTR_FLASH) == 0 ) return static_cast<CFlashUI*>(this);
 		return CActiveXUI::GetInterface(pstrName);
 	}
 
@@ -79,9 +73,9 @@ namespace DuiLib
 			}
 		case DISPID_FLASHEVENT_FSCOMMAND:
 			{
-				if( pDispParams && pDispParams->cArgs == 2 )
+				if ( pDispParams && pDispParams->cArgs == 2 )
 				{
-					if( pDispParams->rgvarg[0].vt == VT_BSTR &&
+					if ( pDispParams->rgvarg[0].vt == VT_BSTR &&
 						pDispParams->rgvarg[1].vt == VT_BSTR )
 					{
 						return FSCommand(pDispParams->rgvarg[1].bstrVal, pDispParams->rgvarg[0].bstrVal);
@@ -113,14 +107,14 @@ namespace DuiLib
 	{
 		*ppvObject = NULL;
 
-		if( riid == IID_IUnknown)
+		if ( riid == IID_IUnknown)
 			*ppvObject = static_cast<LPUNKNOWN>(this);
-		else if( riid == IID_IDispatch)
+		else if ( riid == IID_IDispatch)
 			*ppvObject = static_cast<IDispatch*>(this);
-		else if( riid ==  __uuidof(_IShockwaveFlashEvents))
-			*ppvObject = static_cast<_IShockwaveFlashEvents*>(this);
+		else if (riid == __uuidof(__IShockwaveFlashEvents))
+			*ppvObject = static_cast<__IShockwaveFlashEvents*>(this);
 
-		if( *ppvObject != NULL )
+		if ( *ppvObject != NULL )
 			AddRef();
 		return *ppvObject == NULL ? E_NOINTERFACE : S_OK;
 	}
@@ -173,7 +167,7 @@ namespace DuiLib
 		return S_OK;
 	}
 
-	void CFlashUI::ReleaseControl()
+	LRESULT CFlashUI::ReleaseControl()
 	{
 		//GetManager()->RemoveTranslateAccelerator(this);
 		RegisterEventHandler(FALSE);
@@ -182,16 +176,18 @@ namespace DuiLib
 			m_pFlash->Release();
 			m_pFlash=NULL;
 		}
+
+		return (0L);
 	}
 
-	bool CFlashUI::DoCreateControl()
+	LRESULT CFlashUI::DoCreateControl()
 	{
-		if (!CActiveXUI::DoCreateControl())
-			return false;
+		if (CActiveXUI::DoCreateControl() < (0L))
+			return (-1L);
 		//GetManager()->AddTranslateAccelerator(this);
-		GetControl(__uuidof(IShockwaveFlash),(LPVOID*)&m_pFlash);
+		GetControl(__uuidof(__IShockwaveFlash), (LPVOID*)&m_pFlash);
 		RegisterEventHandler(TRUE);
-		return true;
+		return (0L);
 	}
 
 	void CFlashUI::SetFlashEventHandler( CFlashEventHandler* pHandler )
@@ -211,11 +207,11 @@ namespace DuiLib
 
 	LRESULT CFlashUI::TranslateAccelerator( MSG *pMsg )
 	{
-		if(pMsg->message < WM_KEYFIRST || pMsg->message > WM_KEYLAST)
-			return S_FALSE;
+		if (pMsg->message < WM_KEYFIRST || pMsg->message > WM_KEYLAST)
+			return (-1L);// S_FALSE;
 
-		if( m_pFlash == NULL )
-			return E_NOTIMPL;
+		if ( m_pFlash == NULL )
+			return (-1L);//E_NOTIMPL;
 
 		// 当前Web窗口不是焦点,不处理加速键
 		BOOL bIsChild = FALSE;
@@ -225,20 +221,20 @@ namespace DuiLib
 		hTempWnd = hWndFocus;
 		while(hTempWnd != NULL)
 		{
-			if(hTempWnd == m_hwndHost)
+			if (hTempWnd == m_hwndHost)
 			{
 				bIsChild = TRUE;
 				break;
 			}
 			hTempWnd = ::GetParent(hTempWnd);
 		}
-		if(!bIsChild)
-			return S_FALSE;
+		if (!bIsChild)
+			return (-1L);//S_FALSE;
 
-		IOleInPlaceActiveObject * pObj;
-		//CComPtr<IOleInPlaceActiveObject> pObj;
+		//IOleInPlaceActiveObject * pObj;
+		CComPtr<IOleInPlaceActiveObject> pObj;
 		if (FAILED(m_pFlash->QueryInterface(IID_IOleInPlaceActiveObject, (LPVOID *)&pObj)))
-			return S_FALSE;
+			return (-1L);//S_FALSE;
 
 		HRESULT hResult = pObj->TranslateAccelerator(pMsg);
 		return hResult;
@@ -250,15 +246,15 @@ namespace DuiLib
 			return S_FALSE;
 
 		HRESULT hr=S_FALSE;
-		IConnectionPointContainer * pCPC;
-		IConnectionPoint * pCP;
-        //CComPtr<IConnectionPointContainer>  pCPC;
-        //CComPtr<IConnectionPoint> pCP;
+		//IConnectionPointContainer * pCPC;
+		//IConnectionPoint * pCP;
+        CComPtr<IConnectionPointContainer> pCPC;
+        CComPtr<IConnectionPoint> pCP;
 
 		hr=m_pFlash->QueryInterface(IID_IConnectionPointContainer,(void **)&pCPC);
 		if (FAILED(hr))
 			return hr;
-		hr=pCPC->FindConnectionPoint(__uuidof(_IShockwaveFlashEvents),&pCP);
+		hr = pCPC->FindConnectionPoint(__uuidof(__IShockwaveFlashEvents), &pCP);
 		if (FAILED(hr))
 			return hr;
 

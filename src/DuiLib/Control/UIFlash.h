@@ -13,7 +13,7 @@ namespace DuiLib
 {
 	class DUILIB_API CFlashUI
 		: public CActiveXUI
-		, public _IShockwaveFlashEvents
+		, public __IShockwaveFlashEvents
 		, public ITranslateAccelerator
 	{
 	public:
@@ -21,8 +21,8 @@ namespace DuiLib
 		~CFlashUI(void);
 
 		void SetFlashEventHandler(CFlashEventHandler* pHandler);
-		virtual bool DoCreateControl();
-		IShockwaveFlash* m_pFlash;
+		virtual LRESULT DoCreateControl();
+		__IShockwaveFlash* m_pFlash;
 
 	private:
 		virtual LPCTSTR GetClass() const;
@@ -43,7 +43,7 @@ namespace DuiLib
 		HRESULT FSCommand (_bstr_t command, _bstr_t args);
 		HRESULT FlashCall (_bstr_t request );
 
-		virtual void ReleaseControl();
+		virtual HRESULT ReleaseControl();
 		HRESULT RegisterEventHandler(BOOL inAdvise);
 
 		// ITranslateAccelerator

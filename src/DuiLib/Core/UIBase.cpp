@@ -14,19 +14,42 @@ namespace DuiLib {
 void DUILIB_API DUI__Trace(LPCTSTR pstrFormat, ...)
 {
 #ifdef _DEBUG
-    TCHAR szBuffer[300] = { 0 };
-    va_list args;
-    va_start(args, pstrFormat);
-    ::wvnsprintf(szBuffer, lengthof(szBuffer) - 2, pstrFormat, args);
-    _tcscat(szBuffer, _T("\n"));
-    va_end(args);
-    ::OutputDebugString(szBuffer);
+	TCHAR tszData[MAXWORD] = { 0 };
+	va_list args;
+	va_start(args, pstrFormat);
+	::wvnsprintf(tszData, lengthof(tszData), pstrFormat, args);
+	va_end(args);
+	_tcscat(tszData, _T("\n"));
+	::OutputDebugString(tszData);
+	/*LONG lDataSize = 0;
+	TCHAR * pszData = 0;
+	va_list args;
+	va_start(args, pstrFormat);
+	lDataSize = _vsctprintf(pstrFormat, args);
+	if (lDataSize > 0)
+	{
+		pszData = new TCHAR[lDataSize + sizeof(TCHAR)];// (TCHAR *)malloc((lDataSize + sizeof(TCHAR)) * sizeof(TCHAR));
+		if (pszData)
+		{
+			::wvnsprintf(pszData, lDataSize + sizeof(TCHAR), pstrFormat, args);
+		}
+	}
+	va_end(args);
+	if (pszData)
+	{
+		_tcscat(pszData, _T("\n"));
+		::OutputDebugString(pszData);
+
+		//free(pszData);
+		delete pszData;
+		pszData = 0;
+	}*/
 #endif
 }
 
 LPCTSTR DUI__TraceMsg(UINT uMsg)
 {
-#define MSGDEF(x) if(uMsg==x) return _T(#x)
+#define MSGDEF(x) if (uMsg==x) return _T(#x)
     MSGDEF(WM_SETCURSOR);
     MSGDEF(WM_NCHITTEST);
     MSGDEF(WM_NCPAINT);
@@ -81,7 +104,7 @@ LPCTSTR DUI__TraceMsg(UINT uMsg)
     MSGDEF(WM_GETICON);   
     MSGDEF(WM_GETTEXT);
     MSGDEF(WM_GETTEXTLENGTH);   
-    static TCHAR szMsg[10];
+	static TCHAR szMsg[64] = { 0 };
     ::wsprintf(szMsg, _T("0x%04X"), uMsg);
     return szMsg;
 }
@@ -102,11 +125,11 @@ static const DUI_MSGMAP_ENTRY* DuiFindMessageEntry(const DUI_MSGMAP_ENTRY* lpEnt
 	const DUI_MSGMAP_ENTRY* pMsgTypeEntry = NULL;
 	while (lpEntry->nSig != DuiSig_end)
 	{
-		if(lpEntry->sMsgType==sMsgType)
+		if (lpEntry->sMsgType==sMsgType)
 		{
-			if(!lpEntry->sCtrlName.IsEmpty())
+			if (!lpEntry->sCtrlName.IsEmpty())
 			{
-				if(lpEntry->sCtrlName==sCtrlName)
+				if (lpEntry->sCtrlName==sCtrlName)
 				{
 					return lpEntry;
 				}
@@ -121,27 +144,27 @@ static const DUI_MSGMAP_ENTRY* DuiFindMessageEntry(const DUI_MSGMAP_ENTRY* lpEnt
 	return pMsgTypeEntry;
 }
 
-bool CNotifyPump::AddVirtualWnd(CDuiString strName,CNotifyPump* pObject)
+LRESULT CNotifyPump::AddVirtualWnd(CDuiString strName, CNotifyPump* pObject)
 {
-	if( m_VirtualWndMap.Find(strName) == NULL )
+	if ( m_VirtualWndMap.Find(strName) == NULL )
 	{
 		m_VirtualWndMap.Insert(strName.GetData(),(LPVOID)pObject);
-		return true;
+		return (0L);
 	}
-	return false;
+	return (-1L);
 }
 
-bool CNotifyPump::RemoveVirtualWnd(CDuiString strName)
+LRESULT CNotifyPump::RemoveVirtualWnd(CDuiString strName)
 {
-	if( m_VirtualWndMap.Find(strName) != NULL )
+	if ( m_VirtualWndMap.Find(strName) != NULL )
 	{
 		m_VirtualWndMap.Remove(strName);
-		return true;
+		return (0L);
 	}
-	return false;
+	return (-1L);
 }
 
-bool CNotifyPump::LoopDispatch(TNotifyUI& msg)
+LRESULT CNotifyPump::LoopDispatch(TNotifyUI& msg)
 {
 	const DUI_MSGMAP_ENTRY* lpEntry = NULL;
 	const DUI_MSGMAP* pMessageMap = NULL;
@@ -162,13 +185,12 @@ bool CNotifyPump::LoopDispatch(TNotifyUI& msg)
 			goto LDispatch;
 		}
 	}
-	return false;
+	return (-1L);
 
 LDispatch:
 	union DuiMessageMapFunctions mmf;
 	mmf.pfn = lpEntry->pfn;
 
-	bool bRet = false;
 	int nSig;
 	nSig = lpEntry->nSig;
 	switch (nSig)
@@ -178,26 +200,26 @@ LDispatch:
 		break;
 	case DuiSig_lwl:
 		(this->*mmf.pfn_Notify_lwl)(msg.wParam,msg.lParam);
-		bRet = true;
+		return (0L);
 		break;
 	case DuiSig_vn:
 		(this->*mmf.pfn_Notify_vn)(msg);
-		bRet = true;
+		return (0L);
 		break;
 	}
-	return bRet;
+	return (-1L);
 }
 
-void CNotifyPump::NotifyPump(TNotifyUI& msg)
+LRESULT CNotifyPump::NotifyPump(TNotifyUI& msg)
 {
 	///遍历虚拟窗口
-	if( !msg.sVirtualWnd.IsEmpty() ){
+	if ( !msg.sVirtualWnd.IsEmpty() ){
 		for( int i = 0; i< m_VirtualWndMap.GetSize(); i++ ) {
-			if( LPCTSTR key = m_VirtualWndMap.GetAt(i) ) {
-				if( _tcsicmp(key, msg.sVirtualWnd.GetData()) == 0 ){
+			if ( LPCTSTR key = m_VirtualWndMap.GetAt(i) ) {
+				if ( _tcsicmp(key, msg.sVirtualWnd.GetData()) == 0 ){
 					CNotifyPump* pObject = static_cast<CNotifyPump*>(m_VirtualWndMap.Find(key, false));
-					if( pObject && pObject->LoopDispatch(msg) )
-						return;
+					if ( pObject && pObject->LoopDispatch(msg) )
+						return (0L);
 				}
 			}
 		}
@@ -206,6 +228,7 @@ void CNotifyPump::NotifyPump(TNotifyUI& msg)
 	///
 	//遍历主窗口
 	LoopDispatch( msg );
+	return (0L);
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -246,8 +269,8 @@ HWND CWindowWnd::Create(HWND hwndParent, LPCTSTR pstrName, DWORD dwStyle, DWORD 
 
 HWND CWindowWnd::Create(HWND hwndParent, LPCTSTR pstrName, DWORD dwStyle, DWORD dwExStyle, int x, int y, int cx, int cy, HMENU hMenu)
 {
-    if( GetSuperClassName() != NULL && !RegisterSuperclass() ) return NULL;
-    if( GetSuperClassName() == NULL && !RegisterWindowClass() ) return NULL;
+    if ( GetSuperClassName() != NULL && RegisterSuperclass() < (0L)) return NULL;
+    if ( GetSuperClassName() == NULL && RegisterWindowClass() < (0L) ) return NULL;
     m_hWnd = ::CreateWindowEx(dwExStyle, GetWindowClassName(), pstrName, dwStyle, x, y, cx, cy, hwndParent, hMenu, CPaintManagerUI::GetInstance(), this);
     ASSERT(m_hWnd!=NULL);
     return m_hWnd;
@@ -258,28 +281,30 @@ HWND CWindowWnd::Subclass(HWND hWnd)
     ASSERT(::IsWindow(hWnd));
     ASSERT(m_hWnd==NULL);
     m_OldWndProc = SubclassWindow(hWnd, __WndProc);
-    if( m_OldWndProc == NULL ) return NULL;
+    if ( m_OldWndProc == NULL ) return NULL;
     m_bSubclassed = true;
     m_hWnd = hWnd;
     ::SetWindowLongPtr(hWnd, GWLP_USERDATA, reinterpret_cast<LPARAM>(this));
     return m_hWnd;
 }
 
-void CWindowWnd::Unsubclass()
+LRESULT CWindowWnd::Unsubclass()
 {
     ASSERT(::IsWindow(m_hWnd));
-    if( !::IsWindow(m_hWnd) ) return;
-    if( !m_bSubclassed ) return;
+	if (!::IsWindow(m_hWnd)) return (-1L);
+    if ( !m_bSubclassed ) return (-1L);
     SubclassWindow(m_hWnd, m_OldWndProc);
     m_OldWndProc = ::DefWindowProc;
-    m_bSubclassed = false;
+    m_bSubclassed = FALSE;
+	return (0L);
 }
 
-void CWindowWnd::ShowWindow(bool bShow /*= true*/, bool bTakeFocus /*= false*/)
+LRESULT CWindowWnd::ShowWindow(BOOL bShow /*= true*/, BOOL bTakeFocus /*= false*/)
 {
     ASSERT(::IsWindow(m_hWnd));
-    if( !::IsWindow(m_hWnd) ) return;
+    if ( !::IsWindow(m_hWnd) ) return (-1L);
     ::ShowWindow(m_hWnd, bShow ? (bTakeFocus ? SW_SHOWNORMAL : SW_SHOWNOACTIVATE) : SW_HIDE);
+	return (0L);
 }
 
 UINT CWindowWnd::ShowModal()
@@ -291,31 +316,32 @@ UINT CWindowWnd::ShowModal()
     ::EnableWindow(hWndParent, FALSE);
     MSG msg = { 0 };
     while( ::IsWindow(m_hWnd) && ::GetMessage(&msg, NULL, 0, 0) ) {
-        if( msg.message == WM_CLOSE && msg.hwnd == m_hWnd ) {
+        if ( msg.message == WM_CLOSE && msg.hwnd == m_hWnd ) {
             nRet = msg.wParam;
             ::EnableWindow(hWndParent, TRUE);
             ::SetFocus(hWndParent);
         }
-        if( !CPaintManagerUI::TranslateMessage(&msg) ) {
+        if ( CPaintManagerUI::TranslateMessage(&msg) < (0L)) {
             ::TranslateMessage(&msg);
             ::DispatchMessage(&msg);
         }
-        if( msg.message == WM_QUIT ) break;
+        if ( msg.message == WM_QUIT ) break;
     }
     ::EnableWindow(hWndParent, TRUE);
     ::SetFocus(hWndParent);
-    if( msg.message == WM_QUIT ) ::PostQuitMessage(msg.wParam);
+    if ( msg.message == WM_QUIT ) ::PostQuitMessage(msg.wParam);
     return nRet;
 }
 
-void CWindowWnd::Close(UINT nRet)
+LRESULT CWindowWnd::Close(UINT nRet)
 {
     ASSERT(::IsWindow(m_hWnd));
-    if( !::IsWindow(m_hWnd) ) return;
+    if ( !::IsWindow(m_hWnd) ) return (-1L);
     PostMessage(WM_CLOSE, (WPARAM)nRet, 0L);
+	return (0L);
 }
 
-void CWindowWnd::CenterWindow()
+LRESULT CWindowWnd::CenterWindow()
 {
     ASSERT(::IsWindow(m_hWnd));
     ASSERT((GetWindowStyle(m_hWnd)&WS_CHILD)==0);
@@ -335,7 +361,7 @@ void CWindowWnd::CenterWindow()
 	::GetMonitorInfo(::MonitorFromWindow(hWnd, MONITOR_DEFAULTTONEAREST), &oMonitor);
 	rcArea = oMonitor.rcWork;
 
-	if( hWndCenter == NULL || IsIconic(hWndCenter))
+	if ( hWndCenter == NULL || IsIconic(hWndCenter))
 		rcCenter = rcArea;
 	else
 		::GetWindowRect(hWndCenter, &rcCenter);
@@ -348,14 +374,15 @@ void CWindowWnd::CenterWindow()
     int yTop = (rcCenter.top + rcCenter.bottom) / 2 - DlgHeight / 2;
 
     // The dialog is outside the screen, move it inside
-    if( xLeft < rcArea.left ) xLeft = rcArea.left;
-    else if( xLeft + DlgWidth > rcArea.right ) xLeft = rcArea.right - DlgWidth;
-    if( yTop < rcArea.top ) yTop = rcArea.top;
-    else if( yTop + DlgHeight > rcArea.bottom ) yTop = rcArea.bottom - DlgHeight;
+    if ( xLeft < rcArea.left ) xLeft = rcArea.left;
+    else if ( xLeft + DlgWidth > rcArea.right ) xLeft = rcArea.right - DlgWidth;
+    if ( yTop < rcArea.top ) yTop = rcArea.top;
+    else if ( yTop + DlgHeight > rcArea.bottom ) yTop = rcArea.bottom - DlgHeight;
     ::SetWindowPos(m_hWnd, NULL, xLeft, yTop, -1, -1, SWP_NOSIZE | SWP_NOZORDER | SWP_NOACTIVATE);
+	return (0L);
 }
 
-void CWindowWnd::SetIcon(UINT nRes)
+LRESULT CWindowWnd::SetIcon(UINT nRes)
 {
     HICON hIcon = (HICON)::LoadImage(CPaintManagerUI::GetInstance(), MAKEINTRESOURCE(nRes), IMAGE_ICON, ::GetSystemMetrics(SM_CXICON), ::GetSystemMetrics(SM_CYICON), LR_DEFAULTCOLOR);
     ASSERT(hIcon);
@@ -363,9 +390,10 @@ void CWindowWnd::SetIcon(UINT nRes)
     hIcon = (HICON)::LoadImage(CPaintManagerUI::GetInstance(), MAKEINTRESOURCE(nRes), IMAGE_ICON, ::GetSystemMetrics(SM_CXSMICON), ::GetSystemMetrics(SM_CYSMICON), LR_DEFAULTCOLOR);
     ASSERT(hIcon);
     ::SendMessage(m_hWnd, WM_SETICON, (WPARAM) FALSE, (LPARAM) hIcon);
+	return (0L);
 }
 
-bool CWindowWnd::RegisterWindowClass()
+LRESULT CWindowWnd::RegisterWindowClass()
 {
     WNDCLASS wc = { 0 };
     wc.style = GetClassStyle();
@@ -380,19 +408,23 @@ bool CWindowWnd::RegisterWindowClass()
     wc.lpszClassName = GetWindowClassName();
     ATOM ret = ::RegisterClass(&wc);
     ASSERT(ret!=NULL || ::GetLastError()==ERROR_CLASS_ALREADY_EXISTS);
-    return ret != NULL || ::GetLastError() == ERROR_CLASS_ALREADY_EXISTS;
+	if (ret != NULL || ::GetLastError() == ERROR_CLASS_ALREADY_EXISTS)
+	{
+		return (0L);
+	}
+	return (-1L);
 }
 
-bool CWindowWnd::RegisterSuperclass()
+LRESULT CWindowWnd::RegisterSuperclass()
 {
     // Get the class information from an existing
     // window so we can subclass it later on...
     WNDCLASSEX wc = { 0 };
     wc.cbSize = sizeof(WNDCLASSEX);
-    if( !::GetClassInfoEx(NULL, GetSuperClassName(), &wc) ) {
-        if( !::GetClassInfoEx(CPaintManagerUI::GetInstance(), GetSuperClassName(), &wc) ) {
+    if ( !::GetClassInfoEx(NULL, GetSuperClassName(), &wc) ) {
+        if ( !::GetClassInfoEx(CPaintManagerUI::GetInstance(), GetSuperClassName(), &wc) ) {
             ASSERT(!"Unable to locate window class");
-            return NULL;
+            return (-1L);
         }
     }
     m_OldWndProc = wc.lpfnWndProc;
@@ -401,13 +433,17 @@ bool CWindowWnd::RegisterSuperclass()
     wc.lpszClassName = GetWindowClassName();
     ATOM ret = ::RegisterClassEx(&wc);
     ASSERT(ret!=NULL || ::GetLastError()==ERROR_CLASS_ALREADY_EXISTS);
-    return ret != NULL || ::GetLastError() == ERROR_CLASS_ALREADY_EXISTS;
+	if (ret != NULL || ::GetLastError() == ERROR_CLASS_ALREADY_EXISTS)
+	{
+		return (0L);
+	}
+	return (-1L);
 }
 
 LRESULT CALLBACK CWindowWnd::__WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
     CWindowWnd* pThis = NULL;
-    if( uMsg == WM_NCCREATE ) {
+    if ( uMsg == WM_NCCREATE ) {
         LPCREATESTRUCT lpcs = reinterpret_cast<LPCREATESTRUCT>(lParam);
         pThis = static_cast<CWindowWnd*>(lpcs->lpCreateParams);
         pThis->m_hWnd = hWnd;
@@ -415,27 +451,26 @@ LRESULT CALLBACK CWindowWnd::__WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPAR
     } 
     else {
         pThis = reinterpret_cast<CWindowWnd*>(::GetWindowLongPtr(hWnd, GWLP_USERDATA));
-        if( uMsg == WM_NCDESTROY && pThis != NULL ) {
+        if ( uMsg == WM_NCDESTROY && pThis != NULL ) {
             LRESULT lRes = ::CallWindowProc(pThis->m_OldWndProc, hWnd, uMsg, wParam, lParam);
             ::SetWindowLongPtr(pThis->m_hWnd, GWLP_USERDATA, 0L);
-            if( pThis->m_bSubclassed ) pThis->Unsubclass();
+            if ( pThis->m_bSubclassed ) pThis->Unsubclass();
             pThis->m_hWnd = NULL;
             pThis->OnFinalMessage(hWnd);
             return lRes;
         }
     }
-    if( pThis != NULL ) {
+    if ( pThis != NULL ) {
         return pThis->HandleMessage(uMsg, wParam, lParam);
     } 
-    else {
-        return ::DefWindowProc(hWnd, uMsg, wParam, lParam);
-    }
+    
+    return ::DefWindowProc(hWnd, uMsg, wParam, lParam);
 }
 
 LRESULT CALLBACK CWindowWnd::__ControlProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
     CWindowWnd* pThis = NULL;
-    if( uMsg == WM_NCCREATE ) {
+    if ( uMsg == WM_NCCREATE ) {
         LPCREATESTRUCT lpcs = reinterpret_cast<LPCREATESTRUCT>(lParam);
         pThis = static_cast<CWindowWnd*>(lpcs->lpCreateParams);
         ::SetProp(hWnd, _T("WndX"), (HANDLE) pThis);
@@ -443,16 +478,16 @@ LRESULT CALLBACK CWindowWnd::__ControlProc(HWND hWnd, UINT uMsg, WPARAM wParam, 
     } 
     else {
         pThis = reinterpret_cast<CWindowWnd*>(::GetProp(hWnd, _T("WndX")));
-        if( uMsg == WM_NCDESTROY && pThis != NULL ) {
+        if ( uMsg == WM_NCDESTROY && pThis != NULL ) {
             LRESULT lRes = ::CallWindowProc(pThis->m_OldWndProc, hWnd, uMsg, wParam, lParam);
-            if( pThis->m_bSubclassed ) pThis->Unsubclass();
+            if ( pThis->m_bSubclassed ) pThis->Unsubclass();
             ::SetProp(hWnd, _T("WndX"), NULL);
             pThis->m_hWnd = NULL;
             pThis->OnFinalMessage(hWnd);
             return lRes;
         }
     }
-    if( pThis != NULL ) {
+    if ( pThis != NULL ) {
         return pThis->HandleMessage(uMsg, wParam, lParam);
     } 
     else {
@@ -472,15 +507,16 @@ LRESULT CWindowWnd::PostMessage(UINT uMsg, WPARAM wParam /*= 0*/, LPARAM lParam 
     return ::PostMessage(m_hWnd, uMsg, wParam, lParam);
 }
 
-void CWindowWnd::ResizeClient(int cx /*= -1*/, int cy /*= -1*/)
+LRESULT CWindowWnd::ResizeClient(int cx /*= -1*/, int cy /*= -1*/)
 {
     ASSERT(::IsWindow(m_hWnd));
     RECT rc = { 0 };
-    if( !::GetClientRect(m_hWnd, &rc) ) return;
-    if( cx != -1 ) rc.right = cx;
-    if( cy != -1 ) rc.bottom = cy;
-    if( !::AdjustWindowRectEx(&rc, GetWindowStyle(m_hWnd), (!(GetWindowStyle(m_hWnd) & WS_CHILD) && (::GetMenu(m_hWnd) != NULL)), GetWindowExStyle(m_hWnd)) ) return;
+    if ( !::GetClientRect(m_hWnd, &rc) ) return (-1L);
+    if ( cx != -1 ) rc.right = cx;
+    if ( cy != -1 ) rc.bottom = cy;
+    if ( !::AdjustWindowRectEx(&rc, GetWindowStyle(m_hWnd), (!(GetWindowStyle(m_hWnd) & WS_CHILD) && (::GetMenu(m_hWnd) != NULL)), GetWindowExStyle(m_hWnd)) ) return (-1L);
     ::SetWindowPos(m_hWnd, NULL, 0, 0, rc.right - rc.left, rc.bottom - rc.top, SWP_NOZORDER | SWP_NOMOVE | SWP_NOACTIVATE);
+	return (0L);
 }
 
 LRESULT CWindowWnd::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam)
@@ -488,8 +524,9 @@ LRESULT CWindowWnd::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam)
     return ::CallWindowProc(m_OldWndProc, m_hWnd, uMsg, wParam, lParam);
 }
 
-void CWindowWnd::OnFinalMessage(HWND /*hWnd*/)
+LRESULT CWindowWnd::OnFinalMessage(HWND /*hWnd*/)
 {
+	return (0L);
 }
 
 } // namespace DuiLib

@@ -15,23 +15,23 @@ namespace DuiLib
 		UINT GetControlFlags() const;
 
 		void SetSepWidth(int iWidth);
-		int GetSepWidth() const;
-		void SetSepImmMode(bool bImmediately);
-		bool IsSepImmMode() const;
+		LONG GetSepWidth() const;
+		void SetSepImmMode(BOOL bImmediately);
+		BOOL IsSepImmMode() const;
 		void SetAttribute(LPCTSTR pstrName, LPCTSTR pstrValue);
-		void DoEvent(TEventUI& event);
+		LRESULT DoEvent(TEventUI& event);
 
-		void SetPos(RECT rc, bool bNeedInvalidate = true);
-		void DoPostPaint(HDC hDC, const RECT& rcPaint);
+		LRESULT SetPos(RECT rc, BOOL bNeedInvalidate = TRUE);
+		LRESULT DoPostPaint(HDC hDC, const RECT& rcPaint);
 
-		RECT GetThumbRect(bool bUseNew = false) const;
+		RECT GetThumbRect(BOOL bUseNew = FALSE) const;
 
 	protected:
-		int m_iSepWidth;
+		LONG m_iSepWidth;
 		UINT m_uButtonState;
 		POINT m_ptLastMouse;
 		RECT m_rcNewPos;
-		bool m_bImmMode;
+		BOOL m_bImmMode;
 	};
 }
 #endif // __UIHORIZONTALLAYOUT_H__

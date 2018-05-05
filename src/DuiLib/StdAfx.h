@@ -9,7 +9,7 @@
 #pragma once
 
 #ifdef __GNUC__
-//
+// 若没找到min，max的头文件-_-
 #ifndef min
 #define min(a,b) (((a) < (b)) ? (a) : (b))
 #endif
@@ -54,50 +54,13 @@
 
 #include "UIlib.h"
 
-#include <ocidl.h>
 #include <olectl.h>
-
-#define min(a,b) (((a) < (b)) ? (a) : (b))
-#define max(a,b) (((a) > (b)) ? (a) : (b))
 
 #define lengthof(x) (sizeof(x)/sizeof(*x))
 #define MAX max
 #define MIN min
 #define CLAMP(x,a,b) (MIN(b,MAX(a,x)))
 
-#if !defined(T2BSTR)
-extern __inline char* WcharToChar(wchar_t* wc)
-{
-    int len= WideCharToMultiByte(CP_ACP,0,wc,wcslen(wc),NULL,0,NULL,NULL);
-    char * m_char=new char[len+1];
-    WideCharToMultiByte(CP_ACP,0,wc,wcslen(wc),m_char,len,NULL,NULL);
-    m_char[len]='\0';
-    return m_char;
-}
-extern __inline wchar_t* CharToWchar(char* c)
-{
-    int len = MultiByteToWideChar(CP_ACP,0,c,strlen(c),NULL,0);
-    wchar_t * m_wchar=new wchar_t[len+1];
-    MultiByteToWideChar(CP_ACP,0,c,strlen(c),m_wchar,len);
-    m_wchar[len]= L'\0';
-    return m_wchar;
-}
-extern __inline BSTR T2BSTR(LPCTSTR lpT, BSTR bstrValue)
-{
-#if !defined(UNICODE) && !defined(_UNICODE)
-    wchar_t * pW = CharToWchar((LPSTR)lpT);
-    if(pW)
-    {
-        wcscpy(bstrValue, pW);
-        free(pW);
-    }
-    return bstrValue;
-#else
-    return (BSTR)lpT;
-#endif
-}
-
-#endif // T2BSTR
 //{{AFX_INSERT_LOCATION}}
 // Microsoft Visual C++ will insert additional declarations immediately before the previous line.
 

@@ -39,7 +39,7 @@ namespace DuiLib
 		pCheckBox->SetVisible(false);
 		pItemButton->SetMouseEnabled(false);
 
-		if(_ParentNode)
+		if (_ParentNode)
 		{
 			if (_tcsicmp(_ParentNode->GetClass(), DUI_CTR_TREENODE) != 0)
 				return;
@@ -85,7 +85,7 @@ namespace DuiLib
 	//************************************
 	LPVOID CTreeNodeUI::GetInterface( LPCTSTR pstrName )
 	{
-		if( _tcscmp(pstrName, DUI_CTR_TREENODE) == 0 ) return static_cast<CTreeNodeUI*>(this);
+		if ( _tcscmp(pstrName, DUI_CTR_TREENODE) == 0 ) return static_cast<CTreeNodeUI*>(this);
 		return CListContainerElementUI::GetInterface(pstrName);
 	}
 	
@@ -95,28 +95,28 @@ namespace DuiLib
 	// 参数信息: TEventUI & event
 	// 函数说明:
 	//************************************
-	void CTreeNodeUI::DoEvent( TEventUI& event )
+	LRESULT CTreeNodeUI::DoEvent(TEventUI& event)
 	{
-		if( !IsMouseEnabled() && event.Type > UIEVENT__MOUSEBEGIN && event.Type < UIEVENT__MOUSEEND ) {
-			if( m_pOwner != NULL ) m_pOwner->DoEvent(event);
+		if ( !IsMouseEnabled() && event.Type > UIEVENT__MOUSEBEGIN && event.Type < UIEVENT__MOUSEEND ) {
+			if ( m_pOwner != NULL ) m_pOwner->DoEvent(event);
 			else CContainerUI::DoEvent(event);
-			return;
+			return (0L);
 		}
 
 		CListContainerElementUI::DoEvent(event);
 
-		if( event.Type == UIEVENT_DBLCLICK )
+		if ( event.Type == UIEVENT_DBLCLICK )
 		{
-			if( IsEnabled() ) {
+			if ( IsEnabled() ) {
 				m_pManager->SendNotify(this, DUI_MSGTYPE_ITEMDBCLICK);
 				Invalidate();
 			}
-			return;
+			return (0L);
 		}
-		if( event.Type == UIEVENT_MOUSEENTER )
+		else if ( event.Type == UIEVENT_MOUSEENTER )
 		{
-			if( IsEnabled()) {
-				if(m_bSelected && GetSelItemHotTextColor())
+			if ( IsEnabled()) {
+				if (m_bSelected && GetSelItemHotTextColor())
 					pItemButton->SetTextColor(GetSelItemHotTextColor());
 				else
 					pItemButton->SetTextColor(GetItemHotTextColor());
@@ -126,12 +126,12 @@ namespace DuiLib
 
 			//return;
 		}
-		if( event.Type == UIEVENT_MOUSELEAVE )
+		else if ( event.Type == UIEVENT_MOUSELEAVE )
 		{
-			if( IsEnabled()) {
-				if(m_bSelected && GetSelItemTextColor())
+			if ( IsEnabled()) {
+				if (m_bSelected && GetSelItemTextColor())
 					pItemButton->SetTextColor(GetSelItemTextColor());
-				else if(!m_bSelected)
+				else if (!m_bSelected)
 					pItemButton->SetTextColor(GetItemTextColor());
 			}
 			else 
@@ -139,6 +139,8 @@ namespace DuiLib
 
 			//return;
 		}
+
+		return (0L);
 	}
 
 	//************************************
@@ -148,12 +150,12 @@ namespace DuiLib
 	//************************************
 	void CTreeNodeUI::Invalidate()
 	{
-		if( !IsVisible() )
+		if ( !IsVisible() )
 			return;
 
-		if( GetParent() ) {
+		if ( GetParent() ) {
 			CContainerUI* pParentContainer = static_cast<CContainerUI*>(GetParent()->GetInterface(DUI_CTR_CONTAINER));
-			if( pParentContainer ) {
+			if ( pParentContainer ) {
 				RECT rc = pParentContainer->GetPos();
 				RECT rcInset = pParentContainer->GetInset();
 				rc.left += rcInset.left;
@@ -161,12 +163,12 @@ namespace DuiLib
 				rc.right -= rcInset.right;
 				rc.bottom -= rcInset.bottom;
 				CScrollBarUI* pVerticalScrollBar = pParentContainer->GetVerticalScrollBar();
-				if( pVerticalScrollBar && pVerticalScrollBar->IsVisible() ) rc.right -= pVerticalScrollBar->GetFixedWidth();
+				if ( pVerticalScrollBar && pVerticalScrollBar->IsVisible() ) rc.right -= pVerticalScrollBar->GetFixedWidth();
 				CScrollBarUI* pHorizontalScrollBar = pParentContainer->GetHorizontalScrollBar();
-				if( pHorizontalScrollBar && pHorizontalScrollBar->IsVisible() ) rc.bottom -= pHorizontalScrollBar->GetFixedHeight();
+				if ( pHorizontalScrollBar && pHorizontalScrollBar->IsVisible() ) rc.bottom -= pHorizontalScrollBar->GetFixedHeight();
 
 				RECT invalidateRc = m_rcItem;
-				if( !::IntersectRect(&invalidateRc, &m_rcItem, &rc) ) 
+				if ( !::IntersectRect(&invalidateRc, &m_rcItem, &rc) ) 
 					return;
 
 				CControlUI* pParent = GetParent();
@@ -176,11 +178,11 @@ namespace DuiLib
 				{
 					rcTemp = invalidateRc;
 					rcParent = pParent->GetPos();
-					if( !::IntersectRect(&invalidateRc, &rcTemp, &rcParent) ) 
+					if ( !::IntersectRect(&invalidateRc, &rcTemp, &rcParent) ) 
 						return;
 				}
 
-				if( m_pManager != NULL ) m_pManager->Invalidate(invalidateRc);
+				if ( m_pManager != NULL ) m_pManager->Invalidate(invalidateRc);
 			}
 			else {
 				CContainerUI::Invalidate();
@@ -197,10 +199,10 @@ namespace DuiLib
 	// 参数信息: bool bSelect
 	// 函数说明: 
 	//************************************
-	bool CTreeNodeUI::Select( bool bSelect /*= true*/,  bool bTriggerEvent)
+	BOOL CTreeNodeUI::Select( BOOL bSelect /*= true*/,  BOOL bTriggerEvent)
 	{
-		bool nRet = CListContainerElementUI::Select(bSelect, bTriggerEvent);
-		if(m_bSelected)
+		BOOL nRet = CListContainerElementUI::Select(bSelect, bTriggerEvent);
+		if (m_bSelected)
 			pItemButton->SetTextColor(GetSelItemTextColor());
 		else 
 			pItemButton->SetTextColor(GetItemTextColor());
@@ -214,12 +216,17 @@ namespace DuiLib
 	// 参数信息: CControlUI * _pTreeNodeUI
 	// 函数说明: 通过节点对象添加节点
 	//************************************
-	bool CTreeNodeUI::Add( CControlUI* _pTreeNodeUI )
+	LRESULT CTreeNodeUI::Add(CControlUI* _pTreeNodeUI)
 	{
 		if (_tcsicmp(_pTreeNodeUI->GetClass(), DUI_CTR_TREENODE) == 0)
-			return AddChildNode((CTreeNodeUI*)_pTreeNodeUI);
-
-		return CListContainerElementUI::Add(_pTreeNodeUI);
+		{
+			AddChildNode((CTreeNodeUI*)_pTreeNodeUI);
+		}
+		else
+		{
+			CListContainerElementUI::Add(_pTreeNodeUI);
+		}
+		return (0L);
 	}
 
 	//************************************
@@ -229,30 +236,30 @@ namespace DuiLib
 	// 参数信息: int iIndex				该参数仅针对当前节点下的兄弟索引，并非列表视图索引
 	// 函数说明: 
 	//************************************
-	bool CTreeNodeUI::AddAt( CControlUI* pControl, int iIndex )
+	LRESULT CTreeNodeUI::AddAt(CControlUI* pControl, int iIndex)
 	{
-		if(NULL == static_cast<CTreeNodeUI*>(pControl->GetInterface(DUI_CTR_TREENODE)))
-			return false;
+		if (NULL == static_cast<CTreeNodeUI*>(pControl->GetInterface(DUI_CTR_TREENODE)))
+			return (-1L);
 
 		CTreeNodeUI* pIndexNode = static_cast<CTreeNodeUI*>(mTreeNodes.GetAt(iIndex));
-		if(!pIndexNode){
-			if(!mTreeNodes.Add(pControl))
-				return false;
+		if (!pIndexNode){
+			if (mTreeNodes.Add(pControl) < (0L))
+				return (-1L);
 		}
-		else if(pIndexNode && !mTreeNodes.InsertAt(iIndex,pControl))
-			return false;
+		else if (pIndexNode && mTreeNodes.InsertAt(iIndex,pControl) < (0L))
+			return (-1L);
 
-		if(!pIndexNode && pTreeView && pTreeView->GetItemAt(GetTreeIndex()+1))
+		if (!pIndexNode && pTreeView && pTreeView->GetItemAt(GetTreeIndex()+1))
 			pIndexNode = static_cast<CTreeNodeUI*>(pTreeView->GetItemAt(GetTreeIndex()+1)->GetInterface(DUI_CTR_TREENODE));
 
 		pControl = CalLocation((CTreeNodeUI*)pControl);
 
-		if(pTreeView && pIndexNode)
+		if (pTreeView && pIndexNode)
 			return pTreeView->AddAt((CTreeNodeUI*)pControl,pIndexNode);
 		else 
 			return pTreeView->Add((CTreeNodeUI*)pControl);
 
-		return true;
+		return (0L);
 	}
 
 	//************************************
@@ -261,7 +268,7 @@ namespace DuiLib
 	// 参数信息: bool _IsVisible
 	// 函数说明: 
 	//************************************
-	void CTreeNodeUI::SetVisibleTag( bool _IsVisible )
+	void CTreeNodeUI::SetVisibleTag( BOOL _IsVisible )
 	{
 		m_bIsVisable = _IsVisible;
 	}
@@ -271,7 +278,7 @@ namespace DuiLib
 	// 返回类型: bool
 	// 函数说明: 
 	//************************************
-	bool CTreeNodeUI::GetVisibleTag()
+	BOOL CTreeNodeUI::GetVisibleTag()
 	{
 		return m_bIsVisable;
 	}
@@ -303,7 +310,7 @@ namespace DuiLib
 	// 参数信息: bool _Selected
 	// 函数说明: 
 	//************************************
-	void CTreeNodeUI::CheckBoxSelected( bool _Selected )
+	void CTreeNodeUI::CheckBoxSelected( BOOL _Selected )
 	{
 		pCheckBox->Selected(_Selected);
 	}
@@ -313,7 +320,7 @@ namespace DuiLib
 	// 返回类型: bool
 	// 函数说明: 
 	//************************************
-	bool CTreeNodeUI::IsCheckBoxSelected() const
+	BOOL CTreeNodeUI::IsCheckBoxSelected() const
 	{
 		return pCheckBox->IsSelected();
 	}
@@ -323,7 +330,7 @@ namespace DuiLib
 	// 返回类型: bool
 	// 函数说明: 
 	//************************************
-	bool CTreeNodeUI::IsHasChild() const
+	BOOL CTreeNodeUI::IsHasChild() const
 	{
 		return !mTreeNodes.IsEmpty();
 	}
@@ -334,26 +341,26 @@ namespace DuiLib
 	// 参数信息: CTreeNodeUI * _pTreeNodeUI
 	// 函数说明: 
 	//************************************
-	bool CTreeNodeUI::AddChildNode( CTreeNodeUI* _pTreeNodeUI )
+	LRESULT CTreeNodeUI::AddChildNode( CTreeNodeUI* _pTreeNodeUI )
 	{
 		if (!_pTreeNodeUI)
-			return false;
+			return (-1L);
 
 		if (_tcsicmp(_pTreeNodeUI->GetClass(), DUI_CTR_TREENODE) != 0)
-			return false;
+			return (-1L);
 
 		_pTreeNodeUI = CalLocation(_pTreeNodeUI);
 
-		bool nRet = true;
+		LRESULT nRet = (0L);
 
-		if(pTreeView){
+		if (pTreeView){
 			CTreeNodeUI* pNode = static_cast<CTreeNodeUI*>(mTreeNodes.GetAt(mTreeNodes.GetSize()-1));
-			if(!pNode || !pNode->GetLastNode())
-				nRet = pTreeView->AddAt(_pTreeNodeUI,GetTreeIndex()+1) >= 0;
-			else nRet = pTreeView->AddAt(_pTreeNodeUI,pNode->GetLastNode()->GetTreeIndex()+1) >= 0;
+			if (!pNode || !pNode->GetLastNode())
+				nRet = pTreeView->AddAt(_pTreeNodeUI,GetTreeIndex()+1);
+			else nRet = pTreeView->AddAt(_pTreeNodeUI,pNode->GetLastNode()->GetTreeIndex()+1);
 		}
 
-		if(nRet)
+		if (nRet >= (0L))
 			mTreeNodes.Add(_pTreeNodeUI);
 
 		return nRet;
@@ -365,23 +372,23 @@ namespace DuiLib
 	// 参数信息: CTreeNodeUI * _pTreeNodeUI
 	// 函数说明: 
 	//************************************
-	bool CTreeNodeUI::RemoveAt( CTreeNodeUI* _pTreeNodeUI )
+	LRESULT CTreeNodeUI::RemoveAt( CTreeNodeUI* _pTreeNodeUI )
 	{
 		int nIndex = mTreeNodes.Find(_pTreeNodeUI);
 		CTreeNodeUI* pNode = static_cast<CTreeNodeUI*>(mTreeNodes.GetAt(nIndex));
-		if(pNode && pNode == _pTreeNodeUI)
+		if (pNode && pNode == _pTreeNodeUI)
 		{
 			while(pNode->IsHasChild())
 				pNode->RemoveAt(static_cast<CTreeNodeUI*>(pNode->mTreeNodes.GetAt(0)));
 
 			mTreeNodes.Remove(nIndex);
 
-			if(pTreeView)
+			if (pTreeView)
 				pTreeView->Remove(_pTreeNodeUI);
 
-			return true;
+			return (0L);
 		}
-		return false;
+		return (-1L);
 	}
 
 	//************************************
@@ -445,38 +452,38 @@ namespace DuiLib
 	//************************************
 	void CTreeNodeUI::SetAttribute( LPCTSTR pstrName, LPCTSTR pstrValue )
 	{
-		if(_tcscmp(pstrName, _T("text")) == 0 )
+		if (_tcscmp(pstrName, _T("text")) == 0 )
 			pItemButton->SetText(pstrValue);
-		else if(_tcscmp(pstrName, _T("horizattr")) == 0 )
+		else if (_tcscmp(pstrName, _T("horizattr")) == 0 )
 			pHoriz->SetAttributeList(pstrValue);
-		else if(_tcscmp(pstrName, _T("dotlineattr")) == 0 )
+		else if (_tcscmp(pstrName, _T("dotlineattr")) == 0 )
 			pDottedLine->SetAttributeList(pstrValue);
-		else if(_tcscmp(pstrName, _T("folderattr")) == 0 )
+		else if (_tcscmp(pstrName, _T("folderattr")) == 0 )
 			pFolderButton->SetAttributeList(pstrValue);
-		else if(_tcscmp(pstrName, _T("checkboxattr")) == 0 )
+		else if (_tcscmp(pstrName, _T("checkboxattr")) == 0 )
 			pCheckBox->SetAttributeList(pstrValue);
-		else if(_tcscmp(pstrName, _T("itemattr")) == 0 )
+		else if (_tcscmp(pstrName, _T("itemattr")) == 0 )
 			pItemButton->SetAttributeList(pstrValue);
-		else if(_tcscmp(pstrName, _T("itemtextcolor")) == 0 ){
-			if( *pstrValue == _T('#')) pstrValue = ::CharNext(pstrValue);
+		else if (_tcscmp(pstrName, _T("itemtextcolor")) == 0 ){
+			if ( *pstrValue == _T('#')) pstrValue = ::CharNext(pstrValue);
 			LPTSTR pstr = NULL;
 			DWORD clrColor = _tcstoul(pstrValue, &pstr, 16);
 			SetItemTextColor(clrColor);
 		}
-		else if(_tcscmp(pstrName, _T("itemhottextcolor")) == 0 ){
-			if( *pstrValue == _T('#')) pstrValue = ::CharNext(pstrValue);
+		else if (_tcscmp(pstrName, _T("itemhottextcolor")) == 0 ){
+			if ( *pstrValue == _T('#')) pstrValue = ::CharNext(pstrValue);
 			LPTSTR pstr = NULL;
 			DWORD clrColor = _tcstoul(pstrValue, &pstr, 16);
 			SetItemHotTextColor(clrColor);
 		}
-		else if(_tcscmp(pstrName, _T("selitemtextcolor")) == 0 ){
-			if( *pstrValue == _T('#')) pstrValue = ::CharNext(pstrValue);
+		else if (_tcscmp(pstrName, _T("selitemtextcolor")) == 0 ){
+			if ( *pstrValue == _T('#')) pstrValue = ::CharNext(pstrValue);
 			LPTSTR pstr = NULL;
 			DWORD clrColor = _tcstoul(pstrValue, &pstr, 16);
 			SetSelItemTextColor(clrColor);
 		}
-		else if(_tcscmp(pstrName, _T("selitemhottextcolor")) == 0 ){
-			if( *pstrValue == _T('#')) pstrValue = ::CharNext(pstrValue);
+		else if (_tcscmp(pstrName, _T("selitemhottextcolor")) == 0 ){
+			if ( *pstrValue == _T('#')) pstrValue = ::CharNext(pstrValue);
 			LPTSTR pstr = NULL;
 			DWORD clrColor = _tcstoul(pstrValue, &pstr, 16);
 			SetSelItemHotTextColor(clrColor);
@@ -511,7 +518,7 @@ namespace DuiLib
 	// 参数信息: bool _IsVisibled
 	// 函数说明: 
 	//************************************
-	void CTreeNodeUI::SetVisibleFolderBtn( bool _IsVisibled )
+	void CTreeNodeUI::SetVisibleFolderBtn( BOOL _IsVisibled )
 	{
 		pFolderButton->SetVisible(_IsVisibled);
 	}
@@ -521,7 +528,7 @@ namespace DuiLib
 	// 返回类型: bool
 	// 函数说明: 
 	//************************************
-	bool CTreeNodeUI::GetVisibleFolderBtn()
+	BOOL CTreeNodeUI::GetVisibleFolderBtn()
 	{
 		return pFolderButton->IsVisible();
 	}
@@ -532,7 +539,7 @@ namespace DuiLib
 	// 参数信息: bool _IsVisibled
 	// 函数说明: 
 	//************************************
-	void CTreeNodeUI::SetVisibleCheckBtn( bool _IsVisibled )
+	void CTreeNodeUI::SetVisibleCheckBtn( BOOL _IsVisibled )
 	{
 		pCheckBox->SetVisible(_IsVisibled);
 	}
@@ -542,7 +549,7 @@ namespace DuiLib
 	// 返回类型: bool
 	// 函数说明: 
 	//************************************
-	bool CTreeNodeUI::GetVisibleCheckBtn()
+	BOOL CTreeNodeUI::GetVisibleCheckBtn()
 	{
 		return pCheckBox->IsVisible();
 	}
@@ -554,11 +561,11 @@ namespace DuiLib
 	//************************************
 	int CTreeNodeUI::GetTreeIndex()
 	{
-		if(!pTreeView)
+		if (!pTreeView)
 			return -1;
 
 		for(int nIndex = 0;nIndex < pTreeView->GetCount();nIndex++){
-			if(this == pTreeView->GetItemAt(nIndex))
+			if (this == pTreeView->GetItemAt(nIndex))
 				return nIndex;
 		}
 
@@ -572,10 +579,10 @@ namespace DuiLib
 	//************************************
 	int CTreeNodeUI::GetNodeIndex()
 	{
-		if(!GetParentNode() && !pTreeView)
+		if (!GetParentNode() && !pTreeView)
 			return -1;
 
-		if(!GetParentNode() && pTreeView)
+		if (!GetParentNode() && pTreeView)
 			return GetTreeIndex();
 
 		return GetParentNode()->GetTreeNodes().Find(this);
@@ -588,19 +595,19 @@ namespace DuiLib
 	//************************************
 	CTreeNodeUI* CTreeNodeUI::GetLastNode( )
 	{
-		if(!IsHasChild())
+		if (!IsHasChild())
 			return this;
 
 		CTreeNodeUI* nRetNode = NULL;
 
 		for(int nIndex = 0;nIndex < GetTreeNodes().GetSize();nIndex++){
 			CTreeNodeUI* pNode = static_cast<CTreeNodeUI*>(GetTreeNodes().GetAt(nIndex));
-			if(!pNode)
+			if (!pNode)
 				continue;
 
 			CDuiString aa = pNode->GetItemText();
 
-			if(pNode->IsHasChild())
+			if (pNode->IsHasChild())
 				nRetNode = pNode->GetLastNode();
 			else 
 				nRetNode = pNode;
@@ -752,16 +759,16 @@ namespace DuiLib
 
 	LPVOID CTreeViewUI::GetInterface( LPCTSTR pstrName )
 	{
-		if( _tcscmp(pstrName, DUI_CTR_TREEVIEW) == 0 ) return static_cast<CTreeViewUI*>(this);
+		if ( _tcscmp(pstrName, DUI_CTR_TREEVIEW) == 0 ) return static_cast<CTreeViewUI*>(this);
 		return CListUI::GetInterface(pstrName);
 	}
 
-	bool CTreeViewUI::Add(CControlUI* pControl)
+	LRESULT CTreeViewUI::Add(CControlUI* pControl)
 	{
-		if (!pControl) return false;
+		if (!pControl) return (-1L);
 
         CTreeNodeUI* pTreeNode = static_cast<CTreeNodeUI*>(pControl->GetInterface(DUI_CTR_TREENODE));
-        if (pTreeNode == NULL) return false;
+        if (pTreeNode == NULL) return (-1L);
 
 		pTreeNode->OnNotify += MakeDelegate(this,&CTreeViewUI::OnDBClickItem);
 		pTreeNode->GetFolderButton()->OnNotify += MakeDelegate(this,&CTreeViewUI::OnFolderChanged);
@@ -769,47 +776,47 @@ namespace DuiLib
 
 		pTreeNode->SetVisibleFolderBtn(m_bVisibleFolderBtn);
 		pTreeNode->SetVisibleCheckBtn(m_bVisibleCheckBtn);
-		if(m_uItemMinWidth > 0)	pTreeNode->SetMinWidth(m_uItemMinWidth);
+		if (m_uItemMinWidth > 0)	pTreeNode->SetMinWidth(m_uItemMinWidth);
 
 		CListUI::Add(pTreeNode);
 
-		if(pTreeNode->GetCountChild() > 0)
+		if (pTreeNode->GetCountChild() > 0)
 		{
 			int nCount = pTreeNode->GetCountChild();
 			for(int nIndex = 0;nIndex < nCount;nIndex++)
 			{
 				CTreeNodeUI* pNode = pTreeNode->GetChildNode(nIndex);
-				if(pNode) Add(pNode);
+				if (pNode) Add(pNode);
 			}
 		}
 
 		pTreeNode->SetTreeView(this);
-		return true;
+		return (0L);
 	}
 
-    bool CTreeViewUI::AddAt(CControlUI* pControl, int iIndex)
+	LRESULT CTreeViewUI::AddAt(CControlUI* pControl, LONG iIndex)
     {
-        if (!pControl) return false;
+        if (!pControl) return (-1L);
 
         CTreeNodeUI* pTreeNode = static_cast<CTreeNodeUI*>(pControl->GetInterface(DUI_CTR_TREENODE));
-        if (pTreeNode == NULL) return false;
-        return AddAt(pTreeNode, iIndex) >= 0;
+        if (pTreeNode == NULL) return (-1L);
+        return AddAt(pTreeNode, iIndex);
     }
 
-	bool CTreeViewUI::Remove(CControlUI* pControl, bool bDoNotDestroy)
+	LRESULT CTreeViewUI::Remove(CControlUI* pControl, BOOL bDoNotDestroy)
 	{
         if (!pControl) return false;
 
         CTreeNodeUI* pTreeNode = static_cast<CTreeNodeUI*>(pControl->GetInterface(DUI_CTR_TREENODE));
         if (pTreeNode == NULL) return CListUI::Remove(pControl, bDoNotDestroy);
 
-		if(pTreeNode->GetCountChild() > 0)
+		if (pTreeNode->GetCountChild() > 0)
 		{
 			int nCount = pTreeNode->GetCountChild();
 			for(int nIndex = 0;nIndex < nCount;nIndex++)
 			{
 				CTreeNodeUI* pNode = pTreeNode->GetChildNode(nIndex);
-				if(pNode){
+				if (pNode){
 					pTreeNode->Remove(pNode, true);
 				}
 			}
@@ -817,23 +824,25 @@ namespace DuiLib
 		return CListUI::Remove(pControl, bDoNotDestroy);
 	}
 
-	bool CTreeViewUI::RemoveAt( int iIndex, bool bDoNotDestroy )
+	LRESULT CTreeViewUI::RemoveAt(LONG iIndex, BOOL bDoNotDestroy)
 	{
         CControlUI* pControl = GetItemAt(iIndex);
-        if (pControl == NULL) return false;
+        if (pControl == NULL) return (-1L);
 
         CTreeNodeUI* pTreeNode = static_cast<CTreeNodeUI*>(pControl->GetInterface(DUI_CTR_TREENODE));
-        if (pTreeNode == NULL) return CListUI::Remove(pControl, bDoNotDestroy);
-
+		if (pTreeNode == NULL)
+		{
+			return CListUI::Remove(pControl, bDoNotDestroy);
+		}
 		return Remove(pTreeNode);
 	}
 
-	void CTreeViewUI::RemoveAll()
+	LRESULT CTreeViewUI::RemoveAll()
 	{
-		CListUI::RemoveAll();
+		return CListUI::RemoveAll();
 	}
 
-    long CTreeViewUI::AddAt(CTreeNodeUI* pControl, int iIndex)
+	LRESULT CTreeViewUI::AddAt(CTreeNodeUI* pControl, LONG iIndex)
     {
         if (!pControl) return -1;
 
@@ -841,7 +850,7 @@ namespace DuiLib
         if (pTreeNode == NULL) return -1;
 
         CTreeNodeUI* pParent = static_cast<CTreeNodeUI*>(GetItemAt(iIndex));
-        if(!pParent) return -1;
+        if (!pParent) return -1;
 
         pTreeNode->OnNotify += MakeDelegate(this,&CTreeViewUI::OnDBClickItem);
         pTreeNode->GetFolderButton()->OnNotify += MakeDelegate(this,&CTreeViewUI::OnFolderChanged);
@@ -850,44 +859,44 @@ namespace DuiLib
         pTreeNode->SetVisibleFolderBtn(m_bVisibleFolderBtn);
         pTreeNode->SetVisibleCheckBtn(m_bVisibleCheckBtn);
 
-        if(m_uItemMinWidth > 0) pTreeNode->SetMinWidth(m_uItemMinWidth);
+        if (m_uItemMinWidth > 0) pTreeNode->SetMinWidth(m_uItemMinWidth);
 
         CListUI::AddAt(pTreeNode,iIndex);
 
-        if(pTreeNode->GetCountChild() > 0)
+        if (pTreeNode->GetCountChild() > 0)
         {
             int nCount = pTreeNode->GetCountChild();
             for(int nIndex = 0;nIndex < nCount;nIndex++)
             {
                 CTreeNodeUI* pNode = pTreeNode->GetChildNode(nIndex);
-                if(pNode)
+                if (pNode)
                     return AddAt(pNode,iIndex+1);
             }
         }
         else
             return iIndex+1;
 
-        return -1;
+        return (-1L);
     }
 
-	bool CTreeViewUI::AddAt( CTreeNodeUI* pControl,CTreeNodeUI* _IndexNode )
+	LRESULT CTreeViewUI::AddAt(CTreeNodeUI* pControl, CTreeNodeUI* _IndexNode)
 	{
-		if(!_IndexNode && !pControl)
-			return false;
+		if (!_IndexNode && !pControl)
+			return (-1L);
 
 		int nItemIndex = -1;
 
 		for(int nIndex = 0;nIndex < GetCount();nIndex++){
-			if(_IndexNode == GetItemAt(nIndex)){
+			if (_IndexNode == GetItemAt(nIndex)){
 				nItemIndex = nIndex;
 				break;
 			}
 		}
 
-		if(nItemIndex == -1)
-			return false;
+		if (nItemIndex == -1)
+			return (-1L);
 
-		return AddAt(pControl,nItemIndex) >= 0;
+		return AddAt(pControl,nItemIndex);
 	}
 
 	//************************************
@@ -896,69 +905,69 @@ namespace DuiLib
 	// 参数信息: TNotifyUI & msg
 	// 函数说明: 
 	//************************************
-	void CTreeViewUI::Notify( TNotifyUI& msg )
+	LRESULT CTreeViewUI::Notify(TNotifyUI& msg)
 	{
-		
+		return (0L);
 	}
 	
 	//************************************
 	// 函数名称: OnCheckBoxChanged
-	// 返回类型: bool
+	// 返回类型: LRESULT
 	// 参数信息: void * param
 	// 函数说明: 
 	//************************************
-	bool CTreeViewUI::OnCheckBoxChanged( void* param )
+	LRESULT CTreeViewUI::OnCheckBoxChanged(void* param)
 	{
 		TNotifyUI* pMsg = (TNotifyUI*)param;
-		if(pMsg->sType == DUI_MSGTYPE_SELECTCHANGED)
+		if (pMsg->sType == DUI_MSGTYPE_SELECTCHANGED)
 		{
 			CCheckBoxUI* pCheckBox = (CCheckBoxUI*)pMsg->pSender;
 			CTreeNodeUI* pItem = (CTreeNodeUI*)pCheckBox->GetParent()->GetParent();
 			SetItemCheckBox(pCheckBox->GetCheck(),pItem);
-			return true;
+			return (0L);
 		}
-		return true;
+		return (-1L);
 	}
 	
 	//************************************
 	// 函数名称: OnFolderChanged
-	// 返回类型: bool
+	// 返回类型: LRESULT
 	// 参数信息: void * param
 	// 函数说明: 
 	//************************************
-	bool CTreeViewUI::OnFolderChanged( void* param )
+	LRESULT CTreeViewUI::OnFolderChanged(void* param)
 	{
 		TNotifyUI* pMsg = (TNotifyUI*)param;
-		if(pMsg->sType == DUI_MSGTYPE_SELECTCHANGED)
+		if (pMsg->sType == DUI_MSGTYPE_SELECTCHANGED)
 		{
 			CCheckBoxUI* pFolder = (CCheckBoxUI*)pMsg->pSender;
 			CTreeNodeUI* pItem = (CTreeNodeUI*)pFolder->GetParent()->GetParent();
 			pItem->SetVisibleTag(!pFolder->GetCheck());
 			SetItemExpand(!pFolder->GetCheck(),pItem);
-			return true;
+			return (0L);
 		}
-		return true;
+		return (-1L);
 	}
 	
 	//************************************
 	// 函数名称: OnDBClickItem
-	// 返回类型: bool
+	// 返回类型: LRESULT
 	// 参数信息: void * param
 	// 函数说明:
 	//************************************
-	bool CTreeViewUI::OnDBClickItem( void* param )
+	LRESULT CTreeViewUI::OnDBClickItem(void* param)
 	{
 		TNotifyUI* pMsg = (TNotifyUI*)param;
-		if(pMsg->sType == DUI_MSGTYPE_ITEMDBCLICK)
+		if (pMsg->sType == DUI_MSGTYPE_ITEMDBCLICK)
 		{
 			CTreeNodeUI* pItem		= static_cast<CTreeNodeUI*>(pMsg->pSender);
 			CCheckBoxUI* pFolder	= pItem->GetFolderButton();
 			pFolder->Selected(!pFolder->IsSelected());
 			pItem->SetVisibleTag(!pFolder->GetCheck());
 			SetItemExpand(!pFolder->GetCheck(),pItem);
-			return true;
+			return (0L);
 		}
-		return false;
+		return (-1L);
 	}
 
 	//************************************
@@ -968,18 +977,18 @@ namespace DuiLib
 	// 参数信息: CTreeNodeUI * _TreeNode
 	// 函数说明: 
 	//************************************
-	bool CTreeViewUI::SetItemCheckBox( bool _Selected,CTreeNodeUI* _TreeNode /*= NULL*/ )
+	BOOL CTreeViewUI::SetItemCheckBox( BOOL _Selected,CTreeNodeUI* _TreeNode /*= NULL*/ )
 	{
-		if(_TreeNode)
+		if (_TreeNode)
 		{
-			if(_TreeNode->GetCountChild() > 0)
+			if (_TreeNode->GetCountChild() > 0)
 			{
 				int nCount = _TreeNode->GetCountChild();
 				for(int nIndex = 0;nIndex < nCount;nIndex++)
 				{
 					CTreeNodeUI* pItem = _TreeNode->GetChildNode(nIndex);
 					pItem->GetCheckBox()->Selected(_Selected);
-					if(pItem->GetCountChild())
+					if (pItem->GetCountChild())
 						SetItemCheckBox(_Selected,pItem);
 				}
 			}
@@ -993,7 +1002,7 @@ namespace DuiLib
 			{
 				CTreeNodeUI* pItem = (CTreeNodeUI*)GetItemAt(nIndex);
 				pItem->GetCheckBox()->Selected(_Selected);
-				if(pItem->GetCountChild())
+				if (pItem->GetCountChild())
 					SetItemCheckBox(_Selected,pItem);
 
 				nIndex++;
@@ -1010,11 +1019,11 @@ namespace DuiLib
 	// 参数信息: CTreeNodeUI * _TreeNode
 	// 函数说明: 
 	//************************************
-	void CTreeViewUI::SetItemExpand( bool _Expanded,CTreeNodeUI* _TreeNode /*= NULL*/ )
+	void CTreeViewUI::SetItemExpand( BOOL _Expanded,CTreeNodeUI* _TreeNode /*= NULL*/ )
 	{
-		if(_TreeNode)
+		if (_TreeNode)
 		{
-			if(_TreeNode->GetCountChild() > 0)
+			if (_TreeNode->GetCountChild() > 0)
 			{
 				int nCount = _TreeNode->GetCountChild();
 				for(int nIndex = 0;nIndex < nCount;nIndex++)
@@ -1022,7 +1031,7 @@ namespace DuiLib
 					CTreeNodeUI* pItem = _TreeNode->GetChildNode(nIndex);
 					pItem->SetVisible(_Expanded);
 
-					if(pItem->GetCountChild() && !pItem->GetFolderButton()->IsSelected())
+					if (pItem->GetCountChild() && !pItem->GetFolderButton()->IsSelected())
 						SetItemExpand(_Expanded,pItem);
 				}
 			}
@@ -1037,7 +1046,7 @@ namespace DuiLib
 
 				pItem->SetVisible(_Expanded);
 
-				if(pItem->GetCountChild() && !pItem->GetFolderButton()->IsSelected())
+				if (pItem->GetCountChild() && !pItem->GetFolderButton()->IsSelected())
 					SetItemExpand(_Expanded,pItem);
 
 				nIndex++;
@@ -1051,7 +1060,7 @@ namespace DuiLib
 	// 参数信息: bool _IsVisibled
 	// 函数说明: 
 	//************************************
-	void CTreeViewUI::SetVisibleFolderBtn( bool _IsVisibled )
+	void CTreeViewUI::SetVisibleFolderBtn( BOOL _IsVisibled )
 	{
 		m_bVisibleFolderBtn = _IsVisibled;
 		int nCount = this->GetCount();
@@ -1067,7 +1076,7 @@ namespace DuiLib
 	// 返回类型: bool
 	// 函数说明: 
 	//************************************
-	bool CTreeViewUI::GetVisibleFolderBtn()
+	BOOL CTreeViewUI::GetVisibleFolderBtn()
 	{
 		return m_bVisibleFolderBtn;
 	}
@@ -1078,7 +1087,7 @@ namespace DuiLib
 	// 参数信息: bool _IsVisibled
 	// 函数说明: 
 	//************************************
-	void CTreeViewUI::SetVisibleCheckBtn( bool _IsVisibled )
+	void CTreeViewUI::SetVisibleCheckBtn( BOOL _IsVisibled )
 	{
 		m_bVisibleCheckBtn = _IsVisibled;
 		int nCount = this->GetCount();
@@ -1094,7 +1103,7 @@ namespace DuiLib
 	// 返回类型: bool
 	// 函数说明: 
 	//************************************
-	bool CTreeViewUI::GetVisibleCheckBtn()
+	BOOL CTreeViewUI::GetVisibleCheckBtn()
 	{
 		return m_bVisibleCheckBtn;
 	}
@@ -1111,7 +1120,7 @@ namespace DuiLib
 
 		for(int nIndex = 0;nIndex < GetCount();nIndex++){
 			CTreeNodeUI* pTreeNode = static_cast<CTreeNodeUI*>(GetItemAt(nIndex));
-			if(pTreeNode)
+			if (pTreeNode)
 				pTreeNode->SetMinWidth(GetItemMinWidth());
 		}
 		Invalidate();
@@ -1137,7 +1146,7 @@ namespace DuiLib
 	{
 		for(int nIndex = 0;nIndex < GetCount();nIndex++){
 			CTreeNodeUI* pTreeNode = static_cast<CTreeNodeUI*>(GetItemAt(nIndex));
-			if(pTreeNode)
+			if (pTreeNode)
 				pTreeNode->SetItemTextColor(_dwItemTextColor);
 		}
 	}
@@ -1152,7 +1161,7 @@ namespace DuiLib
 	{
 		for(int nIndex = 0;nIndex < GetCount();nIndex++){
 			CTreeNodeUI* pTreeNode = static_cast<CTreeNodeUI*>(GetItemAt(nIndex));
-			if(pTreeNode)
+			if (pTreeNode)
 				pTreeNode->SetItemHotTextColor(_dwItemHotTextColor);
 		}
 	}
@@ -1167,7 +1176,7 @@ namespace DuiLib
 	{
 		for(int nIndex = 0;nIndex < GetCount();nIndex++){
 			CTreeNodeUI* pTreeNode = static_cast<CTreeNodeUI*>(GetItemAt(nIndex));
-			if(pTreeNode)
+			if (pTreeNode)
 				pTreeNode->SetSelItemTextColor(_dwSelItemTextColor);
 		}
 	}
@@ -1182,7 +1191,7 @@ namespace DuiLib
 	{
 		for(int nIndex = 0;nIndex < GetCount();nIndex++){
 			CTreeNodeUI* pTreeNode = static_cast<CTreeNodeUI*>(GetItemAt(nIndex));
-			if(pTreeNode)
+			if (pTreeNode)
 				pTreeNode->SetSelItemHotTextColor(_dwSelHotItemTextColor);
 		}
 	}
@@ -1196,32 +1205,32 @@ namespace DuiLib
 	//************************************
 	void CTreeViewUI::SetAttribute( LPCTSTR pstrName, LPCTSTR pstrValue )
 	{
-		if(_tcscmp(pstrName,_T("visiblefolderbtn")) == 0)
+		if (_tcscmp(pstrName,_T("visiblefolderbtn")) == 0)
 			SetVisibleFolderBtn(_tcscmp(pstrValue,_T("true")) == 0);
-		else if(_tcscmp(pstrName,_T("visiblecheckbtn")) == 0)
+		else if (_tcscmp(pstrName,_T("visiblecheckbtn")) == 0)
 			SetVisibleCheckBtn(_tcscmp(pstrValue,_T("true")) == 0);
-		else if(_tcscmp(pstrName,_T("itemminwidth")) == 0)
+		else if (_tcscmp(pstrName,_T("itemminwidth")) == 0)
 			SetItemMinWidth(_ttoi(pstrValue));
-		else if(_tcscmp(pstrName, _T("itemtextcolor")) == 0 ){
-			if( *pstrValue == _T('#')) pstrValue = ::CharNext(pstrValue);
+		else if (_tcscmp(pstrName, _T("itemtextcolor")) == 0 ){
+			if ( *pstrValue == _T('#')) pstrValue = ::CharNext(pstrValue);
 			LPTSTR pstr = NULL;
 			DWORD clrColor = _tcstoul(pstrValue, &pstr, 16);
 			SetItemTextColor(clrColor);
 		}
-		else if(_tcscmp(pstrName, _T("itemhottextcolor")) == 0 ){
-			if( *pstrValue == _T('#')) pstrValue = ::CharNext(pstrValue);
+		else if (_tcscmp(pstrName, _T("itemhottextcolor")) == 0 ){
+			if ( *pstrValue == _T('#')) pstrValue = ::CharNext(pstrValue);
 			LPTSTR pstr = NULL;
 			DWORD clrColor = _tcstoul(pstrValue, &pstr, 16);
 			SetItemHotTextColor(clrColor);
 		}
-		else if(_tcscmp(pstrName, _T("selitemtextcolor")) == 0 ){
-			if( *pstrValue == _T('#')) pstrValue = ::CharNext(pstrValue);
+		else if (_tcscmp(pstrName, _T("selitemtextcolor")) == 0 ){
+			if ( *pstrValue == _T('#')) pstrValue = ::CharNext(pstrValue);
 			LPTSTR pstr = NULL;
 			DWORD clrColor = _tcstoul(pstrValue, &pstr, 16);
 			SetSelItemTextColor(clrColor);
 		}
-		else if(_tcscmp(pstrName, _T("selitemhottextcolor")) == 0 ){
-			if( *pstrValue == _T('#')) pstrValue = ::CharNext(pstrValue);
+		else if (_tcscmp(pstrName, _T("selitemhottextcolor")) == 0 ){
+			if ( *pstrValue == _T('#')) pstrValue = ::CharNext(pstrValue);
 			LPTSTR pstr = NULL;
 			DWORD clrColor = _tcstoul(pstrValue, &pstr, 16);
 			SetSelItemHotTextColor(clrColor);

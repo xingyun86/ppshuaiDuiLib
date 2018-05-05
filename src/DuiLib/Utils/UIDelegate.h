@@ -8,86 +8,86 @@ namespace DuiLib {
 class DUILIB_API CDelegateBase
 {
 public:
-    CDelegateBase(void* pObject, void* pFn);
+    CDelegateBase(void* pObj, void* pFun);
     CDelegateBase(const CDelegateBase& rhs);
     virtual ~CDelegateBase();
-    bool Equals(const CDelegateBase& rhs) const;
-    bool operator() (void* param);
+	BOOL Equals(const CDelegateBase& rhs) const;
+	LRESULT operator() (void* param);
     virtual CDelegateBase* Copy() const = 0; // add const for gcc
 
 protected:
-    void* GetFn();
-    void* GetObject();
-    virtual bool Invoke(void* param) = 0;
+    void* GetFun();
+    void* GetObj();
+	virtual LRESULT Invoke(void* param) = 0;
 
 private:
-    void* m_pObject;
-    void* m_pFn;
+    void* m_pObj;
+    void* m_pFun;
 };
 
 class CDelegateStatic: public CDelegateBase
 {
-    typedef bool (*Fn)(void*);
+	typedef LRESULT(*Fun)(void*);
 public:
-    CDelegateStatic(Fn pFn) : CDelegateBase(NULL, (void *)pFn) { }
+    CDelegateStatic(Fun pFun) : CDelegateBase(NULL, (void *)pFun) { }
     CDelegateStatic(const CDelegateStatic& rhs) : CDelegateBase(rhs) { }
     virtual CDelegateBase* Copy() const { return new CDelegateStatic(*this); }
 
 protected:
-    virtual bool Invoke(void* param)
+	virtual LRESULT Invoke(void* param)
     {
-        Fn pFn = (Fn)GetFn();
-        return (*pFn)(param);
+        Fun pFun = (Fun)GetFun();
+        return (*pFun)(param);
     }
 };
 
 template <class O, class T>
 class CDelegate : public CDelegateBase
 {
-    typedef bool (T::* Fn)(void*);
+	typedef LRESULT(T::* Fun)(void*);
 public:
-    CDelegate(O* pObj, Fn pFn) : CDelegateBase(pObj, *(void**)&pFn) { }
+    CDelegate(O* pObj, Fun pFun) : CDelegateBase(pObj, *(void**)&pFun) { }
     CDelegate(const CDelegate& rhs) : CDelegateBase(rhs) { }
     virtual CDelegateBase* Copy() const { return new CDelegate(*this); }
 
 protected:
-    virtual bool Invoke(void* param)
+	virtual LRESULT Invoke(void* param)
     {
-		O* pObject = (O*) GetObject();
+		O* pObj = (O*) GetObj();
 		union
 		{
 			void* ptr;
-			Fn fn;
-		} func = { GetFn() };
-		return (pObject->*func.fn)(param);
+			Fun fun;
+		} ufun = { GetFun() };
+		return (pObj->*ufun.fun)(param);
     }
 
 private:
-	Fn m_pFn;
+	Fun m_pFun;
 };
 
 template <class O, class T>
-CDelegate<O, T> MakeDelegate(O* pObject, bool (T::* pFn)(void*))
+CDelegate<O, T> MakeDelegate(O* pObj, LRESULT(T::* pFun)(void*))
 {
-    return CDelegate<O, T>(pObject, pFn);
+    return CDelegate<O, T>(pObj, pFun);
 }
 
-inline CDelegateStatic MakeDelegate(bool (*pFn)(void*))
+inline CDelegateStatic MakeDelegate(LRESULT(*pFun)(void*))
 {
-    return CDelegateStatic(pFn);
+    return CDelegateStatic(pFun);
 }
 
 class DUILIB_API CEventSource
 {
-    typedef bool (*FnType)(void*);
+    typedef LRESULT (*FunType)(void*);
 public:
     ~CEventSource();
-    operator bool();
+	operator LRESULT();
     void operator+= (const CDelegateBase& d); // add const for gcc
-    void operator+= (FnType pFn);
+    void operator+= (FunType pFn);
     void operator-= (const CDelegateBase& d);
-    void operator-= (FnType pFn);
-    bool operator() (void* param);
+    void operator-= (FunType pFn);
+    LRESULT operator() (void* param);
 
 protected:
     CDuiPtrArray m_aDelegates;

@@ -14,9 +14,9 @@ namespace DuiLib
 		LPVOID GetInterface(LPCTSTR pstrName);
 		UINT GetControlFlags() const;
 
-		bool Activate();
-		void SetEnabled(bool bEnable = true);
-		void DoEvent(TEventUI& event);
+		BOOL Activate();
+		void SetEnabled(BOOL bEnable = true);
+		LRESULT DoEvent(TEventUI& event);
 
 		LPCTSTR GetNormalImage();
 		void SetNormalImage(LPCTSTR pStrImage);
@@ -49,8 +49,8 @@ namespace DuiLib
 		SIZE EstimateSize(SIZE szAvailable);
 		void SetAttribute(LPCTSTR pstrName, LPCTSTR pstrValue);
 
-		void PaintText(HDC hDC);
-		void PaintStatusImage(HDC hDC);
+		LRESULT PaintText(HDC hDC);
+		LRESULT PaintStatusImage(HDC hDC);
 
 	protected:
 		enum

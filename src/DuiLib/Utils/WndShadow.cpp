@@ -36,7 +36,7 @@
 // walk around the for iterator scope bug of VC++6.0
 #ifdef _MSC_VER
 #if _MSC_VER == 1200
-#define for if(false);else for
+#define for if (false);else for
 #endif
 #endif
 
@@ -86,7 +86,7 @@ CWndShadow::CWndShadow(void)
 
 CWndShadow::~CWndShadow(void)
 {
-	if( ::IsWindow(m_hWnd) ) PostMessage(m_hWnd, WM_CLOSE, (WPARAM)0, 0L);
+	if ( ::IsWindow(m_hWnd) ) PostMessage(m_hWnd, WM_CLOSE, (WPARAM)0, 0L);
 	if (m_pImageInfo)
 	{
 		CRenderEngine::FreeImage(m_pImageInfo);
@@ -94,7 +94,7 @@ CWndShadow::~CWndShadow(void)
 	}
 }
 
-bool CWndShadow::Initialize(HINSTANCE hInstance)
+BOOL CWndShadow::Initialize(HINSTANCE hInstance)
 {
 	// Should not initiate more than once
 	if (NULL != s_UpdateLayeredWindow)
@@ -148,7 +148,7 @@ CWndShadow::operator HWND() const
 void CWndShadow::Create(HWND hParentWnd)
 {
 	// Do nothing if the system does not support layered windows
-	if(NULL == s_UpdateLayeredWindow)
+	if (NULL == s_UpdateLayeredWindow)
 		return;
 
 	// Already initialized
@@ -167,9 +167,9 @@ void CWndShadow::Create(HWND hParentWnd)
 
 	// Determine the initial show state of shadow according to parent window's state
 	LONG lParentStyle = GetWindowLong(hParentWnd, GWL_STYLE);
-	if(!(WS_VISIBLE & lParentStyle))	// Parent invisible
+	if (!(WS_VISIBLE & lParentStyle))	// Parent invisible
 		m_Status = SS_ENABLED;
-	else if((WS_MAXIMIZE | WS_MINIMIZE) & lParentStyle)	// Parent visible but does not need shadow
+	else if ((WS_MAXIMIZE | WS_MINIMIZE) & lParentStyle)	// Parent visible but does not need shadow
 		m_Status = SS_ENABLED | SS_PARENTVISIBLE;
 	else	// Show the shadow
 	{
@@ -190,7 +190,7 @@ void CWndShadow::Create(HWND hParentWnd)
 LRESULT CALLBACK CWndShadow::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
     CWindowWnd* pThis = NULL;
-    if( uMsg == WM_MOUSEACTIVATE ) return MA_NOACTIVATE;
+    if ( uMsg == WM_MOUSEACTIVATE ) return MA_NOACTIVATE;
     return ::DefWindowProc(hWnd, uMsg, wParam, lParam);
 }
 
@@ -202,7 +202,7 @@ LRESULT CALLBACK CWndShadow::ParentProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPA
 	switch(uMsg)
 	{
 	case WM_MOVE:
-		if(pThis->m_Status & SS_VISABLE)
+		if (pThis->m_Status & SS_VISABLE)
 		{
 			RECT WndRect;
 			GetWindowRect(hwnd, &WndRect);
@@ -221,23 +221,23 @@ LRESULT CALLBACK CWndShadow::ParentProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPA
 		break;
 
 	case WM_SIZE:
-		if(pThis->m_Status & SS_ENABLED)
+		if (pThis->m_Status & SS_ENABLED)
 		{
-			if(SIZE_MAXIMIZED == wParam || SIZE_MINIMIZED == wParam)
+			if (SIZE_MAXIMIZED == wParam || SIZE_MINIMIZED == wParam)
 			{
 				::ShowWindow(pThis->m_hWnd, SW_HIDE);
 				pThis->m_Status &= ~SS_VISABLE;
 			}
-			else if(pThis->m_Status & SS_PARENTVISIBLE)	// Parent maybe resized even if invisible
+			else if (pThis->m_Status & SS_PARENTVISIBLE)	// Parent maybe resized even if invisible
 			{
 				// Awful! It seems that if the window size was not decreased
 				// the window region would never be updated until WM_PAINT was sent.
 				// So do not Update() until next WM_PAINT is received in this case
-				if(LOWORD(lParam) > LOWORD(pThis->m_WndSize) || HIWORD(lParam) > HIWORD(pThis->m_WndSize))
+				if (LOWORD(lParam) > LOWORD(pThis->m_WndSize) || HIWORD(lParam) > HIWORD(pThis->m_WndSize))
 					pThis->m_bUpdate = true;
 				else
 					pThis->Update(hwnd);
-				if(!(pThis->m_Status & SS_VISABLE))
+				if (!(pThis->m_Status & SS_VISABLE))
 				{
 					::ShowWindow(pThis->m_hWnd, SW_SHOWNA);
 					pThis->m_Status |= SS_VISABLE;
@@ -249,7 +249,7 @@ LRESULT CALLBACK CWndShadow::ParentProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPA
 
 	case WM_PAINT:
 		{
-			if(pThis->m_bUpdate)
+			if (pThis->m_bUpdate)
 			{
 				pThis->Update(hwnd);
 				pThis->m_bUpdate = false;
@@ -261,21 +261,21 @@ LRESULT CALLBACK CWndShadow::ParentProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPA
 		// In some cases of sizing, the up-right corner of the parent window region would not be properly updated
 		// Update() again when sizing is finished
 	case WM_EXITSIZEMOVE:
-		if(pThis->m_Status & SS_VISABLE)
+		if (pThis->m_Status & SS_VISABLE)
 		{
 			pThis->Update(hwnd);
 		}
 		break;
 
 	case WM_SHOWWINDOW:
-		if(pThis->m_Status & SS_ENABLED)
+		if (pThis->m_Status & SS_ENABLED)
 		{
-			if(!wParam)	// the window is being hidden
+			if (!wParam)	// the window is being hidden
 			{
 				::ShowWindow(pThis->m_hWnd, SW_HIDE);
 				pThis->m_Status &= ~(SS_VISABLE | SS_PARENTVISIBLE);
 			}
-			else if(!(pThis->m_Status & SS_PARENTVISIBLE))
+			else if (!(pThis->m_Status & SS_PARENTVISIBLE))
 			{
 				//pThis->Update(hwnd);
 				pThis->m_bUpdate = true;
@@ -417,7 +417,7 @@ void CWndShadow::MakeShadow(UINT32 *pShadBits, HWND hParent, RECT *rcParent)
 	ptAnchors[0][1] = 0;
 	ptAnchors[nAnchors + 1][0] = szParent.cx;
 	ptAnchors[nAnchors + 1][1] = 0;
-	if(m_nSize > 0)
+	if (m_nSize > 0)
 	{
 		// Put the parent window anchors at the center
 		for(int i = 0; i < m_nSize; i++)
@@ -435,7 +435,7 @@ void CWndShadow::MakeShadow(UINT32 *pShadBits, HWND hParent, RECT *rcParent)
 		int j;
 		for(j = 0; j < szParent.cx; j++)
 		{
-			if(PtInRegion(hParentRgn, j, i))
+			if (PtInRegion(hParentRgn, j, i))
 			{
 				ptAnchors[i + 1][0] = j + m_nSize;
 				ptAnchorsOri[i][0] = j;
@@ -443,7 +443,7 @@ void CWndShadow::MakeShadow(UINT32 *pShadBits, HWND hParent, RECT *rcParent)
 			}
 		}
 
-		if(j >= szParent.cx)	// Start point not found
+		if (j >= szParent.cx)	// Start point not found
 		{
 			ptAnchors[i + 1][0] = szParent.cx;
 			ptAnchorsOri[i][1] = 0;
@@ -455,7 +455,7 @@ void CWndShadow::MakeShadow(UINT32 *pShadBits, HWND hParent, RECT *rcParent)
 			// find end point
 			for(j = szParent.cx - 1; j >= ptAnchors[i + 1][0]; j--)
 			{
-				if(PtInRegion(hParentRgn, j, i))
+				if (PtInRegion(hParentRgn, j, i))
 				{
 					ptAnchors[i + 1][1] = j + 1 + m_nSize;
 					ptAnchorsOri[i][1] = j + 1;
@@ -465,7 +465,7 @@ void CWndShadow::MakeShadow(UINT32 *pShadBits, HWND hParent, RECT *rcParent)
 		}
 	}
 
-	if(m_nSize > 0)
+	if (m_nSize > 0)
 		ptAnchors -= m_nSize;	// Restore pos of ptAnchors for erosion
 	int (*ptAnchorsTmp)[2] = new int[nAnchors + 2][2];	// Store the result of erosion
 	// First and last line should be empty
@@ -505,9 +505,9 @@ void CWndShadow::MakeShadow(UINT32 *pShadBits, HWND hParent, RECT *rcParent)
 		for(int j = 0; j <= 2 * nKernelSize; j++)
 		{
 			double dLength = sqrt((i - nKernelSize) * (i - nKernelSize) + (j - nKernelSize) * (double)(j - nKernelSize));
-			if(dLength < nCenterSize)
+			if (dLength < nCenterSize)
 				*pKernelIter = m_nDarkness << 24 | PreMultiply(m_Color, m_nDarkness);
-			else if(dLength <= nKernelSize)
+			else if (dLength <= nKernelSize)
 			{
 				UINT32 nFactor = ((UINT32)((1 - (dLength - nCenterSize) / (m_nSharpness + 1)) * m_nDarkness));
 				*pKernelIter = nFactor << 24 | PreMultiply(m_Color, nFactor);
@@ -523,7 +523,7 @@ void CWndShadow::MakeShadow(UINT32 *pShadBits, HWND hParent, RECT *rcParent)
 	for(int i = nKernelSize; i < szShadow.cy - nKernelSize; i++)
 	{
 		int j;
-		if(ptAnchors[i][0] < ptAnchors[i][1])
+		if (ptAnchors[i][0] < ptAnchors[i][1])
 		{
 
 			// Start of line
@@ -538,7 +538,7 @@ void CWndShadow::MakeShadow(UINT32 *pShadBits, HWND hParent, RECT *rcParent)
 					UINT32 *pKernelPixel = pKernel + k * (2 * nKernelSize + 1);
 					for(int l = 0; l <= 2 * nKernelSize; l++)
 					{
-						if(*pPixel < *pKernelPixel)
+						if (*pPixel < *pKernelPixel)
 							*pPixel = *pKernelPixel;
 						pPixel++;
 						pKernelPixel++;
@@ -558,7 +558,7 @@ void CWndShadow::MakeShadow(UINT32 *pShadBits, HWND hParent, RECT *rcParent)
 					UINT32 *pKernelPixel = pKernel + k * (2 * nKernelSize + 1);
 					for(int l = 0; l <= 2 * nKernelSize; l++)
 					{
-						if(*pPixel < *pKernelPixel)
+						if (*pPixel < *pKernelPixel)
 							*pPixel = *pKernelPixel;
 						pPixel++;
 						pKernelPixel++;
@@ -576,7 +576,7 @@ void CWndShadow::MakeShadow(UINT32 *pShadBits, HWND hParent, RECT *rcParent)
 		i++)
 	{
 		UINT32 *pLine = pShadBits + (szShadow.cy - i - 1) * szShadow.cx;
-		if(i - m_nSize + m_nyOffset < 0 || i - m_nSize + m_nyOffset >= szParent.cy)	// Line is not covered by parent window
+		if (i - m_nSize + m_nyOffset < 0 || i - m_nSize + m_nyOffset >= szParent.cy)	// Line is not covered by parent window
 		{
 			for(int j = ptAnchors[i][0]; j < ptAnchors[i][1]; j++)
 			{
@@ -608,7 +608,7 @@ void CWndShadow::MakeShadow(UINT32 *pShadBits, HWND hParent, RECT *rcParent)
 	DeleteObject(hParentRgn);
 }
 
-bool CWndShadow::SetImage(LPCTSTR image, RECT rcCorner, RECT rcHoleOffset)
+BOOL CWndShadow::SetImage(LPCTSTR image, RECT rcCorner, RECT rcHoleOffset)
 {
 	TImageInfo* pImageInfo = CRenderEngine::LoadImage(image); 
 	if (pImageInfo == NULL) return false;
@@ -618,61 +618,61 @@ bool CWndShadow::SetImage(LPCTSTR image, RECT rcCorner, RECT rcHoleOffset)
 	m_rcCorner = rcCorner;
 	m_rcHoleOffset = rcHoleOffset;
 
-	if(SS_VISABLE & m_Status)
+	if (SS_VISABLE & m_Status)
 		Update(GetParent(m_hWnd));
 	return true;
 }
 
-bool CWndShadow::SetSize(int NewSize)
+BOOL CWndShadow::SetSize(int NewSize)
 {
-	//if(NewSize > 20 || NewSize < -20)
+	//if (NewSize > 20 || NewSize < -20)
 	//	return false;
 
 	m_nSize = (signed char)NewSize;
-	if(SS_VISABLE & m_Status)
+	if (SS_VISABLE & m_Status)
 		Update(GetParent(m_hWnd));
 	return true;
 }
 
-bool CWndShadow::SetSharpness(unsigned int NewSharpness)
+BOOL CWndShadow::SetSharpness(unsigned int NewSharpness)
 {
-	if(NewSharpness > 20)
+	if (NewSharpness > 20)
 		return false;
 
 	m_nSharpness = (unsigned char)NewSharpness;
-	if(SS_VISABLE & m_Status)
+	if (SS_VISABLE & m_Status)
 		Update(GetParent(m_hWnd));
 	return true;
 }
 
-bool CWndShadow::SetDarkness(unsigned int NewDarkness)
+BOOL CWndShadow::SetDarkness(unsigned int NewDarkness)
 {
-	if(NewDarkness > 255)
+	if (NewDarkness > 255)
 		return false;
 
 	m_nDarkness = (unsigned char)NewDarkness;
-	if(SS_VISABLE & m_Status)
+	if (SS_VISABLE & m_Status)
 		Update(GetParent(m_hWnd));
 	return true;
 }
 
-bool CWndShadow::SetPosition(int NewXOffset, int NewYOffset)
+BOOL CWndShadow::SetPosition(int NewXOffset, int NewYOffset)
 {
-	if(NewXOffset > 20 || NewXOffset < -20 ||
+	if (NewXOffset > 20 || NewXOffset < -20 ||
 		NewYOffset > 20 || NewYOffset < -20)
 		return false;
 	
 	m_nxOffset = (signed char)NewXOffset;
 	m_nyOffset = (signed char)NewYOffset;
-	if(SS_VISABLE & m_Status)
+	if (SS_VISABLE & m_Status)
 		Update(GetParent(m_hWnd));
 	return true;
 }
 
-bool CWndShadow::SetColor(COLORREF NewColor)
+BOOL CWndShadow::SetColor(COLORREF NewColor)
 {
 	m_Color = NewColor;
-	if(SS_VISABLE & m_Status)
+	if (SS_VISABLE & m_Status)
 		Update(GetParent(m_hWnd));
 	return true;
 }
